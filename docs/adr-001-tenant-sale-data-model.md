@@ -1,6 +1,6 @@
 # ADR-001: Tenant, roles, and sale data model
 
-**Status:** Proposed
+**Status:** Accepted
 **Owner:** Berissa
 **Date:** 2026-09-09
 **Area:** Product+POS
