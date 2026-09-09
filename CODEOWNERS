@@ -1,0 +1,30 @@
+# TillFlow — Code Ownership
+
+
+# Product + POS — Berissa
+/services/pos/                      berissamuyizere
+/services/web/                      berissamuyizere
+/evidence/product-pos/              berissamuyizere
+
+# Payments + integrity — Arsema
+/services/payments/                 arsemagebremichael
+/evidence/payments-integrity/       arsemagebremichael
+
+# Platform + delivery — Yordanos
+/infra/                             yordanoshagos
+/.github/workflows/                 yordanoshagos
+/services/_shared/                  yordanoshagos
+/evidence/platform-delivery/        yordanoshagos
+
+# Reliability + operations — Saloi
+/docs/slo-error-budgets.md          akezasaloi
+/docs/runbook.md                    akezasaloi
+/evidence/reliability-operations/   akezasaloi
+
+# Commission worker touches Payments + Product — dual review
+/services/commission/               arsemagebremichael berissamuyizere
+
+# Cross-cutting docs — all four should review
+/docs/ownership.md                  berissamuyizere arsemagebremichael yordanoshagos
+/docs/architecture.md               berissamuyizere arsemagebremichael yordanoshagos
+/README.md                          berissamuyizere arsemagebremichael yordanoshagos
