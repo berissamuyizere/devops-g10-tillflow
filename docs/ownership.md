@@ -5,8 +5,7 @@ implements via their own PRs, links runtime proof in `evidence/`, and
 defends the area live at G5. Every member also cross-reviews one other
 area's PRs.
 
-GitHub usernames for path ownership live in `CODEOWNERS`. Replace the
-placeholder handles there with each person's real account.
+
 
 | Primary area | DRI | Owns and decides | Cross-reviewer |
 |---|---|---|---|
@@ -24,8 +23,8 @@ placeholder handles there with each person's real account.
 
 ## Group facts
 
-- Repo: private, group mono-repo — mentor added as collaborator
-- AWS region: _fill in once Yordanos's ADR is merged_
+- Repo: 
+- AWS region: 
 - Resource name prefix: `devops-g10-`
 - Capstone: TillFlow (POS + M-Pesa on AWS ECS)
 - Due: Mon 21 Sep 2026, 23:59 EAT
