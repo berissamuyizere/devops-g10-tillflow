@@ -1,0 +1,145 @@
+name: PR checks
+
+on:
+  pull_request:
+    branches: [develop, main]
+
+concurrency:
+  group: pr-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  gitleaks:
+    name: Secret scan (gitleaks)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Run gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  iac-scan:
+    name: IaC scan (Trivy config + tfsec)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Trivy config scan
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: config
+          scan-ref: infra/
+          severity: HIGH,CRITICAL
+          exit-code: '1'
+          ignore-unfixed: true
+
+  terraform:
+    name: Terraform fmt + validate + plan
+    runs-on: ubuntu-latest
+    needs: [gitleaks, iac-scan]
+    defaults:
+      run:
+        working-directory: infra
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.9.8
+          terraform_wrapper: false
+
+      - name: terraform fmt
+        run: terraform fmt -check -recursive
+
+      - name: terraform validate (init without backend)
+        run: |
+          terraform init -backend=false
+          terraform validate
+
+      # Plan runs against real state. Requires that infra/bootstrap has been
+      # applied once and the CI OIDC role exists. On first-ever run of a
+      # brand-new account the plan job will fail; that's expected — merge
+      # the bootstrap PR first, then re-run.
+      - name: Configure AWS credentials (OIDC)
+        if: ${{ vars.AWS_CI_ROLE_ARN != '' && vars.TF_STATE_BUCKET != '' }}
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_CI_ROLE_ARN }}
+          aws-region: eu-central-1
+
+      - name: terraform init (remote backend)
+        if: ${{ vars.AWS_CI_ROLE_ARN != '' && vars.TF_STATE_BUCKET != '' }}
+        run: |
+          terraform init \
+            -backend-config="bucket=${{ vars.TF_STATE_BUCKET }}" \
+            -backend-config="dynamodb_table=devops-g10-tflock" \
+            -backend-config="region=eu-central-1" \
+            -backend-config="key=platform/terraform.tfstate"
+
+      - name: terraform plan
+        if: ${{ vars.AWS_CI_ROLE_ARN != '' && vars.TF_STATE_BUCKET != '' }}
+        run: terraform plan -input=false -no-color -out=plan.bin
+
+      - name: Upload plan
+        if: ${{ vars.AWS_CI_ROLE_ARN != '' && vars.TF_STATE_BUCKET != '' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: terraform-plan
+          path: infra/plan.bin
+          retention-days: 14
+
+  services:
+    name: Service lint + test (${{ matrix.service }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        service: [web]
+    defaults:
+      run:
+        working-directory: services/${{ matrix.service }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Detect changes
+        id: changes
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            svc:
+              - 'services/${{ matrix.service }}/**'
+              - '.github/workflows/pr.yml'
+
+      - uses: actions/setup-node@v4
+        if: steps.changes.outputs.svc == 'true'
+        with:
+          node-version: '20.17'
+          cache: 'npm'
+          cache-dependency-path: services/${{ matrix.service }}/package-lock.json
+
+      - name: Install
+        if: steps.changes.outputs.svc == 'true'
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci
+          else
+            npm install
+          fi
+
+      - name: Lint
+        if: steps.changes.outputs.svc == 'true'
+        run: npm run lint --if-present
+
+      - name: Test
+        if: steps.changes.outputs.svc == 'true'
+        run: npm test --if-present
+
+      - name: Docker build (validate)
+        if: steps.changes.outputs.svc == 'true'
+        run: docker build -t local/${{ matrix.service }}:pr .

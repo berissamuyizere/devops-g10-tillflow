@@ -1,0 +1,77 @@
+name: web · build + push image
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'services/web/**'
+      - 'services/_shared/**'
+      - '.github/workflows/web-image.yml'
+  workflow_dispatch: {}
+
+concurrency:
+  group: web-image-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  AWS_REGION: eu-central-1
+  ECR_REPO_NAME: devops-g10/web
+
+jobs:
+  build:
+    name: Build + push
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_CI_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: ECR login
+        id: ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build image (SHA tag)
+        id: build
+        working-directory: services/web
+        run: |
+          IMAGE="${{ steps.ecr.outputs.registry }}/${{ env.ECR_REPO_NAME }}:${GITHUB_SHA}"
+          docker buildx build \
+            --file Dockerfile \
+            --tag "${IMAGE}" \
+            --label "org.opencontainers.image.revision=${GITHUB_SHA}" \
+            --label "org.opencontainers.image.source=https://github.com/${{ github.repository }}" \
+            --load \
+            .
+          echo "image=${IMAGE}" >> "$GITHUB_OUTPUT"
+
+      - name: Trivy image scan (fail on fixable HIGH/CRITICAL)
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: ${{ steps.build.outputs.image }}
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: '1'
+
+      - name: SBOM (syft)
+        uses: anchore/sbom-action@v0
+        with:
+          image: ${{ steps.build.outputs.image }}
+          format: spdx-json
+          output-file: sbom-web.spdx.json
+
+      - name: Upload SBOM
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom-web-${{ github.sha }}
+          path: sbom-web.spdx.json
+
+      - name: Push image
+        run: docker push "${{ steps.build.outputs.image }}"
