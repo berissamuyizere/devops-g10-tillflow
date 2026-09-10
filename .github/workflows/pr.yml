@@ -119,7 +119,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        service: [web]
+        service: [web, pos]
     defaults:
       run:
         working-directory: services/${{ matrix.service }}
@@ -139,10 +139,8 @@ jobs:
         if: steps.changes.outputs.svc == 'true'
         with:
           node-version: '20.17'
-          # No `cache: npm` yet — package-lock.json lands in the first PR
-          # that actually installs deps locally. Once it exists, add:
-          #   cache: 'npm'
-          #   cache-dependency-path: services/${{ matrix.service }}/package-lock.json
+          cache: 'npm'
+          cache-dependency-path: services/${{ matrix.service }}/package-lock.json
 
       - name: Install
         if: steps.changes.outputs.svc == 'true'
@@ -153,12 +151,25 @@ jobs:
             npm install --no-audit --no-fund --no-progress
           fi
 
+      - name: Start Postgres (pos)
+        if: matrix.service == 'pos' && steps.changes.outputs.svc == 'true'
+        run: docker compose up -d --wait
+
+      - name: Migrate (pos)
+        if: matrix.service == 'pos' && steps.changes.outputs.svc == 'true'
+        env:
+          DATABASE_URL: postgres://pos:pos@127.0.0.1:5433/tillflow_pos
+        run: npm run migrate
+
       - name: Lint
         if: steps.changes.outputs.svc == 'true'
         run: npm run lint --if-present
 
       - name: Test
         if: steps.changes.outputs.svc == 'true'
+        env:
+          DATABASE_URL: postgres://pos:pos@127.0.0.1:5433/tillflow_pos
+          PAYMENTS_SERVICE_TOKEN: dev-payments-token
         run: npm test --if-present
 
       - name: Docker build (validate)
