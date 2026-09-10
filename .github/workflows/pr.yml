@@ -119,7 +119,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        service: [web, pos]
+        service: [web, pos, payments]
     defaults:
       run:
         working-directory: services/${{ matrix.service }}
@@ -134,16 +134,28 @@ jobs:
             svc:
               - 'services/${{ matrix.service }}/**'
               - '.github/workflows/pr.yml'
+            shared:
+              - 'services/_shared/**'
+
+      - name: Decide whether this service runs
+        id: run
+        run: |
+          if [ "${{ steps.changes.outputs.svc }}" = "true" ] || \
+             { [ "${{ matrix.service }}" = "payments" ] && [ "${{ steps.changes.outputs.shared }}" = "true" ]; }; then
+            echo "go=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "go=false" >> "$GITHUB_OUTPUT"
+          fi
 
       - uses: actions/setup-node@v4
-        if: steps.changes.outputs.svc == 'true'
+        if: steps.run.outputs.go == 'true'
         with:
           node-version: '20.17'
           cache: 'npm'
           cache-dependency-path: services/${{ matrix.service }}/package-lock.json
 
       - name: Install
-        if: steps.changes.outputs.svc == 'true'
+        if: steps.run.outputs.go == 'true'
         run: |
           if [ -f package-lock.json ]; then
             npm ci --no-audit --no-fund --no-progress
@@ -152,26 +164,45 @@ jobs:
           fi
 
       - name: Start Postgres (pos)
-        if: matrix.service == 'pos' && steps.changes.outputs.svc == 'true'
+        if: matrix.service == 'pos' && steps.run.outputs.go == 'true'
         run: docker compose up -d --wait
 
       - name: Migrate (pos)
-        if: matrix.service == 'pos' && steps.changes.outputs.svc == 'true'
+        if: matrix.service == 'pos' && steps.run.outputs.go == 'true'
         env:
           DATABASE_URL: postgres://pos:pos@127.0.0.1:5433/tillflow_pos
         run: npm run migrate
 
+      - name: Start Postgres (payments)
+        if: matrix.service == 'payments' && steps.run.outputs.go == 'true'
+        run: docker compose up -d --wait
+
+      - name: Migrate (payments)
+        if: matrix.service == 'payments' && steps.run.outputs.go == 'true'
+        env:
+          DATABASE_URL: postgres://payments:payments@127.0.0.1:5434/tillflow_payments
+        run: npm run migrate
+
       - name: Lint
-        if: steps.changes.outputs.svc == 'true'
+        if: steps.run.outputs.go == 'true'
         run: npm run lint --if-present
 
       - name: Test
-        if: steps.changes.outputs.svc == 'true'
+        if: steps.run.outputs.go == 'true'
         env:
-          DATABASE_URL: postgres://pos:pos@127.0.0.1:5433/tillflow_pos
+          DATABASE_URL: ${{ matrix.service == 'payments'
+            && 'postgres://payments:payments@127.0.0.1:5434/tillflow_payments'
+            || 'postgres://pos:pos@127.0.0.1:5433/tillflow_pos' }}
           PAYMENTS_SERVICE_TOKEN: dev-payments-token
+          MPESA_MODE: fake
         run: npm test --if-present
 
       - name: Docker build (validate)
-        if: steps.changes.outputs.svc == 'true'
-        run: docker build -t local/${{ matrix.service }}:pr .
+        if: steps.run.outputs.go == 'true'
+        run: |
+          if [ "${{ matrix.service }}" = "payments" ]; then
+            docker build -f "${GITHUB_WORKSPACE}/services/payments/Dockerfile" \
+              -t local/payments:pr "${GITHUB_WORKSPACE}"
+          else
+            docker build -t local/${{ matrix.service }}:pr .
+          fi
