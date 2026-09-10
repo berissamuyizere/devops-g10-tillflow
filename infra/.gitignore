@@ -1,0 +1,15 @@
+# Terraform working directories — never commit.
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfstate.backup
+crash.log
+crash.*.log
+
+# Plan / apply artifacts.
+plan.bin
+*.tfplan
+*.tfvars
+!*.auto.tfvars.example
+
+# Do commit .terraform.lock.hcl (provider version pinning).

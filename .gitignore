@@ -1,0 +1,26 @@
+# Node / npm / service builds — never commit deps or logs.
+node_modules/
+npm-debug.log
+yarn-error.log
+.pnp.*
+
+# Coverage + test output.
+coverage/
+.nyc_output/
+
+# Env files — real secrets never in Git; sandbox creds live in Secrets Manager.
+.env
+.env.*
+!.env.example
+
+# OS / editor cruft.
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Runtime scratch.
+tmp/
+*.log
