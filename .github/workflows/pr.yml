@@ -26,18 +26,30 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   iac-scan:
-    name: IaC scan (Trivy config + tfsec)
+    name: IaC scan (Trivy config)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Trivy config scan
-        uses: aquasecurity/trivy-action@0.28.0
-        with:
-          scan-type: config
-          scan-ref: infra/
-          severity: HIGH,CRITICAL
-          exit-code: '1'
-          ignore-unfixed: true
+
+      # Install Trivy directly instead of using aquasecurity/trivy-action;
+      # the action's tag scheme has been unreliable (0.28.0 was reported
+      # missing at runtime). Pinning the binary version is deterministic.
+      - name: Install Trivy
+        env:
+          TRIVY_VERSION: v0.56.2
+        run: |
+          set -euo pipefail
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh \
+            | sudo sh -s -- -b /usr/local/bin "${TRIVY_VERSION}"
+          trivy --version
+
+      - name: Trivy config scan (infra/)
+        run: |
+          trivy config infra/ \
+            --severity HIGH,CRITICAL \
+            --ignore-unfixed \
+            --exit-code 1 \
+            --no-progress
 
   terraform:
     name: Terraform fmt + validate + plan
@@ -120,16 +132,18 @@ jobs:
         if: steps.changes.outputs.svc == 'true'
         with:
           node-version: '20.17'
-          cache: 'npm'
-          cache-dependency-path: services/${{ matrix.service }}/package-lock.json
+          # No `cache: npm` yet — package-lock.json lands in the first PR
+          # that actually installs deps locally. Once it exists, add:
+          #   cache: 'npm'
+          #   cache-dependency-path: services/${{ matrix.service }}/package-lock.json
 
       - name: Install
         if: steps.changes.outputs.svc == 'true'
         run: |
           if [ -f package-lock.json ]; then
-            npm ci
+            npm ci --no-audit --no-fund --no-progress
           else
-            npm install
+            npm install --no-audit --no-fund --no-progress
           fi
 
       - name: Lint

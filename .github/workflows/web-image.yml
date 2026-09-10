@@ -52,13 +52,22 @@ jobs:
             .
           echo "image=${IMAGE}" >> "$GITHUB_OUTPUT"
 
+      - name: Install Trivy
+        env:
+          TRIVY_VERSION: v0.56.2
+        run: |
+          set -euo pipefail
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh \
+            | sudo sh -s -- -b /usr/local/bin "${TRIVY_VERSION}"
+          trivy --version
+
       - name: Trivy image scan (fail on fixable HIGH/CRITICAL)
-        uses: aquasecurity/trivy-action@0.28.0
-        with:
-          image-ref: ${{ steps.build.outputs.image }}
-          severity: HIGH,CRITICAL
-          ignore-unfixed: true
-          exit-code: '1'
+        run: |
+          trivy image "${{ steps.build.outputs.image }}" \
+            --severity HIGH,CRITICAL \
+            --ignore-unfixed \
+            --exit-code 1 \
+            --no-progress
 
       - name: SBOM (syft)
         uses: anchore/sbom-action@v0
