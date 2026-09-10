@@ -54,13 +54,16 @@ jobs:
 
       - name: Install Trivy
         env:
-          TRIVY_VERSION: v0.56.2
+          TRIVY_VERSION: '0.56.2'
         run: |
           set -euo pipefail
-          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh \
-            | sudo sh -s -- -b /usr/local/bin "${TRIVY_VERSION}"
+          curl -fsSL \
+            "https://github.com/aquasecurity/trivy/releases/download/v${TRIVY_VERSION}/trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz" \
+            | sudo tar -xz -C /usr/local/bin trivy
           trivy --version
 
+      # `--ignore-unfixed` is valid for `trivy image` (skips CVEs with no
+      # available patch); `--no-progress` also fine here.
       - name: Trivy image scan (fail on fixable HIGH/CRITICAL)
         run: |
           trivy image "${{ steps.build.outputs.image }}" \

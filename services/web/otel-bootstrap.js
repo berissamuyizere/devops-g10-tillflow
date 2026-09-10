@@ -43,7 +43,6 @@ try {
   sdk.start();
 } catch (err) {
   // Do not crash on OTel init failure.
-  // eslint-disable-next-line no-console
   console.error(
     JSON.stringify({
       level: 'error',

@@ -26,11 +26,13 @@ resource "aws_vpc_security_group_ingress_rule" "alb_from_vpc" {
   ip_protocol       = "tcp"
 }
 
-resource "aws_vpc_security_group_egress_rule" "alb_all" {
-  security_group_id = aws_security_group.alb.id
-  description       = "ALB can reach ECS task SG on the app port."
-  cidr_ipv4         = "0.0.0.0/0"
-  ip_protocol       = "-1"
+resource "aws_vpc_security_group_egress_rule" "alb_to_ecs" {
+  security_group_id            = aws_security_group.alb.id
+  description                  = "ALB → ECS task app port only."
+  referenced_security_group_id = aws_security_group.ecs_tasks.id
+  from_port                    = 8080
+  to_port                      = 8080
+  ip_protocol                  = "tcp"
 }
 
 # ---------------------------------------------------------------------

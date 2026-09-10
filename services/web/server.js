@@ -37,7 +37,7 @@ app.use(express.json({ limit: '32kb' }));
 app.use(
   pinoHttp({
     logger,
-    customProps: (req) => {
+    customProps: (_req) => {
       const span = otel.trace.getActiveSpan();
       const ctx = span ? span.spanContext() : null;
       return ctx
@@ -85,7 +85,8 @@ app.get('/version', (_req, res) => {
 
 // Placeholder for the sale-create flow — Berissa wires the real POS proxy
 // at G2. Returns 501 today so nobody accidentally treats web as POS.
-app.post('/sales', (_req, res) => {
+app.post('/sales', (req, res) => {
+  req.log.debug('sales_placeholder_hit');
   res
     .status(501)
     .json({ error: 'not implemented', hint: 'POS API lands at G2' });
@@ -99,7 +100,8 @@ app.get('/', (_req, res) => {
 });
 
 // Explicit error handler so all failures produce JSON, not HTML.
-// eslint-disable-next-line no-unused-vars
+// 4-arg signature is required by Express to detect it as an error handler,
+// even though `_next` is unused.
 app.use((err, req, res, _next) => {
   req.log.error({ err }, 'unhandled_error');
   res.status(500).json({ error: 'internal_error' });

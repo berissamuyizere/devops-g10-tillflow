@@ -31,25 +31,31 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Install Trivy directly instead of using aquasecurity/trivy-action;
-      # the action's tag scheme has been unreliable (0.28.0 was reported
-      # missing at runtime). Pinning the binary version is deterministic.
+      # Install Trivy from the official GitHub release tarball. The
+      # `install.sh` script has been flaky on `sudo sh -s --` piping and
+      # the aquasecurity/trivy-action tag scheme is unreliable, so we
+      # download the binary directly for a fully-pinned install.
       - name: Install Trivy
         env:
-          TRIVY_VERSION: v0.56.2
+          TRIVY_VERSION: '0.56.2'
         run: |
           set -euo pipefail
-          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh \
-            | sudo sh -s -- -b /usr/local/bin "${TRIVY_VERSION}"
+          curl -fsSL \
+            "https://github.com/aquasecurity/trivy/releases/download/v${TRIVY_VERSION}/trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz" \
+            | sudo tar -xz -C /usr/local/bin trivy
           trivy --version
 
+      # Note: `trivy config` does NOT accept `--ignore-unfixed` or
+      # `--no-progress` — those are `trivy image` flags. Config findings
+      # are always "fixable" (change your IaC); acceptance goes in
+      # .trivyignore with a justification, owner, and expiry date.
       - name: Trivy config scan (infra/)
         run: |
           trivy config infra/ \
             --severity HIGH,CRITICAL \
-            --ignore-unfixed \
             --exit-code 1 \
-            --no-progress
+            --ignorefile .trivyignore \
+            --tf-exclude-downloaded-modules
 
   terraform:
     name: Terraform fmt + validate + plan
