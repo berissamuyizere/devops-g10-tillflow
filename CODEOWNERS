@@ -13,6 +13,7 @@
 /evidence/payments-integrity/               @arsemagebremichael
 /docs/adrs/ADR-002-idempotency-and-replay-safety.md  @arsemagebremichael
 /docs/threat-model.md                       @arsemagebremichael
+/docs/contracts/commission-payments-b2c.md  @arsemagebremichael @berissamuyizere
 
 # Platform + delivery — Yordanos
 /infra/                                     @yordanoshagos
@@ -30,6 +31,7 @@
 
 # Commission worker touches Payments + Product — dual review
 /services/commission/                       @arsemagebremichael @berissamuyizere
+/services/_shared/mpesa/                    @arsemagebremichael @yordanoshagos
 
 # Cross-cutting docs — all four should review
 /docs/ownership.md                          @berissamuyizere @arsemagebremichael @yordanoshagos @akezasaloi

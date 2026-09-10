@@ -1,0 +1,16 @@
+.git
+.github
+node_modules
+**/node_modules
+**/npm-debug.log
+**/.env
+**/.env.*
+**/coverage
+**/test
+**/*.md
+**/docker-compose.yml
+**/Dockerfile
+**/.dockerignore
+infra
+evidence
+docs

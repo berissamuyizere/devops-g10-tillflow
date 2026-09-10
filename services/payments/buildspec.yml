@@ -1,0 +1,51 @@
+version: 0.2
+
+env:
+  variables:
+    IMAGE_TAG_STRATEGY: "sha"
+    MPESA_MODE: "fake"
+
+phases:
+  install:
+    runtime-versions:
+      docker: latest
+    commands:
+      - echo "install phase"
+      - apt-get update && apt-get install -y --no-install-recommends jq
+
+  pre_build:
+    commands:
+      - echo "pre_build phase"
+      - COMMIT_SHA=${CODEBUILD_RESOLVED_SOURCE_VERSION:-$(git rev-parse HEAD)}
+      - export COMMIT_SHA
+      - echo "commit sha ${COMMIT_SHA}"
+      - aws ecr get-login-password --region "${AWS_REGION}" | docker login --username AWS --password-stdin "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+
+  build:
+    commands:
+      - echo "build phase"
+      - cd $CODEBUILD_SRC_DIR
+      - >
+        docker buildx build
+        --file services/payments/Dockerfile
+        --tag "${ECR_REPO}:${COMMIT_SHA}"
+        --label "org.opencontainers.image.revision=${COMMIT_SHA}"
+        --label "org.opencontainers.image.source=https://github.com/berissamuyizere/devops-g10-tillflow"
+        --load
+        .
+
+  post_build:
+    commands:
+      - echo "post_build phase"
+      - docker push "${ECR_REPO}:${COMMIT_SHA}"
+      - IMAGE_DIGEST=$(aws ecr describe-images --repository-name "${ECR_REPO##*/}" --image-ids imageTag="${COMMIT_SHA}" --region "${AWS_REGION}" --query 'imageDetails[0].imageDigest' --output text)
+      - IMAGE_URI="${ECR_REPO}@${IMAGE_DIGEST}"
+      - echo "resolved image ${IMAGE_URI}"
+      - cd $CODEBUILD_SRC_DIR
+      - printf '[{"name":"%s","imageUri":"%s"}]' "${CONTAINER_NAME}" "${IMAGE_URI}" > imagedefinitions.json
+      - cat imagedefinitions.json
+
+artifacts:
+  files:
+    - imagedefinitions.json
+  discard-paths: yes
