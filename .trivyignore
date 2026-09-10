@@ -1,0 +1,43 @@
+# Trivy config-scan ignore list — accepted risks with owners and expiry.
+#
+# Rule: every entry MUST have a justification, an owner, and a date after
+# which someone re-reviews it. If the justification is "not sure", fix the
+# finding instead of adding it here. This file is read by both the PR IaC
+# scan (`.github/workflows/pr.yml`) and any local `trivy config` run
+# (`trivy config infra/ --ignorefile .trivyignore`).
+#
+# Format: one Trivy check ID per line. `#` starts a comment. Optional inline
+# `exp:YYYY-MM-DD` is honoured by Trivy 0.51+.
+
+# --------------------------------------------------------------------
+# AVD-AWS-0054 — ALB listener uses HTTP.
+# The ALB is *internal*, reachable only from the API Gateway VPC Link.
+# TLS terminates at API Gateway (HTTPS), so plaintext inside the VPC is
+# the standard AWS pattern. Owner: yordanos. Re-review: 2026-12-01.
+AVD-AWS-0054 exp:2026-12-01
+
+# --------------------------------------------------------------------
+# AVD-AWS-0132 — S3 buckets not encrypted with a customer-managed KMS key.
+# ADR-003 documents this: capstone stays on the AWS-managed S3 key (AES256).
+# Moving to a customer-managed KMS key is the first hardening step listed
+# in that ADR. Owner: yordanos. Re-review: 2026-12-01.
+AVD-AWS-0132 exp:2026-12-01
+
+# --------------------------------------------------------------------
+# AVD-AWS-0345 — IAM policy allows `s3:*`.
+# The CI deploy role (`devops-g10-ci-deploy`) needs to manage every S3
+# bucket Terraform creates. Scope is limited by an `aws:RequestedRegion`
+# condition to eu-central-1 (see infra/iam.tf, "WriteNamespacedResources"
+# statement). ADR-004 records this decision. Owner: yordanos.
+# Re-review: 2026-12-01.
+AVD-AWS-0345 exp:2026-12-01
+
+# --------------------------------------------------------------------
+# AVD-AWS-0104 — Security group rule allows unrestricted egress.
+# The ECS task SG needs egress to (a) the Daraja sandbox (public IP over
+# TLS), (b) AWS APIs via NAT for anything not covered by the interface VPC
+# endpoints. This is the standard Fargate task egress pattern. RDS, cache,
+# and VPC endpoint SGs restrict *ingress* to this SG, so a compromised
+# task can only reach services we've explicitly allowed. Owner: yordanos.
+# Re-review: 2026-12-01.
+AVD-AWS-0104 exp:2026-12-01

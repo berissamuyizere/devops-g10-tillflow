@@ -1,30 +1,36 @@
 # TillFlow — Code Ownership
+# Every primary area has exactly one owner. Handles must stay valid collaborators.
 
 # Product + POS — Berissa
-/services/pos/                      @berissamuyizere
-/services/web/                      @berissamuyizere
-/evidence/product-pos/              @berissamuyizere
-/docs/adr-001-tenant-sale-data-model.md  @berissamuyizere
+/services/pos/                              @berissamuyizere
+/services/web/                              @berissamuyizere
+/evidence/product-pos/                      @berissamuyizere
+/docs/adr-001-tenant-sale-data-model.md     @berissamuyizere
+/docs/contracts/pos-payments-api.md         @berissamuyizere @arsemagebremichael
 
 # Payments + integrity — Arsema
-/services/payments/                 @arsemagebremichael
-/evidence/payments-integrity/       @arsemagebremichael
+/services/payments/                         @arsemagebremichael
+/evidence/payments-integrity/               @arsemagebremichael
+/docs/adrs/ADR-002-idempotency-and-replay-safety.md  @arsemagebremichael
+/docs/threat-model.md                       @arsemagebremichael
 
 # Platform + delivery — Yordanos
-/infra/                             @yordanoshagos
-/.github/workflows/                 @yordanoshagos
-/services/_shared/                  @yordanoshagos
-/evidence/platform-delivery/        @yordanoshagos
+/infra/                                     @yordanoshagos
+/.github/workflows/                         @yordanoshagos
+/services/_shared/                          @yordanoshagos
+/evidence/platform-delivery/                @yordanoshagos
+/docs/adrs/ADR-001-region-and-naming.md     @yordanoshagos
+/docs/naming.md                             @yordanoshagos
+/docs/architecture.md                       @yordanoshagos
 
 # Reliability + operations — Saloi
-/docs/slo-error-budgets.md          @akezasaloi
-/docs/runbook.md                    @akezasaloi
-/evidence/reliability-operations/   @akezasaloi
+/docs/slo-error-budgets.md                  @akezasaloi
+/docs/runbook.md                            @akezasaloi
+/evidence/reliability-operations/           @akezasaloi
 
 # Commission worker touches Payments + Product — dual review
-/services/commission/               @arsemagebremichael @berissamuyizere
+/services/commission/                       @arsemagebremichael @berissamuyizere
 
 # Cross-cutting docs — all four should review
-/docs/ownership.md                  @berissamuyizere @arsemagebremichael @yordanoshagos @akezasaloi
-/docs/architecture.md               @berissamuyizere @arsemagebremichael @yordanoshagos @akezasaloi
-/README.md                          @berissamuyizere @arsemagebremichael @yordanoshagos @akezasaloi
+/docs/ownership.md                          @berissamuyizere @arsemagebremichael @yordanoshagos @akezasaloi
+/README.md                                  @berissamuyizere @arsemagebremichael @yordanoshagos @akezasaloi

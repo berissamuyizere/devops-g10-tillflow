@@ -1,0 +1,40 @@
+# Golden path base image for TillFlow services.
+#
+# Downstream services should:
+#   FROM devops-g10/base:<sha>  (built by CI from this file)
+#   COPY package.json package-lock.json ./
+#   RUN npm ci --omit=dev
+#   COPY . .
+#   USER app
+#   CMD ["node", "--require", "/opt/tillflow/otel-bootstrap.js", "server.js"]
+#
+# For G1 the `web` service inlines the base into its own Dockerfile to keep
+# the build pipeline simple (one image per service). Once we have a shared
+# base ECR repo (planned G2), downstream services will FROM this base.
+
+FROM node:20.17-alpine3.20
+
+# Non-root user; UID matches ECS task definition.
+RUN addgroup -g 10001 app && \
+    adduser  -D -H -u 10001 -G app -s /sbin/nologin app
+
+# Common OS tools we depend on: wget for HEALTHCHECK, dumb-init for signal
+# handling, tzdata for Africa/Nairobi timestamps.
+RUN apk add --no-cache dumb-init wget tzdata ca-certificates && \
+    ln -sf /usr/share/zoneinfo/Africa/Nairobi /etc/localtime
+
+# Landing dir for the shared bootstrap files.
+RUN mkdir -p /opt/tillflow && chown app:app /opt/tillflow
+COPY --chown=app:app otel-bootstrap.js /opt/tillflow/otel-bootstrap.js
+
+WORKDIR /app
+ENV NODE_ENV=production \
+    NPM_CONFIG_UPDATE_NOTIFIER=false
+
+# Standard health probe. Individual services override with their own /health
+# handler; base image asserts the endpoint contract.
+HEALTHCHECK --interval=10s --timeout=3s --start-period=20s --retries=3 \
+  CMD wget -qO- http://127.0.0.1:${PORT:-8080}/health || exit 1
+
+ENTRYPOINT ["dumb-init", "--"]
+CMD ["node", "server.js"]
