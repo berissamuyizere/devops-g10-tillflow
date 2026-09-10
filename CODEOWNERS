@@ -6,6 +6,7 @@
 /services/web/                              @berissamuyizere
 /evidence/product-pos/                      @berissamuyizere
 /docs/adr-001-tenant-sale-data-model.md     @berissamuyizere
+/docs/contracts/pos-payments-api.md         @berissamuyizere @arsemagebremichael
 
 # Payments + integrity — Arsema
 /services/payments/                         @arsemagebremichael
