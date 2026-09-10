@@ -31,31 +31,32 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Install Trivy from the official GitHub release tarball. The
-      # `install.sh` script has been flaky on `sudo sh -s --` piping and
-      # the aquasecurity/trivy-action tag scheme is unreliable, so we
-      # download the binary directly for a fully-pinned install.
-      - name: Install Trivy
-        env:
-          TRIVY_VERSION: '0.56.2'
-        run: |
-          set -euo pipefail
-          curl -fsSL \
-            "https://github.com/aquasecurity/trivy/releases/download/v${TRIVY_VERSION}/trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz" \
-            | sudo tar -xz -C /usr/local/bin trivy
-          trivy --version
-
-      # Note: `trivy config` does NOT accept `--ignore-unfixed` or
+      # Run Trivy from its official Docker image. This avoids the
+      # aquasecurity/trivy-action tag churn and the release-tarball
+      # naming inconsistencies (`Linux-64bit.tar.gz` vs
+      # `linux-amd64.tar.gz` vs `linux-64bit.tar.gz` — different
+      # versions ship different names, and the CI failure log shows a
+      # 404 either way). The container ships everything Trivy needs
+      # and is pinned by tag.
+      #
+      # `trivy config` does NOT accept `--ignore-unfixed` or
       # `--no-progress` — those are `trivy image` flags. Config findings
       # are always "fixable" (change your IaC); acceptance goes in
       # .trivyignore with a justification, owner, and expiry date.
       - name: Trivy config scan (infra/)
+        env:
+          TRIVY_VERSION: '0.56.2'
         run: |
-          trivy config infra/ \
-            --severity HIGH,CRITICAL \
-            --exit-code 1 \
-            --ignorefile .trivyignore \
-            --tf-exclude-downloaded-modules
+          set -euo pipefail
+          docker run --rm \
+            -v "${GITHUB_WORKSPACE}:/scan" \
+            -w /scan \
+            "aquasec/trivy:${TRIVY_VERSION}" \
+            config infra/ \
+              --severity HIGH,CRITICAL \
+              --exit-code 1 \
+              --ignorefile .trivyignore \
+              --tf-exclude-downloaded-modules
 
   terraform:
     name: Terraform fmt + validate + plan

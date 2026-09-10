@@ -52,25 +52,25 @@ jobs:
             .
           echo "image=${IMAGE}" >> "$GITHUB_OUTPUT"
 
-      - name: Install Trivy
+      # Trivy runs inside its official image; the docker socket is
+      # mounted so it can inspect the image we just built + loaded
+      # into the runner's local daemon. `--ignore-unfixed` and
+      # `--no-progress` are valid for `trivy image` (unlike
+      # `trivy config` — see pr.yml).
+      - name: Trivy image scan (fail on fixable HIGH/CRITICAL)
         env:
           TRIVY_VERSION: '0.56.2'
         run: |
           set -euo pipefail
-          curl -fsSL \
-            "https://github.com/aquasecurity/trivy/releases/download/v${TRIVY_VERSION}/trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz" \
-            | sudo tar -xz -C /usr/local/bin trivy
-          trivy --version
-
-      # `--ignore-unfixed` is valid for `trivy image` (skips CVEs with no
-      # available patch); `--no-progress` also fine here.
-      - name: Trivy image scan (fail on fixable HIGH/CRITICAL)
-        run: |
-          trivy image "${{ steps.build.outputs.image }}" \
-            --severity HIGH,CRITICAL \
-            --ignore-unfixed \
-            --exit-code 1 \
-            --no-progress
+          docker run --rm \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            "aquasec/trivy:${TRIVY_VERSION}" \
+            image \
+              --severity HIGH,CRITICAL \
+              --ignore-unfixed \
+              --exit-code 1 \
+              --no-progress \
+              "${{ steps.build.outputs.image }}"
 
       - name: SBOM (syft)
         uses: anchore/sbom-action@v0
