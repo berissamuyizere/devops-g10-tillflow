@@ -135,6 +135,23 @@ data "aws_iam_policy_document" "ci_deploy" {
     resources = ["*"]
   }
 
+  # State lock lives in bootstrap (not this stack). Plan and apply both
+  # PutItem/GetItem/DeleteItem on devops-g10-tflock. Without this, OIDC
+  # succeeds and terraform plan fails with AccessDenied on DynamoDB.
+  statement {
+    sid    = "TerraformStateLock"
+    effect = "Allow"
+    actions = [
+      "dynamodb:DescribeTable",
+      "dynamodb:GetItem",
+      "dynamodb:PutItem",
+      "dynamodb:DeleteItem",
+    ]
+    resources = [
+      "arn:${data.aws_partition.current.partition}:dynamodb:${var.region}:${data.aws_caller_identity.current.account_id}:table/${var.name_prefix}-tflock",
+    ]
+  }
+
   # Namespaced write on the resources Terraform manages.
   statement {
     sid    = "WriteNamespacedResources"
