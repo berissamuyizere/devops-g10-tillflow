@@ -144,8 +144,8 @@ data "aws_iam_policy_document" "ci_deploy" {
   # IAM is global, so PassRole does not satisfy aws:RequestedRegion on
   # the write statement above. Needed to register ECS task defs from CI.
   statement {
-    sid    = "PassTaskRolesToECS"
-    effect = "Allow"
+    sid     = "PassTaskRolesToECS"
+    effect  = "Allow"
     actions = ["iam:PassRole"]
     resources = [
       "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/${var.name_prefix}-*-task",
