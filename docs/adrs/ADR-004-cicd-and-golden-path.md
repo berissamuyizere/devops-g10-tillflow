@@ -19,32 +19,28 @@ runs end-to-end for at least one service.
 
 ### Delivery lanes
 
-- **GitHub Actions — PR + Terraform.**
+- **GitHub Actions — PR + Terraform + image deploy (primary).**
   - `pr.yml` on every PR: `terraform fmt -check`, `terraform validate`,
-    `tflint`, `trivy config` (IaC scan), `gitleaks` (secret scan), plus
-    per-service lint/test wherever a service exists.
-  - `terraform-plan.yml` on PR touching `infra/**`: `terraform plan`
-    against `develop`, plan artifact uploaded to the PR.
-  - `terraform-apply.yml` on push to `main`: `terraform apply` via
-    GitHub OIDC into the `devops-g10-ci-deploy` role. Protected
-    environment `production` with required reviewer.
-- **AWS CodePipeline — ECR → ECS.**
-  - Source: CodeStar Connections (GitHub App) to this repo, branch
-    `main`. Path filters via CodeBuild's `git-filter-changed`
-    behaviour so a `services/payments/**` commit only rebuilds
-    payments.
-  - Build: CodeBuild builds the image with the commit SHA as the tag,
-    pushes to ECR, generates an SBOM (syft), scans with Trivy image,
-    fails on fixable HIGH/CRITICAL.
-  - Deploy: ECS rolling deploy of the immutable digest (never a
-    floating tag). Post-deploy smoke hits `/health` on the ALB.
-  - Rollback: CodeDeploy is out of scope for the capstone; rollback
-    is `aws ecs update-service --task-definition <previous>` triggered
-    manually from the runbook when smoke fails.
-
-One CodePipeline, one stage per service — this ADR provisions the
-`web` pipeline; POS/Payments/Commission plug in behind the same
-scaffolding at G2.
+    `trivy config` (IaC scan), `gitleaks` (secret scan), plus
+    per-service lint/test wherever a service exists. When repo
+    variables are set, the same job also runs `terraform plan`
+    against live state and uploads `plan.bin`.
+  - `release.yml` on push to `main` (and `workflow_dispatch`):
+    path-filtered `terraform apply` via GitHub OIDC into
+    `devops-g10-ci-deploy`, then (if `services/web` or `_shared`
+    changed) SHA-tagged `linux/arm64` image build, Trivy, SBOM,
+    ECR push, ECS rolling update by digest, smoke of `/health` and
+    `/version` through API Gateway. The PR is the review gate; there
+    is no second required-reviewer Environment after merge.
+- **AWS CodePipeline — optional ECR → ECS.**
+  - Still provisioned in `pipeline.tf` when `codeconnections_arn` is
+    set. Terraform cannot complete the GitHub App handshake, so
+    CodePipeline is not the default G1 path. GitHub Actions owns
+    apply + the first `web` deploy. POS/Payments/Commission plug
+    into the same Actions matrix at G2.
+  - Rollback: CodeDeploy is out of scope; rollback is
+    `aws ecs update-service --task-definition <previous>` from the
+    runbook when smoke fails.
 
 ### Golden path (shared)
 
@@ -80,12 +76,12 @@ Closes the threat-model residual on API Gateway rate limits.
 
 - **API Gateway HTTP API** in front of the ALB via VPC Link. Public
   DNS name is what the demo uses at G5.
-- **AWS WAFv2** attached to API Gateway with the AWS-managed
-  `CommonRuleSet` + `KnownBadInputs`, and a rate-based rule of
-  **200 requests / 5 minutes per source IP** across all routes. This
-  is intentionally tight for a capstone demo — it protects k6 from
-  accidentally becoming the DoS, and Daraja callbacks come from a
-  small set of IPs.
+- **AWS WAFv2** attached to the **internal ALB** (same request path
+  as API Gateway → VPC Link → ALB). HTTP API `$default` stage ARNs
+  are rejected by `AssociateWebACL`. Managed rules:
+  `CommonRuleSet` + `KnownBadInputs`, plus a rate-based rule of
+  **200 requests / 5 minutes per source IP**. Daraja callbacks are
+  exempted by path. k6 should hit the ALB (or accept WAF limits).
 - **Access logs** to `devops-g10-logs` in the standard
   `$context.*` JSON shape, plus `x-amzn-trace-id` propagated to
   downstream services.
@@ -122,12 +118,19 @@ Closes the threat-model residual on API Gateway rate limits.
 - **Distroless base images.** Would be stricter, but debugging in a
   capstone timeframe is easier on Alpine with a shell. Documented as
   next hardening step.
+- **CodePipeline as the only deploy path.** Blocked on a one-time
+  GitHub App connection Terraform cannot create. GitHub Actions +
+  OIDC already has the CI role, so apply + `web` deploy run there.
+- **GitHub Environment `production` required reviewer on apply.**
+  Re-introduces a click after merge. The PR (with live `terraform
+  plan`) is the gate.
 
 ## Consequences
 
-- Only the CI deploy role can `terraform apply` in the account.
-  Console clicks earn no evidence credit — this ADR is the enforcement
-  hook.
+- Only the CI deploy role can `terraform apply` in the account after
+  the one-time local bootstrap + first apply. Day-2 applies and image
+  deploys are merge-to-main only. Console clicks earn no evidence
+  credit — this ADR is the enforcement hook.
 - Every image is traceable back to a commit and a digest visible in
   ECS. The Grafana dashboard shows both.
 - WAF rate limits will bite k6 unless k6 runs against the ALB
@@ -141,9 +144,7 @@ Closes the threat-model residual on API Gateway rate limits.
   `infra/api_gateway.tf`, `infra/ecr.tf` — resources described above.
 - `services/_shared/Dockerfile.base`, `services/web/Dockerfile`,
   `services/web/server.js` — the golden path applied to `web`.
-- `.github/workflows/pr.yml`, `terraform-plan.yml`,
-  `terraform-apply.yml`, `web-image.yml` — the CI half.
-- G1 evidence: `terraform apply` output, first CodePipeline run
-  transcript with commit SHA, ECS task ARN with `web` app + ADOT
-  sidecar both `RUNNING`, and a `curl` of `/health` through API
-  Gateway.
+- `.github/workflows/pr.yml`, `release.yml` — the CI half.
+- G1 evidence: `terraform apply` output, first `release.yml` run
+  with commit SHA, ECS task ARN with `web` app + ADOT sidecar both
+  `RUNNING`, and a `curl` of `/health` through API Gateway.

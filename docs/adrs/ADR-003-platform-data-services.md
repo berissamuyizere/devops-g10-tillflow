@@ -21,8 +21,9 @@ prefix from [ADR-001](ADR-001-region-and-naming.md).
 
 ### RDS PostgreSQL
 
-- **Engine:** PostgreSQL **16.4**. Latest widely-supported minor on
-  `eu-central-1`, matches what the app libraries target.
+- **Engine:** PostgreSQL **16.15**. Latest 16.x available in
+  `eu-central-1` (16.4 is not offered there). Matches what the app
+  libraries target.
 - **Instance class:** `db.t4g.micro` for the capstone. Cheap, ARM,
   fits every workload we will run at k6 sustained RPS.
 - **Storage:** `gp3`, 20 GiB, autoscale to 50 GiB. No provisioned IOPS.

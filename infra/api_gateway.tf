@@ -35,10 +35,10 @@ resource "aws_apigatewayv2_integration" "alb" {
   connection_type    = "VPC_LINK"
   connection_id      = aws_apigatewayv2_vpc_link.app.id
 
-  request_parameters = {
-    "overwrite:header.X-Forwarded-For" = "$context.identity.sourceIp"
-  }
-
+  # Do not map X-Forwarded-For: API Gateway forbids overwrite/append on
+  # that header (BadRequestException: Operations on header x-forwarded-for
+  # are restricted). Client IP is already in access logs as
+  # $context.identity.sourceIp.
   timeout_milliseconds = 29000
 }
 
@@ -85,7 +85,7 @@ resource "aws_apigatewayv2_stage" "default" {
       protocol         = "$context.protocol"
       responseLength   = "$context.responseLength"
       integrationError = "$context.integrationErrorMessage"
-      xrayTraceId      = "$context.xrayTraceId"
+      requestId2       = "$context.extendedRequestId"
     })
   }
 
@@ -95,7 +95,11 @@ resource "aws_apigatewayv2_stage" "default" {
 }
 
 # ---------------------------------------------------------------------
-# WAFv2 — regional (API Gateway is regional).
+# WAFv2 regional. Attach to the ALB, not the HTTP API $default stage.
+# AssociateWebACL rejects aws_apigatewayv2_stage.arn
+# (arn:aws:apigateway:region::/apis/.../stages/$default is not a valid
+# WAF resource ARN). ALB is a first-class REGIONAL WAF target and sits
+# on the same request path (API GW -> VPC Link -> ALB).
 # ---------------------------------------------------------------------
 resource "aws_wafv2_web_acl" "app" {
   name        = "${var.name_prefix}-waf"
@@ -204,6 +208,6 @@ resource "aws_wafv2_web_acl" "app" {
 }
 
 resource "aws_wafv2_web_acl_association" "app" {
-  resource_arn = aws_apigatewayv2_stage.default.arn
+  resource_arn = aws_lb.app.arn
   web_acl_arn  = aws_wafv2_web_acl.app.arn
 }

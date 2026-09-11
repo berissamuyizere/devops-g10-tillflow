@@ -45,26 +45,21 @@ Then, in the AWS console:
 Set two GitHub Actions repo variables (Settings → Secrets and variables
 → Variables):
 
-- `AWS_CI_ROLE_ARN` — will be `arn:aws:iam::<acct>:role/devops-g10-ci-deploy`
-  after the first apply. Chicken-and-egg: the first apply happens locally.
-- `TF_STATE_BUCKET` — the bucket the bootstrap output printed.
+- `AWS_CI_ROLE_ARN` — `arn:aws:iam::<acct>:role/devops-g10-ci-deploy`
+- `TF_STATE_BUCKET` — the bucket the bootstrap output printed
 
-Local first-apply (once):
+Chicken-and-egg: the **first** apply (CI role + platform) happens
+locally. After those two variables exist, do not apply from a laptop
+again. Merge to `main` runs `.github/workflows/release.yml`:
 
-```bash
-cd infra
-terraform init \
-  -backend-config="bucket=devops-g10-tfstate-<acct>" \
-  -backend-config="dynamodb_table=devops-g10-tflock" \
-  -backend-config="region=eu-central-1" \
-  -backend-config="key=platform/terraform.tfstate"
+1. `terraform apply` when `infra/**` changed
+2. web image build → ECR → ECS rolling update → `/health` + `/version`
+   smoke when `services/web/**` or `services/_shared/**` changed
 
-terraform apply \
-  -var="codeconnections_arn=arn:aws:codeconnections:eu-central-1:<acct>:connection/<uuid>"
-```
+`workflow_dispatch` on that workflow re-runs both jobs.
 
-After that, subsequent applies happen via
-`.github/workflows/terraform-apply.yml` on pushes to `main`.
+CodePipeline is optional. Only pass `codeconnections_arn` if you have
+already created the GitHub App connection in the console.
 
 ## Smoke test
 

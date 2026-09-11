@@ -1,24 +1,30 @@
-# ---------------------------------------------------------------------
-# GitHub Actions OIDC — one provider, one deploy role.
-# ---------------------------------------------------------------------
-resource "aws_iam_openid_connect_provider" "github" {
-  url             = "https://token.actions.githubusercontent.com"
-  client_id_list  = ["sts.amazonaws.com"]
-  thumbprint_list = ["6938fd4d98bab03faadb97b34396831e3780aea1"]
-
-  tags = {
-    service = "iam"
-  }
+# Account already has this provider (lab). We cannot create or tag it
+# (iam:TagOpenIDConnectProvider is denied). Read it only.
+data "aws_iam_openid_connect_provider" "github" {
+  url = "https://token.actions.githubusercontent.com"
 }
 
 data "aws_iam_policy_document" "gha_trust" {
+  # This account enforces AWS's 2026 GitHub-OIDC guard:
+  # UpdateAssumeRolePolicy requires token.actions.githubusercontent.com:sub
+  # or :job_workflow_ref, "not scoped to all" (a trailing :* is rejected).
+  # A statement with only repository_id was rejected with MalformedPolicyDocument.
+  #
+  # GitHub will not disable immutable subjects here (repo created 2026-09-09;
+  # PUT use_immutable_subject=false stayed true). Tokens therefore use
+  # repo:owner@id/name@id:pull_request. Exact-match on that sub still
+  # AccessDenied in CloudTrail — IAM condition evaluation of `sub` is
+  # unreliable once `@` is in the claim. job_workflow_ref stays
+  # owner/repo/.github/workflows/file@ref and is what AWS told us to use.
+
   statement {
+    sid     = "GitHubOIDCByWorkflowRef"
     effect  = "Allow"
     actions = ["sts:AssumeRoleWithWebIdentity"]
 
     principals {
       type        = "Federated"
-      identifiers = [aws_iam_openid_connect_provider.github.arn]
+      identifiers = [data.aws_iam_openid_connect_provider.github.arn]
     }
 
     condition {
@@ -27,14 +33,44 @@ data "aws_iam_policy_document" "gha_trust" {
       values   = ["sts.amazonaws.com"]
     }
 
-    # Trust: pushes to main (apply), and any PR (plan-only).
     condition {
       test     = "StringLike"
+      variable = "token.actions.githubusercontent.com:job_workflow_ref"
+      values = [
+        "${var.github_org}/${var.github_repo}/.github/workflows/pr.yml@*",
+        "${var.github_org}/${var.github_repo}/.github/workflows/release.yml@*",
+        "${var.github_org}@${var.github_owner_id}/${var.github_repo}@${var.github_repo_id}/.github/workflows/pr.yml@*",
+        "${var.github_org}@${var.github_owner_id}/${var.github_repo}@${var.github_repo_id}/.github/workflows/release.yml@*",
+      ]
+    }
+  }
+
+  statement {
+    sid     = "GitHubOIDCBySub"
+    effect  = "Allow"
+    actions = ["sts:AssumeRoleWithWebIdentity"]
+
+    principals {
+      type        = "Federated"
+      identifiers = [data.aws_iam_openid_connect_provider.github.arn]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "token.actions.githubusercontent.com:aud"
+      values   = ["sts.amazonaws.com"]
+    }
+
+    condition {
+      test     = "StringEquals"
       variable = "token.actions.githubusercontent.com:sub"
       values = [
+        "repo:${var.github_org}/${var.github_repo}:pull_request",
         "repo:${var.github_org}/${var.github_repo}:ref:refs/heads/main",
         "repo:${var.github_org}/${var.github_repo}:ref:refs/heads/develop",
-        "repo:${var.github_org}/${var.github_repo}:pull_request",
+        "repo:${var.github_org}@${var.github_owner_id}/${var.github_repo}@${var.github_repo_id}:pull_request",
+        "repo:${var.github_org}@${var.github_owner_id}/${var.github_repo}@${var.github_repo_id}:ref:refs/heads/main",
+        "repo:${var.github_org}@${var.github_owner_id}/${var.github_repo}@${var.github_repo_id}:ref:refs/heads/develop",
       ]
     }
   }
@@ -42,7 +78,7 @@ data "aws_iam_policy_document" "gha_trust" {
 
 resource "aws_iam_role" "ci_deploy" {
   name               = "${var.name_prefix}-ci-deploy"
-  description        = "GitHub Actions OIDC role — terraform plan/apply + docker push to ECR."
+  description        = "GitHub Actions OIDC role for terraform plan/apply and ECR push."
   assume_role_policy = data.aws_iam_policy_document.gha_trust.json
 
   tags = {
@@ -94,9 +130,29 @@ data "aws_iam_policy_document" "ci_deploy" {
       "secretsmanager:DescribeSecret",
       "kms:Describe*",
       "kms:List*",
+      "ssm:Get*",
+      "ssm:Describe*",
+      "ssm:List*",
       "sts:GetCallerIdentity",
     ]
     resources = ["*"]
+  }
+
+  # State lock lives in bootstrap (not this stack). Plan and apply both
+  # PutItem/GetItem/DeleteItem on devops-g10-tflock. Without this, OIDC
+  # succeeds and terraform plan fails with AccessDenied on DynamoDB.
+  statement {
+    sid    = "TerraformStateLock"
+    effect = "Allow"
+    actions = [
+      "dynamodb:DescribeTable",
+      "dynamodb:GetItem",
+      "dynamodb:PutItem",
+      "dynamodb:DeleteItem",
+    ]
+    resources = [
+      "arn:${data.aws_partition.current.partition}:dynamodb:${var.region}:${data.aws_caller_identity.current.account_id}:table/${var.name_prefix}-tflock",
+    ]
   }
 
   # Namespaced write on the resources Terraform manages.
@@ -121,6 +177,7 @@ data "aws_iam_policy_document" "ci_deploy" {
       "codebuild:*",
       "iam:*",
       "secretsmanager:*",
+      "ssm:*",
     ]
     resources = ["*"]
     condition {
@@ -143,6 +200,23 @@ data "aws_iam_policy_document" "ci_deploy" {
       "ecr:UploadLayerPart",
     ]
     resources = ["*"]
+  }
+
+  # IAM is global, so PassRole does not satisfy aws:RequestedRegion on
+  # the write statement above. Needed to register ECS task defs from CI.
+  statement {
+    sid     = "PassTaskRolesToECS"
+    effect  = "Allow"
+    actions = ["iam:PassRole"]
+    resources = [
+      "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/${var.name_prefix}-*-task",
+      "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/${var.name_prefix}-*-exec",
+    ]
+    condition {
+      test     = "StringEquals"
+      variable = "iam:PassedToService"
+      values   = ["ecs-tasks.amazonaws.com"]
+    }
   }
 }
 
@@ -180,8 +254,8 @@ resource "aws_iam_role" "task_exec" {
 }
 
 resource "aws_iam_role_policy_attachment" "task_exec_default" {
-  for_each   = aws_iam_role.task_exec
-  role       = each.value.name
+  for_each   = toset(local.services)
+  role       = aws_iam_role.task_exec[each.key].name
   policy_arn = "arn:${data.aws_partition.current.partition}:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
@@ -211,8 +285,8 @@ resource "aws_iam_policy" "task_exec_secrets" {
 }
 
 resource "aws_iam_role_policy_attachment" "task_exec_secrets" {
-  for_each   = aws_iam_role.task_exec
-  role       = each.value.name
+  for_each   = toset(local.services)
+  role       = aws_iam_role.task_exec[each.key].name
   policy_arn = aws_iam_policy.task_exec_secrets.arn
 }
 
@@ -265,8 +339,8 @@ resource "aws_iam_policy" "task_common" {
 }
 
 resource "aws_iam_role_policy_attachment" "task_common" {
-  for_each   = aws_iam_role.task
-  role       = each.value.name
+  for_each   = toset(local.services)
+  role       = aws_iam_role.task[each.key].name
   policy_arn = aws_iam_policy.task_common.arn
 }
 
