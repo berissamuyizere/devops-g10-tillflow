@@ -27,6 +27,10 @@
 # Reliability + operations — Saloi
 /docs/slo-error-budgets.md                  @akezasaloi
 /docs/runbook.md                            @akezasaloi
+/docs/alerts.md                             @akezasaloi
+/docs/game-day.md                           @akezasaloi
+/docs/adrs/ADR-005-observability.md         @akezasaloi
+/docs/platform-asks-g2.md                   @akezasaloi @yordanoshagos
 /evidence/reliability-operations/           @akezasaloi
 
 # Commission worker touches Payments + Product — dual review

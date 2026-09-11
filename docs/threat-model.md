@@ -158,3 +158,4 @@ than collapsing into one. That log is the repudiation evidence for G2.
 - [POS ↔ Payments contract](contracts/pos-payments-api.md)
 - [Commission ↔ Payments B2C contract](contracts/commission-payments-b2c.md)
 - [slo-error-budgets.md](slo-error-budgets.md)
+- [runbook.md](runbook.md) / [game-day.md](game-day.md)

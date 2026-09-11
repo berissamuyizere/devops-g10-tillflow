@@ -19,6 +19,8 @@ area's PRs.
 | `docs/architecture.md` | Yordanos |
 | `docs/threat-model.md` | Arsema |
 | `docs/slo-error-budgets.md` | Saloi |
+| `docs/runbook.md` / `docs/alerts.md` / `docs/game-day.md` | Saloi |
+| Grafana workspace ADR (ADR-005) | Saloi |
 | Tenant / sale data model ADR | Berissa |
 | Region + naming ADR | Yordanos |
 | Idempotency + replay ADR | Arsema |
@@ -28,7 +30,7 @@ area's PRs.
 - **Berissa (Product + POS):** ADR + end-to-end sale demo
 - **Arsema (Payments + integrity):** Invariant tests + trace
 - **Yordanos (Platform + delivery):** Plan + pipeline release
-- **Saloi (Reliability + operations):** Dashboard + game day
+- **Saloi (Reliability + operations):** Dashboard + game day (`docs/runbook.md`, `docs/alerts.md`, `docs/game-day.md`, ADR-005)
 
 ## Group facts
 
