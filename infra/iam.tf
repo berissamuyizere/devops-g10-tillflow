@@ -130,6 +130,9 @@ data "aws_iam_policy_document" "ci_deploy" {
       "secretsmanager:DescribeSecret",
       "kms:Describe*",
       "kms:List*",
+      "ssm:Get*",
+      "ssm:Describe*",
+      "ssm:List*",
       "sts:GetCallerIdentity",
     ]
     resources = ["*"]
@@ -174,6 +177,7 @@ data "aws_iam_policy_document" "ci_deploy" {
       "codebuild:*",
       "iam:*",
       "secretsmanager:*",
+      "ssm:*",
     ]
     resources = ["*"]
     condition {
