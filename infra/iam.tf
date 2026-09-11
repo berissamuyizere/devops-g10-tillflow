@@ -5,7 +5,20 @@ data "aws_iam_openid_connect_provider" "github" {
 }
 
 data "aws_iam_policy_document" "gha_trust" {
+  # This account enforces AWS's 2026 GitHub-OIDC guard:
+  # UpdateAssumeRolePolicy requires token.actions.githubusercontent.com:sub
+  # or :job_workflow_ref, "not scoped to all" (a trailing :* is rejected).
+  # A statement with only repository_id was rejected with MalformedPolicyDocument.
+  #
+  # GitHub will not disable immutable subjects here (repo created 2026-09-09;
+  # PUT use_immutable_subject=false stayed true). Tokens therefore use
+  # repo:owner@id/name@id:pull_request. Exact-match on that sub still
+  # AccessDenied in CloudTrail — IAM condition evaluation of `sub` is
+  # unreliable once `@` is in the claim. job_workflow_ref stays
+  # owner/repo/.github/workflows/file@ref and is what AWS told us to use.
+
   statement {
+    sid     = "GitHubOIDCByWorkflowRef"
     effect  = "Allow"
     actions = ["sts:AssumeRoleWithWebIdentity"]
 
@@ -20,19 +33,44 @@ data "aws_iam_policy_document" "gha_trust" {
       values   = ["sts.amazonaws.com"]
     }
 
-    # This repo was created 2026-09-09, after GitHub's 2026-07-15 cutoff.
-    # Tokens use immutable IDs, not the legacy name-only sub:
-    #   repo:berissamuyizere@139049950/devops-g10-tillflow@1363012653:pull_request
-    # CloudTrail AccessDenied showed that exact subject. Name-only
-    # repo:owner/name:pull_request never matches.
     condition {
       test     = "StringLike"
+      variable = "token.actions.githubusercontent.com:job_workflow_ref"
+      values = [
+        "${var.github_org}/${var.github_repo}/.github/workflows/pr.yml@*",
+        "${var.github_org}/${var.github_repo}/.github/workflows/release.yml@*",
+        "${var.github_org}@${var.github_owner_id}/${var.github_repo}@${var.github_repo_id}/.github/workflows/pr.yml@*",
+        "${var.github_org}@${var.github_owner_id}/${var.github_repo}@${var.github_repo_id}/.github/workflows/release.yml@*",
+      ]
+    }
+  }
+
+  statement {
+    sid     = "GitHubOIDCBySub"
+    effect  = "Allow"
+    actions = ["sts:AssumeRoleWithWebIdentity"]
+
+    principals {
+      type        = "Federated"
+      identifiers = [data.aws_iam_openid_connect_provider.github.arn]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "token.actions.githubusercontent.com:aud"
+      values   = ["sts.amazonaws.com"]
+    }
+
+    condition {
+      test     = "StringEquals"
       variable = "token.actions.githubusercontent.com:sub"
       values = [
+        "repo:${var.github_org}/${var.github_repo}:pull_request",
+        "repo:${var.github_org}/${var.github_repo}:ref:refs/heads/main",
+        "repo:${var.github_org}/${var.github_repo}:ref:refs/heads/develop",
+        "repo:${var.github_org}@${var.github_owner_id}/${var.github_repo}@${var.github_repo_id}:pull_request",
         "repo:${var.github_org}@${var.github_owner_id}/${var.github_repo}@${var.github_repo_id}:ref:refs/heads/main",
         "repo:${var.github_org}@${var.github_owner_id}/${var.github_repo}@${var.github_repo_id}:ref:refs/heads/develop",
-        "repo:${var.github_org}@${var.github_owner_id}/${var.github_repo}@${var.github_repo_id}:pull_request",
-        "repo:${var.github_org}@${var.github_owner_id}/${var.github_repo}@${var.github_repo_id}:environment:production",
       ]
     }
   }
