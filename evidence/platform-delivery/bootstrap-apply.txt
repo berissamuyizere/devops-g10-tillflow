@@ -1,0 +1,181 @@
+data.aws_caller_identity.current: Reading...
+data.aws_caller_identity.current: Read complete after 0s [id=240462142849]
+aws_s3_bucket.tfstate: Refreshing state... [id=devops-g10-tfstate-240462142849]
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  + create
+  ~ update in-place
+
+Terraform will perform the following actions:
+
+  # aws_dynamodb_table.tflock will be created
+  + resource "aws_dynamodb_table" "tflock" {
+      + arn              = (known after apply)
+      + billing_mode     = "PAY_PER_REQUEST"
+      + hash_key         = "LockID"
+      + id               = (known after apply)
+      + name             = "devops-g10-tflock"
+      + read_capacity    = (known after apply)
+      + stream_arn       = (known after apply)
+      + stream_label     = (known after apply)
+      + stream_view_type = (known after apply)
+      + tags_all         = {
+          + "capstone"    = "tillflow"
+          + "environment" = "shared"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "platform-bootstrap"
+        }
+      + write_capacity   = (known after apply)
+
+      + attribute {
+          + name = "LockID"
+          + type = "S"
+        }
+
+      + point_in_time_recovery {
+          + enabled                 = true
+          + recovery_period_in_days = (known after apply)
+        }
+
+      + server_side_encryption {
+          + enabled     = true
+          + kms_key_arn = (known after apply)
+        }
+
+      + ttl (known after apply)
+    }
+
+  # aws_s3_bucket.tfstate will be updated in-place
+  ~ resource "aws_s3_bucket" "tfstate" {
+      + force_destroy               = false
+        id                          = "devops-g10-tfstate-240462142849"
+      ~ tags                        = {
+          - "Environment" = "lab" -> null
+          - "Group"       = "group-10" -> null
+          - "Owner"       = "platform-owner" -> null
+          - "Project"     = "devops-mentorship" -> null
+        }
+      ~ tags_all                    = {
+          - "Environment" = "lab" -> null
+          - "Group"       = "group-10" -> null
+          - "Owner"       = "platform-owner" -> null
+          - "Project"     = "devops-mentorship" -> null
+          + "capstone"    = "tillflow"
+          + "environment" = "shared"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "platform-bootstrap"
+        }
+        # (11 unchanged attributes hidden)
+
+        # (3 unchanged blocks hidden)
+    }
+
+  # aws_s3_bucket_lifecycle_configuration.tfstate will be created
+  + resource "aws_s3_bucket_lifecycle_configuration" "tfstate" {
+      + bucket                                 = "devops-g10-tfstate-240462142849"
+      + expected_bucket_owner                  = (known after apply)
+      + id                                     = (known after apply)
+      + transition_default_minimum_object_size = "all_storage_classes_128K"
+
+      + rule {
+          + id     = "expire-noncurrent-versions"
+          + status = "Enabled"
+            # (1 unchanged attribute hidden)
+
+          + abort_incomplete_multipart_upload {
+              + days_after_initiation = 7
+            }
+
+          + filter {
+                # (1 unchanged attribute hidden)
+            }
+
+          + noncurrent_version_expiration {
+              + noncurrent_days = 90
+            }
+        }
+    }
+
+  # aws_s3_bucket_ownership_controls.tfstate will be created
+  + resource "aws_s3_bucket_ownership_controls" "tfstate" {
+      + bucket = "devops-g10-tfstate-240462142849"
+      + id     = (known after apply)
+
+      + rule {
+          + object_ownership = "BucketOwnerEnforced"
+        }
+    }
+
+  # aws_s3_bucket_public_access_block.tfstate will be created
+  + resource "aws_s3_bucket_public_access_block" "tfstate" {
+      + block_public_acls       = true
+      + block_public_policy     = true
+      + bucket                  = "devops-g10-tfstate-240462142849"
+      + id                      = (known after apply)
+      + ignore_public_acls      = true
+      + restrict_public_buckets = true
+    }
+
+  # aws_s3_bucket_server_side_encryption_configuration.tfstate will be created
+  + resource "aws_s3_bucket_server_side_encryption_configuration" "tfstate" {
+      + bucket = "devops-g10-tfstate-240462142849"
+      + id     = (known after apply)
+
+      + rule {
+          + bucket_key_enabled = true
+
+          + apply_server_side_encryption_by_default {
+              + sse_algorithm     = "AES256"
+                # (1 unchanged attribute hidden)
+            }
+        }
+    }
+
+  # aws_s3_bucket_versioning.tfstate will be created
+  + resource "aws_s3_bucket_versioning" "tfstate" {
+      + bucket = "devops-g10-tfstate-240462142849"
+      + id     = (known after apply)
+
+      + versioning_configuration {
+          + mfa_delete = (known after apply)
+          + status     = "Enabled"
+        }
+    }
+
+Plan: 6 to add, 1 to change, 0 to destroy.
+
+Changes to Outputs:
+  + lock_table   = "devops-g10-tflock"
+aws_dynamodb_table.tflock: Creating...
+aws_s3_bucket.tfstate: Modifying... [id=devops-g10-tfstate-240462142849]
+aws_s3_bucket.tfstate: Modifications complete after 4s [id=devops-g10-tfstate-240462142849]
+aws_s3_bucket_public_access_block.tfstate: Creating...
+aws_s3_bucket_ownership_controls.tfstate: Creating...
+aws_s3_bucket_versioning.tfstate: Creating...
+aws_s3_bucket_server_side_encryption_configuration.tfstate: Creating...
+aws_s3_bucket_lifecycle_configuration.tfstate: Creating...
+aws_s3_bucket_public_access_block.tfstate: Creation complete after 1s [id=devops-g10-tfstate-240462142849]
+aws_s3_bucket_server_side_encryption_configuration.tfstate: Creation complete after 1s [id=devops-g10-tfstate-240462142849]
+aws_s3_bucket_ownership_controls.tfstate: Creation complete after 1s [id=devops-g10-tfstate-240462142849]
+aws_s3_bucket_versioning.tfstate: Creation complete after 2s [id=devops-g10-tfstate-240462142849]
+aws_dynamodb_table.tflock: Still creating... [00m10s elapsed]
+aws_dynamodb_table.tflock: Creation complete after 10s [id=devops-g10-tflock]
+aws_s3_bucket_lifecycle_configuration.tfstate: Still creating... [00m10s elapsed]
+aws_s3_bucket_lifecycle_configuration.tfstate: Still creating... [00m20s elapsed]
+aws_s3_bucket_lifecycle_configuration.tfstate: Still creating... [00m30s elapsed]
+aws_s3_bucket_lifecycle_configuration.tfstate: Still creating... [00m40s elapsed]
+aws_s3_bucket_lifecycle_configuration.tfstate: Still creating... [00m50s elapsed]
+aws_s3_bucket_lifecycle_configuration.tfstate: Creation complete after 57s [id=devops-g10-tfstate-240462142849]
+
+Apply complete! Resources: 6 added, 1 changed, 0 destroyed.
+
+Outputs:
+
+lock_table = "devops-g10-tflock"
+region = "eu-central-1"
+state_bucket = "devops-g10-tfstate-240462142849"
