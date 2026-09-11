@@ -33,6 +33,18 @@ variable "github_repo" {
   default     = "devops-g10-tillflow"
 }
 
+variable "github_owner_id" {
+  description = "Numeric GitHub owner id. Required in OIDC sub after 2026-07-15 immutable claims."
+  type        = string
+  default     = "139049950"
+}
+
+variable "github_repo_id" {
+  description = "Numeric GitHub repository id. Required in OIDC sub after 2026-07-15 immutable claims."
+  type        = string
+  default     = "1363012653"
+}
+
 variable "web_image_digest" {
   description = <<-EOT
     Full ECR image reference for the web service, including digest.

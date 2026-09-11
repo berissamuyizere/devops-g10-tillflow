@@ -20,17 +20,19 @@ data "aws_iam_policy_document" "gha_trust" {
       values   = ["sts.amazonaws.com"]
     }
 
-    # Trust: pushes to main (apply), and any PR (plan-only).
+    # This repo was created 2026-09-09, after GitHub's 2026-07-15 cutoff.
+    # Tokens use immutable IDs, not the legacy name-only sub:
+    #   repo:berissamuyizere@139049950/devops-g10-tillflow@1363012653:pull_request
+    # CloudTrail AccessDenied showed that exact subject. Name-only
+    # repo:owner/name:pull_request never matches.
     condition {
       test     = "StringLike"
       variable = "token.actions.githubusercontent.com:sub"
       values = [
-        "repo:${var.github_org}/${var.github_repo}:ref:refs/heads/main",
-        "repo:${var.github_org}/${var.github_repo}:ref:refs/heads/develop",
-        "repo:${var.github_org}/${var.github_repo}:pull_request",
-        # If a workflow job sets `environment: production`, GitHub emits
-        # this subject instead of the branch ref.
-        "repo:${var.github_org}/${var.github_repo}:environment:production",
+        "repo:${var.github_org}@${var.github_owner_id}/${var.github_repo}@${var.github_repo_id}:ref:refs/heads/main",
+        "repo:${var.github_org}@${var.github_owner_id}/${var.github_repo}@${var.github_repo_id}:ref:refs/heads/develop",
+        "repo:${var.github_org}@${var.github_owner_id}/${var.github_repo}@${var.github_repo_id}:pull_request",
+        "repo:${var.github_org}@${var.github_owner_id}/${var.github_repo}@${var.github_repo_id}:environment:production",
       ]
     }
   }
