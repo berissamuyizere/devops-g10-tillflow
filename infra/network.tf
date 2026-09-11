@@ -23,15 +23,54 @@ module "vpc" {
 
   create_database_subnet_group = true
 
-  # Flow logs → CloudWatch, cheap and enough for a capstone.
+  # Flow logs to CloudWatch. IAM role is created below with the devops-g10-
+  # prefix because this SSO role cannot iam:CreateRole on unprefixed names.
   enable_flow_log                      = true
-  create_flow_log_cloudwatch_iam_role  = true
+  create_flow_log_cloudwatch_iam_role  = false
   create_flow_log_cloudwatch_log_group = true
+  flow_log_cloudwatch_iam_role_arn     = aws_iam_role.vpc_flow.arn
   flow_log_max_aggregation_interval    = 60
 
   tags = {
     service = "network"
   }
+}
+
+data "aws_iam_policy_document" "vpc_flow_assume" {
+  statement {
+    effect  = "Allow"
+    actions = ["sts:AssumeRole"]
+    principals {
+      type        = "Service"
+      identifiers = ["vpc-flow-logs.amazonaws.com"]
+    }
+  }
+}
+
+resource "aws_iam_role" "vpc_flow" {
+  name               = "${var.name_prefix}-vpc-flow-logs"
+  description        = "VPC flow logs to CloudWatch."
+  assume_role_policy = data.aws_iam_policy_document.vpc_flow_assume.json
+  tags               = { service = "network" }
+}
+
+resource "aws_iam_role_policy" "vpc_flow" {
+  name = "${var.name_prefix}-vpc-flow-logs"
+  role = aws_iam_role.vpc_flow.id
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect = "Allow"
+      Action = [
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents",
+        "logs:DescribeLogGroups",
+        "logs:DescribeLogStreams",
+      ]
+      Resource = "*"
+    }]
+  })
 }
 
 # VPC endpoints so ECS tasks can pull from ECR / write to CloudWatch / read

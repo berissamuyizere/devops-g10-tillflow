@@ -31,7 +31,7 @@ resource "aws_secretsmanager_secret_version" "rds_master" {
 resource "aws_db_parameter_group" "pg16" {
   name        = "${var.name_prefix}-pg16"
   family      = "postgres16"
-  description = "TillFlow — RDS Postgres 16 parameters"
+  description = "TillFlow RDS Postgres 16 parameters"
 
   parameter {
     name  = "log_min_duration_statement"
@@ -56,7 +56,7 @@ resource "aws_db_parameter_group" "pg16" {
 resource "aws_db_instance" "pg" {
   identifier     = "${var.name_prefix}-pg"
   engine         = "postgres"
-  engine_version = "16.4"
+  engine_version = "16.15"
   instance_class = "db.t4g.micro"
 
   db_name  = "tillflow"

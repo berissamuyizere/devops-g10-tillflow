@@ -1,0 +1,113 @@
+{
+  "account_id": {
+    "sensitive": false,
+    "type": "string",
+    "value": "240462142849"
+  },
+  "alb_dns_name": {
+    "sensitive": false,
+    "type": "string",
+    "value": "internal-devops-g10-alb-878071676.eu-central-1.elb.amazonaws.com"
+  },
+  "api_gateway_url": {
+    "sensitive": false,
+    "type": "string",
+    "value": "https://f9nla14lfh.execute-api.eu-central-1.amazonaws.com"
+  },
+  "ci_deploy_role_arn": {
+    "sensitive": false,
+    "type": "string",
+    "value": "arn:aws:iam::240462142849:role/devops-g10-ci-deploy"
+  },
+  "ecr_repositories": {
+    "sensitive": false,
+    "type": [
+      "object",
+      {
+        "commission": "string",
+        "payments": "string",
+        "pos": "string",
+        "web": "string"
+      }
+    ],
+    "value": {
+      "commission": "240462142849.dkr.ecr.eu-central-1.amazonaws.com/devops-g10/commission",
+      "payments": "240462142849.dkr.ecr.eu-central-1.amazonaws.com/devops-g10/payments",
+      "pos": "240462142849.dkr.ecr.eu-central-1.amazonaws.com/devops-g10/pos",
+      "web": "240462142849.dkr.ecr.eu-central-1.amazonaws.com/devops-g10/web"
+    }
+  },
+  "ecs_cluster": {
+    "sensitive": false,
+    "type": "string",
+    "value": "devops-g10"
+  },
+  "private_subnets": {
+    "sensitive": false,
+    "type": [
+      "tuple",
+      [
+        "string",
+        "string"
+      ]
+    ],
+    "value": [
+      "subnet-034c31442d6c6c438",
+      "subnet-0dff0f1bc9e4c8ba1"
+    ]
+  },
+  "rds_endpoint": {
+    "sensitive": false,
+    "type": "string",
+    "value": "devops-g10-pg.cxiicgm8iuvj.eu-central-1.rds.amazonaws.com"
+  },
+  "region": {
+    "sensitive": false,
+    "type": "string",
+    "value": "eu-central-1"
+  },
+  "s3_buckets": {
+    "sensitive": false,
+    "type": [
+      "object",
+      {
+        "artifacts": "string",
+        "backups": "string",
+        "logs": "string"
+      }
+    ],
+    "value": {
+      "artifacts": "devops-g10-artifacts-240462142849",
+      "backups": "devops-g10-backups-240462142849",
+      "logs": "devops-g10-logs-240462142849"
+    }
+  },
+  "secrets": {
+    "sensitive": false,
+    "type": [
+      "object",
+      {
+        "cache_auth": "string",
+        "daraja": "string",
+        "rds_master": "string",
+        "slack": "string"
+      }
+    ],
+    "value": {
+      "cache_auth": "arn:aws:secretsmanager:eu-central-1:240462142849:secret:devops-g10/cache/auth-LOAkpy",
+      "daraja": "arn:aws:secretsmanager:eu-central-1:240462142849:secret:devops-g10/daraja-s3gGMt",
+      "rds_master": "arn:aws:secretsmanager:eu-central-1:240462142849:secret:devops-g10/db/master-LOAkpy",
+      "slack": "arn:aws:secretsmanager:eu-central-1:240462142849:secret:devops-g10/slack-webhook-NR4QlQ"
+    }
+  },
+  "valkey_endpoint": {
+    "sensitive": false,
+    "type": "string",
+    "value": "master.devops-g10-valkey.i2hvx8.euc1.cache.amazonaws.com"
+  },
+  "vpc_id": {
+    "sensitive": false,
+    "type": "string",
+    "value": "vpc-0608a01d03195ac0d"
+  }
+}

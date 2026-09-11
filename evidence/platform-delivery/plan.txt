@@ -1,0 +1,4566 @@
+
+Warning: Deprecated Parameter
+
+The parameter "dynamodb_table" is deprecated. Use parameter "use_lockfile"
+instead.
+Acquiring state lock. This may take a few moments...
+data.aws_iam_policy_document.ecs_task_trust: Reading...
+module.vpc.data.aws_partition.current[0]: Reading...
+data.aws_iam_policy_document.ci_deploy: Reading...
+module.vpc.data.aws_partition.current[0]: Read complete after 0s [id=aws]
+data.aws_iam_policy_document.ecs_task_trust: Read complete after 0s [id=1077804475]
+data.aws_caller_identity.current: Reading...
+data.aws_iam_policy_document.ci_deploy: Read complete after 0s [id=776265425]
+aws_iam_openid_connect_provider.github: Refreshing state... [id=arn:aws:iam::240462142849:oidc-provider/token.actions.githubusercontent.com]
+data.aws_region.current: Reading...
+module.vpc.data.aws_caller_identity.current[0]: Reading...
+module.vpc.data.aws_iam_policy_document.flow_log_cloudwatch_assume_role[0]: Reading...
+data.aws_elb_service_account.current: Reading...
+data.aws_region.current: Read complete after 0s [id=eu-central-1]
+module.vpc.data.aws_iam_policy_document.flow_log_cloudwatch_assume_role[0]: Read complete after 0s [id=1021377347]
+data.aws_elb_service_account.current: Read complete after 0s [id=054676820928]
+data.aws_partition.current: Reading...
+module.vpc.data.aws_region.current[0]: Reading...
+module.vpc.data.aws_region.current[0]: Read complete after 0s [id=eu-central-1]
+data.aws_partition.current: Read complete after 0s [id=aws]
+data.aws_availability_zones.available: Reading...
+data.aws_iam_policy_document.pipeline_trust: Reading...
+data.aws_iam_policy_document.codebuild_trust: Reading...
+data.aws_iam_policy_document.pipeline_trust: Read complete after 0s [id=2245101310]
+data.aws_iam_policy_document.codebuild_trust: Read complete after 0s [id=1229436035]
+data.aws_caller_identity.current: Read complete after 0s [id=240462142849]
+data.aws_iam_policy_document.task_common: Reading...
+data.aws_iam_policy_document.task_common: Read complete after 0s [id=3065540964]
+module.vpc.data.aws_caller_identity.current[0]: Read complete after 0s [id=240462142849]
+data.aws_availability_zones.available: Read complete after 1s [id=eu-central-1]
+module.vpc_endpoints.data.aws_vpc_endpoint_service.this["logs"]: Reading...
+module.vpc_endpoints.data.aws_vpc_endpoint_service.this["secretsmanager"]: Reading...
+module.vpc_endpoints.data.aws_vpc_endpoint_service.this["ecr_dkr"]: Reading...
+module.vpc_endpoints.data.aws_vpc_endpoint_service.this["ssm"]: Reading...
+module.vpc_endpoints.data.aws_vpc_endpoint_service.this["s3"]: Reading...
+module.vpc_endpoints.data.aws_vpc_endpoint_service.this["ecr_api"]: Reading...
+module.vpc_endpoints.data.aws_vpc_endpoint_service.this["logs"]: Read complete after 0s [id=3692912310]
+module.vpc_endpoints.data.aws_vpc_endpoint_service.this["secretsmanager"]: Read complete after 0s [id=1187544957]
+module.vpc_endpoints.data.aws_vpc_endpoint_service.this["ssm"]: Read complete after 1s [id=3588315509]
+module.vpc_endpoints.data.aws_vpc_endpoint_service.this["ecr_dkr"]: Read complete after 1s [id=2102250698]
+module.vpc_endpoints.data.aws_vpc_endpoint_service.this["ecr_api"]: Read complete after 1s [id=1490357335]
+module.vpc_endpoints.data.aws_vpc_endpoint_service.this["s3"]: Read complete after 1s [id=4172194041]
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  + create
+  ~ update in-place
+ <= read (data resources)
+
+Terraform will perform the following actions:
+
+  # data.aws_iam_policy_document.codebuild will be read during apply
+  # (config refers to values not yet known)
+ <= data "aws_iam_policy_document" "codebuild" {
+      + id            = (known after apply)
+      + json          = (known after apply)
+      + minified_json = (known after apply)
+
+      + statement {
+          + actions   = [
+              + "logs:CreateLogGroup",
+              + "logs:CreateLogStream",
+              + "logs:PutLogEvents",
+            ]
+          + effect    = "Allow"
+          + resources = [
+              + "arn:aws:logs:eu-central-1:240462142849:log-group:/aws/codebuild/devops-g10-*",
+            ]
+        }
+      + statement {
+          + actions   = [
+              + "s3:GetBucketLocation",
+              + "s3:GetObject",
+              + "s3:ListBucket",
+              + "s3:PutObject",
+            ]
+          + effect    = "Allow"
+          + resources = [
+              + (known after apply),
+              + (known after apply),
+            ]
+        }
+      + statement {
+          + actions   = [
+              + "ecr:BatchCheckLayerAvailability",
+              + "ecr:BatchGetImage",
+              + "ecr:CompleteLayerUpload",
+              + "ecr:DescribeImageScanFindings",
+              + "ecr:DescribeImages",
+              + "ecr:GetAuthorizationToken",
+              + "ecr:GetDownloadUrlForLayer",
+              + "ecr:InitiateLayerUpload",
+              + "ecr:PutImage",
+              + "ecr:UploadLayerPart",
+            ]
+          + effect    = "Allow"
+          + resources = [
+              + "*",
+            ]
+        }
+      + statement {
+          + actions   = [
+              + "codestar-connections:UseConnection",
+            ]
+          + effect    = "Allow"
+          + resources = [
+              + "*",
+            ]
+        }
+      + statement {
+          + actions   = [
+              + "ssm:GetParameters",
+            ]
+          + effect    = "Allow"
+          + resources = [
+              + "arn:aws:ssm:eu-central-1:240462142849:parameter/devops-g10/*",
+            ]
+        }
+    }
+
+  # data.aws_iam_policy_document.commission_close_from_events will be read during apply
+  # (config refers to values not yet known)
+ <= data "aws_iam_policy_document" "commission_close_from_events" {
+      + id            = (known after apply)
+      + json          = (known after apply)
+      + minified_json = (known after apply)
+
+      + statement {
+          + actions   = [
+              + "sqs:SendMessage",
+            ]
+          + effect    = "Allow"
+          + resources = [
+              + (known after apply),
+            ]
+          + sid       = "AllowEventBridge"
+
+          + condition {
+              + test     = "ArnEquals"
+              + values   = [
+                  + (known after apply),
+                ]
+              + variable = "aws:SourceArn"
+            }
+
+          + principals {
+              + identifiers = [
+                  + "events.amazonaws.com",
+                ]
+              + type        = "Service"
+            }
+        }
+    }
+
+  # data.aws_iam_policy_document.commission_task will be read during apply
+  # (config refers to values not yet known)
+ <= data "aws_iam_policy_document" "commission_task" {
+      + id            = (known after apply)
+      + json          = (known after apply)
+      + minified_json = (known after apply)
+
+      + statement {
+          + actions   = [
+              + "sqs:ChangeMessageVisibility",
+              + "sqs:DeleteMessage",
+              + "sqs:GetQueueAttributes",
+              + "sqs:ReceiveMessage",
+            ]
+          + effect    = "Allow"
+          + resources = [
+              + (known after apply),
+              + (known after apply),
+            ]
+        }
+      + statement {
+          + actions   = [
+              + "s3:GetObject",
+              + "s3:PutObject",
+            ]
+          + effect    = "Allow"
+          + resources = [
+              + (known after apply),
+            ]
+        }
+    }
+
+  # data.aws_iam_policy_document.gha_trust will be read during apply
+  # (depends on a resource or a module with changes pending)
+ <= data "aws_iam_policy_document" "gha_trust" {
+      + id            = (known after apply)
+      + json          = (known after apply)
+      + minified_json = (known after apply)
+
+      + statement {
+          + actions = [
+              + "sts:AssumeRoleWithWebIdentity",
+            ]
+          + effect  = "Allow"
+
+          + condition {
+              + test     = "StringEquals"
+              + values   = [
+                  + "sts.amazonaws.com",
+                ]
+              + variable = "token.actions.githubusercontent.com:aud"
+            }
+          + condition {
+              + test     = "StringLike"
+              + values   = [
+                  + "repo:berissamuyizere/devops-g10-tillflow:ref:refs/heads/main",
+                  + "repo:berissamuyizere/devops-g10-tillflow:ref:refs/heads/develop",
+                  + "repo:berissamuyizere/devops-g10-tillflow:pull_request",
+                ]
+              + variable = "token.actions.githubusercontent.com:sub"
+            }
+
+          + principals {
+              + identifiers = [
+                  + "arn:aws:iam::240462142849:oidc-provider/token.actions.githubusercontent.com",
+                ]
+              + type        = "Federated"
+            }
+        }
+    }
+
+  # data.aws_iam_policy_document.logs will be read during apply
+  # (config refers to values not yet known)
+ <= data "aws_iam_policy_document" "logs" {
+      + id            = (known after apply)
+      + json          = (known after apply)
+      + minified_json = (known after apply)
+
+      + statement {
+          + actions   = [
+              + "s3:PutObject",
+            ]
+          + effect    = "Allow"
+          + resources = [
+              + (known after apply),
+            ]
+          + sid       = "AllowELBLogging"
+
+          + principals {
+              + identifiers = [
+                  + "arn:aws:iam::054676820928:root",
+                ]
+              + type        = "AWS"
+            }
+        }
+      + statement {
+          + actions   = [
+              + "s3:PutObject",
+            ]
+          + effect    = "Allow"
+          + resources = [
+              + (known after apply),
+            ]
+          + sid       = "AllowLogDeliveryWrite"
+
+          + condition {
+              + test     = "StringEquals"
+              + values   = [
+                  + "bucket-owner-full-control",
+                ]
+              + variable = "s3:x-amz-acl"
+            }
+
+          + principals {
+              + identifiers = [
+                  + "delivery.logs.amazonaws.com",
+                ]
+              + type        = "Service"
+            }
+        }
+      + statement {
+          + actions   = [
+              + "s3:GetBucketAcl",
+            ]
+          + effect    = "Allow"
+          + resources = [
+              + (known after apply),
+            ]
+          + sid       = "AllowLogDeliveryAclCheck"
+
+          + principals {
+              + identifiers = [
+                  + "delivery.logs.amazonaws.com",
+                ]
+              + type        = "Service"
+            }
+        }
+    }
+
+  # data.aws_iam_policy_document.payments_task will be read during apply
+  # (config refers to values not yet known)
+ <= data "aws_iam_policy_document" "payments_task" {
+      + id            = (known after apply)
+      + json          = (known after apply)
+      + minified_json = (known after apply)
+
+      + statement {
+          + actions   = [
+              + "secretsmanager:GetSecretValue",
+            ]
+          + effect    = "Allow"
+          + resources = [
+              + (known after apply),
+            ]
+        }
+      + statement {
+          + actions   = [
+              + "sqs:ChangeMessageVisibility",
+              + "sqs:DeleteMessage",
+              + "sqs:GetQueueAttributes",
+              + "sqs:ReceiveMessage",
+              + "sqs:SendMessage",
+            ]
+          + effect    = "Allow"
+          + resources = [
+              + (known after apply),
+              + (known after apply),
+            ]
+        }
+    }
+
+  # data.aws_iam_policy_document.pipeline will be read during apply
+  # (config refers to values not yet known)
+ <= data "aws_iam_policy_document" "pipeline" {
+      + id            = (known after apply)
+      + json          = (known after apply)
+      + minified_json = (known after apply)
+
+      + statement {
+          + actions   = [
+              + "s3:GetBucketLocation",
+              + "s3:GetObject",
+              + "s3:GetObjectVersion",
+              + "s3:ListBucket",
+              + "s3:PutObject",
+            ]
+          + effect    = "Allow"
+          + resources = [
+              + (known after apply),
+              + (known after apply),
+            ]
+        }
+      + statement {
+          + actions   = [
+              + "codebuild:BatchGetBuilds",
+              + "codebuild:StartBuild",
+            ]
+          + effect    = "Allow"
+          + resources = [
+              + (known after apply),
+            ]
+        }
+      + statement {
+          + actions   = [
+              + "ecs:DescribeServices",
+              + "ecs:DescribeTaskDefinition",
+              + "ecs:DescribeTasks",
+              + "ecs:ListTasks",
+              + "ecs:RegisterTaskDefinition",
+              + "ecs:UpdateService",
+            ]
+          + effect    = "Allow"
+          + resources = [
+              + "*",
+            ]
+        }
+      + statement {
+          + actions   = [
+              + "iam:PassRole",
+            ]
+          + effect    = "Allow"
+          + resources = [
+              + (known after apply),
+              + (known after apply),
+            ]
+
+          + condition {
+              + test     = "StringEqualsIfExists"
+              + values   = [
+                  + "ecs-tasks.amazonaws.com",
+                ]
+              + variable = "iam:PassedToService"
+            }
+        }
+      + statement {
+          + actions   = [
+              + "codestar-connections:UseConnection",
+            ]
+          + effect    = "Allow"
+          + resources = [
+              + "*",
+            ]
+        }
+    }
+
+  # data.aws_iam_policy_document.task_exec_secrets will be read during apply
+  # (config refers to values not yet known)
+ <= data "aws_iam_policy_document" "task_exec_secrets" {
+      + id            = (known after apply)
+      + json          = (known after apply)
+      + minified_json = (known after apply)
+
+      + statement {
+          + actions   = [
+              + "secretsmanager:GetSecretValue",
+            ]
+          + effect    = "Allow"
+          + resources = [
+              + (known after apply),
+              + (known after apply),
+              + (known after apply),
+              + (known after apply),
+            ]
+        }
+      + statement {
+          + actions   = [
+              + "ssm:GetParameter",
+              + "ssm:GetParameters",
+            ]
+          + effect    = "Allow"
+          + resources = [
+              + "arn:aws:ssm:eu-central-1:240462142849:parameter/devops-g10/*",
+            ]
+        }
+    }
+
+  # aws_apigatewayv2_api.app will be created
+  + resource "aws_apigatewayv2_api" "app" {
+      + api_endpoint                 = (known after apply)
+      + api_key_selection_expression = "$request.header.x-api-key"
+      + arn                          = (known after apply)
+      + description                  = "TillFlow public HTTP API — routes to internal ALB via VPC Link."
+      + execution_arn                = (known after apply)
+      + id                           = (known after apply)
+      + ip_address_type              = (known after apply)
+      + name                         = "devops-g10-api"
+      + protocol_type                = "HTTP"
+      + route_selection_expression   = "$request.method $request.path"
+      + tags                         = {
+          + "service" = "api-gateway"
+        }
+      + tags_all                     = {
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "api-gateway"
+        }
+
+      + cors_configuration {
+          + allow_headers = [
+              + "authorization",
+              + "content-type",
+              + "idempotency-key",
+              + "x-amzn-trace-id",
+            ]
+          + allow_methods = [
+              + "DELETE",
+              + "GET",
+              + "OPTIONS",
+              + "POST",
+              + "PUT",
+            ]
+          + allow_origins = [
+              + "*",
+            ]
+          + max_age       = 300
+        }
+    }
+
+  # aws_apigatewayv2_integration.alb will be created
+  + resource "aws_apigatewayv2_integration" "alb" {
+      + api_id                                    = (known after apply)
+      + connection_id                             = (known after apply)
+      + connection_type                           = "VPC_LINK"
+      + id                                        = (known after apply)
+      + integration_method                        = "ANY"
+      + integration_response_selection_expression = (known after apply)
+      + integration_type                          = "HTTP_PROXY"
+      + integration_uri                           = (known after apply)
+      + payload_format_version                    = "1.0"
+      + request_parameters                        = {
+          + "overwrite:header.X-Forwarded-For" = "$context.identity.sourceIp"
+        }
+      + timeout_milliseconds                      = 29000
+    }
+
+  # aws_apigatewayv2_route.proxy will be created
+  + resource "aws_apigatewayv2_route" "proxy" {
+      + api_id             = (known after apply)
+      + api_key_required   = false
+      + authorization_type = "NONE"
+      + id                 = (known after apply)
+      + route_key          = "ANY /{proxy+}"
+      + target             = (known after apply)
+    }
+
+  # aws_apigatewayv2_route.root will be created
+  + resource "aws_apigatewayv2_route" "root" {
+      + api_id             = (known after apply)
+      + api_key_required   = false
+      + authorization_type = "NONE"
+      + id                 = (known after apply)
+      + route_key          = "ANY /"
+      + target             = (known after apply)
+    }
+
+  # aws_apigatewayv2_stage.default will be created
+  + resource "aws_apigatewayv2_stage" "default" {
+      + api_id        = (known after apply)
+      + arn           = (known after apply)
+      + auto_deploy   = true
+      + deployment_id = (known after apply)
+      + execution_arn = (known after apply)
+      + id            = (known after apply)
+      + invoke_url    = (known after apply)
+      + name          = "$default"
+      + tags          = {
+          + "service" = "api-gateway"
+        }
+      + tags_all      = {
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "api-gateway"
+        }
+
+      + access_log_settings {
+          + destination_arn = (known after apply)
+          + format          = jsonencode(
+                {
+                  + httpMethod       = "$context.httpMethod"
+                  + integrationError = "$context.integrationErrorMessage"
+                  + ip               = "$context.identity.sourceIp"
+                  + protocol         = "$context.protocol"
+                  + requestId        = "$context.requestId"
+                  + requestTime      = "$context.requestTime"
+                  + responseLength   = "$context.responseLength"
+                  + routeKey         = "$context.routeKey"
+                  + status           = "$context.status"
+                  + xrayTraceId      = "$context.xrayTraceId"
+                }
+            )
+        }
+
+      + default_route_settings {
+          + data_trace_enabled       = false
+          + detailed_metrics_enabled = true
+          + logging_level            = (known after apply)
+          + throttling_burst_limit   = 200
+          + throttling_rate_limit    = 100
+        }
+    }
+
+  # aws_apigatewayv2_vpc_link.app will be created
+  + resource "aws_apigatewayv2_vpc_link" "app" {
+      + arn                = (known after apply)
+      + id                 = (known after apply)
+      + name               = "devops-g10-vpclink"
+      + security_group_ids = (known after apply)
+      + subnet_ids         = (known after apply)
+      + tags               = {
+          + "service" = "api-gateway"
+        }
+      + tags_all           = {
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "api-gateway"
+        }
+    }
+
+  # aws_cloudwatch_event_rule.commission_daily will be created
+  + resource "aws_cloudwatch_event_rule" "commission_daily" {
+      + arn                 = (known after apply)
+      + description         = "Fires once a day after business close in Africa/Nairobi (EAT)."
+      + event_bus_name      = "default"
+      + force_destroy       = false
+      + id                  = (known after apply)
+      + name                = "devops-g10-commission-daily-close"
+      + name_prefix         = (known after apply)
+      + schedule_expression = "cron(45 20 * * ? *)"
+      + tags                = {
+          + "service" = "commission"
+        }
+      + tags_all            = {
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "commission"
+        }
+    }
+
+  # aws_cloudwatch_event_target.commission_daily_sqs will be created
+  + resource "aws_cloudwatch_event_target" "commission_daily_sqs" {
+      + arn            = (known after apply)
+      + event_bus_name = "default"
+      + force_destroy  = false
+      + id             = (known after apply)
+      + rule           = "devops-g10-commission-daily-close"
+      + target_id      = "commission-close-queue"
+
+      + input_transformer {
+          + input_paths    = {
+              + "time" = "$.time"
+            }
+          + input_template = <<-EOT
+                {
+                  "type": "commission.daily-close",
+                  "scheduled_at": <time>,
+                  "reason": "eventbridge.cron"
+                }
+            EOT
+        }
+    }
+
+  # aws_cloudwatch_log_group.adot_metrics will be created
+  + resource "aws_cloudwatch_log_group" "adot_metrics" {
+      + arn               = (known after apply)
+      + id                = (known after apply)
+      + log_group_class   = (known after apply)
+      + name              = "/devops-g10/adot/metrics"
+      + name_prefix       = (known after apply)
+      + retention_in_days = 30
+      + skip_destroy      = false
+      + tags              = {
+          + "service" = "adot"
+        }
+      + tags_all          = {
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "adot"
+        }
+    }
+
+  # aws_cloudwatch_log_group.adot_web will be created
+  + resource "aws_cloudwatch_log_group" "adot_web" {
+      + arn               = (known after apply)
+      + id                = (known after apply)
+      + log_group_class   = (known after apply)
+      + name              = "/devops-g10/adot/web"
+      + name_prefix       = (known after apply)
+      + retention_in_days = 30
+      + skip_destroy      = false
+      + tags              = {
+          + "role"    = "adot-sidecar"
+          + "service" = "web"
+        }
+      + tags_all          = {
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "role"        = "adot-sidecar"
+          + "service"     = "web"
+        }
+    }
+
+  # aws_cloudwatch_log_group.apigw will be created
+  + resource "aws_cloudwatch_log_group" "apigw" {
+      + arn               = (known after apply)
+      + id                = (known after apply)
+      + log_group_class   = (known after apply)
+      + name              = "/devops-g10/api-gateway"
+      + name_prefix       = (known after apply)
+      + retention_in_days = 30
+      + skip_destroy      = false
+      + tags              = {
+          + "service" = "api-gateway"
+        }
+      + tags_all          = {
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "api-gateway"
+        }
+    }
+
+  # aws_cloudwatch_log_group.codebuild_web will be created
+  + resource "aws_cloudwatch_log_group" "codebuild_web" {
+      + arn               = (known after apply)
+      + id                = (known after apply)
+      + log_group_class   = (known after apply)
+      + name              = "/aws/codebuild/devops-g10-web-build"
+      + name_prefix       = (known after apply)
+      + retention_in_days = 30
+      + skip_destroy      = false
+      + tags              = {
+          + "service" = "cicd"
+        }
+      + tags_all          = {
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "cicd"
+        }
+    }
+
+  # aws_cloudwatch_log_group.web will be created
+  + resource "aws_cloudwatch_log_group" "web" {
+      + arn               = (known after apply)
+      + id                = (known after apply)
+      + log_group_class   = (known after apply)
+      + name              = "/devops-g10/web"
+      + name_prefix       = (known after apply)
+      + retention_in_days = 30
+      + skip_destroy      = false
+      + tags              = {
+          + "service" = "web"
+        }
+      + tags_all          = {
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "web"
+        }
+    }
+
+  # aws_codebuild_project.web will be created
+  + resource "aws_codebuild_project" "web" {
+      + arn                  = (known after apply)
+      + badge_enabled        = false
+      + badge_url            = (known after apply)
+      + build_timeout        = 60
+      + description          = (known after apply)
+      + encryption_key       = (known after apply)
+      + id                   = (known after apply)
+      + name                 = "devops-g10-web-build"
+      + project_visibility   = "PRIVATE"
+      + public_project_alias = (known after apply)
+      + queued_timeout       = 480
+      + service_role         = (known after apply)
+      + tags                 = {
+          + "service" = "cicd"
+        }
+      + tags_all             = {
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "cicd"
+        }
+
+      + artifacts {
+          + encryption_disabled    = false
+          + override_artifact_name = false
+          + type                   = "CODEPIPELINE"
+        }
+
+      + environment {
+          + compute_type                = "BUILD_GENERAL1_SMALL"
+          + image                       = "aws/codebuild/standard:7.0"
+          + image_pull_credentials_type = "CODEBUILD"
+          + privileged_mode             = true
+          + type                        = "LINUX_CONTAINER"
+
+          + environment_variable {
+              + name  = "AWS_REGION"
+              + type  = "PLAINTEXT"
+              + value = "eu-central-1"
+            }
+          + environment_variable {
+              + name  = "AWS_ACCOUNT_ID"
+              + type  = "PLAINTEXT"
+              + value = "240462142849"
+            }
+          + environment_variable {
+              + name  = "ECR_REPO"
+              + type  = "PLAINTEXT"
+              + value = (known after apply)
+            }
+          + environment_variable {
+              + name  = "SERVICE"
+              + type  = "PLAINTEXT"
+              + value = "web"
+            }
+          + environment_variable {
+              + name  = "CONTAINER_NAME"
+              + type  = "PLAINTEXT"
+              + value = "app"
+            }
+        }
+
+      + logs_config {
+          + cloudwatch_logs {
+              + group_name = "/aws/codebuild/devops-g10-web-build"
+              + status     = "ENABLED"
+            }
+        }
+
+      + source {
+          + buildspec = "services/web/buildspec.yml"
+          + type      = "CODEPIPELINE"
+        }
+    }
+
+  # aws_db_instance.pg will be created
+  + resource "aws_db_instance" "pg" {
+      + address                               = (known after apply)
+      + allocated_storage                     = 20
+      + apply_immediately                     = false
+      + arn                                   = (known after apply)
+      + auto_minor_version_upgrade            = true
+      + availability_zone                     = (known after apply)
+      + backup_retention_period               = 7
+      + backup_target                         = (known after apply)
+      + backup_window                         = "02:00-03:00"
+      + ca_cert_identifier                    = (known after apply)
+      + character_set_name                    = (known after apply)
+      + copy_tags_to_snapshot                 = true
+      + database_insights_mode                = (known after apply)
+      + db_name                               = "tillflow"
+      + db_subnet_group_name                  = "devops-g10-vpc"
+      + dedicated_log_volume                  = false
+      + delete_automated_backups              = false
+      + deletion_protection                   = true
+      + domain_fqdn                           = (known after apply)
+      + enabled_cloudwatch_logs_exports       = [
+          + "postgresql",
+          + "upgrade",
+        ]
+      + endpoint                              = (known after apply)
+      + engine                                = "postgres"
+      + engine_lifecycle_support              = (known after apply)
+      + engine_version                        = "16.15"
+      + engine_version_actual                 = (known after apply)
+      + final_snapshot_identifier             = (known after apply)
+      + hosted_zone_id                        = (known after apply)
+      + id                                    = (known after apply)
+      + identifier                            = "devops-g10-pg"
+      + identifier_prefix                     = (known after apply)
+      + instance_class                        = "db.t4g.micro"
+      + iops                                  = (known after apply)
+      + kms_key_id                            = (known after apply)
+      + latest_restorable_time                = (known after apply)
+      + license_model                         = (known after apply)
+      + listener_endpoint                     = (known after apply)
+      + maintenance_window                    = "sun:03:30-sun:05:00"
+      + master_user_secret                    = (known after apply)
+      + master_user_secret_kms_key_id         = (known after apply)
+      + max_allocated_storage                 = 50
+      + monitoring_interval                   = 0
+      + monitoring_role_arn                   = (known after apply)
+      + multi_az                              = false
+      + nchar_character_set_name              = (known after apply)
+      + network_type                          = (known after apply)
+      + option_group_name                     = (known after apply)
+      + parameter_group_name                  = "devops-g10-pg16"
+      + password                              = (sensitive value)
+      + password_wo                           = (write-only attribute)
+      + performance_insights_enabled          = true
+      + performance_insights_kms_key_id       = (known after apply)
+      + performance_insights_retention_period = 7
+      + port                                  = 5432
+      + publicly_accessible                   = false
+      + replica_mode                          = (known after apply)
+      + replicas                              = (known after apply)
+      + resource_id                           = (known after apply)
+      + skip_final_snapshot                   = false
+      + snapshot_identifier                   = (known after apply)
+      + status                                = (known after apply)
+      + storage_encrypted                     = true
+      + storage_throughput                    = (known after apply)
+      + storage_type                          = "gp3"
+      + tags                                  = {
+          + "service" = "rds"
+        }
+      + tags_all                              = {
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "rds"
+        }
+      + timezone                              = (known after apply)
+      + username                              = "tillflow_master"
+      + vpc_security_group_ids                = (known after apply)
+    }
+
+  # aws_db_parameter_group.pg16 will be created
+  + resource "aws_db_parameter_group" "pg16" {
+      + arn          = (known after apply)
+      + description  = "TillFlow — RDS Postgres 16 parameters"
+      + family       = "postgres16"
+      + id           = (known after apply)
+      + name         = "devops-g10-pg16"
+      + name_prefix  = (known after apply)
+      + skip_destroy = false
+      + tags         = {
+          + "service" = "rds"
+        }
+      + tags_all     = {
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "rds"
+        }
+
+      + parameter {
+          + apply_method = "immediate"
+          + name         = "log_connections"
+          + value        = "1"
+        }
+      + parameter {
+          + apply_method = "immediate"
+          + name         = "log_disconnections"
+          + value        = "1"
+        }
+      + parameter {
+          + apply_method = "immediate"
+          + name         = "log_min_duration_statement"
+          + value        = "500"
+        }
+    }
+
+  # aws_ecr_lifecycle_policy.service["commission"] will be created
+  + resource "aws_ecr_lifecycle_policy" "service" {
+      + id          = (known after apply)
+      + policy      = jsonencode(
+            {
+              + rules = [
+                  + {
+                      + action       = {
+                          + type = "expire"
+                        }
+                      + description  = "Keep last 20 images per repo."
+                      + rulePriority = 1
+                      + selection    = {
+                          + countNumber = 20
+                          + countType   = "imageCountMoreThan"
+                          + tagStatus   = "any"
+                        }
+                    },
+                ]
+            }
+        )
+      + registry_id = (known after apply)
+      + repository  = "devops-g10/commission"
+    }
+
+  # aws_ecr_lifecycle_policy.service["payments"] will be created
+  + resource "aws_ecr_lifecycle_policy" "service" {
+      + id          = (known after apply)
+      + policy      = jsonencode(
+            {
+              + rules = [
+                  + {
+                      + action       = {
+                          + type = "expire"
+                        }
+                      + description  = "Keep last 20 images per repo."
+                      + rulePriority = 1
+                      + selection    = {
+                          + countNumber = 20
+                          + countType   = "imageCountMoreThan"
+                          + tagStatus   = "any"
+                        }
+                    },
+                ]
+            }
+        )
+      + registry_id = (known after apply)
+      + repository  = "devops-g10/payments"
+    }
+
+  # aws_ecr_lifecycle_policy.service["pos"] will be created
+  + resource "aws_ecr_lifecycle_policy" "service" {
+      + id          = (known after apply)
+      + policy      = jsonencode(
+            {
+              + rules = [
+                  + {
+                      + action       = {
+                          + type = "expire"
+                        }
+                      + description  = "Keep last 20 images per repo."
+                      + rulePriority = 1
+                      + selection    = {
+                          + countNumber = 20
+                          + countType   = "imageCountMoreThan"
+                          + tagStatus   = "any"
+                        }
+                    },
+                ]
+            }
+        )
+      + registry_id = (known after apply)
+      + repository  = "devops-g10/pos"
+    }
+
+  # aws_ecr_lifecycle_policy.service["web"] will be created
+  + resource "aws_ecr_lifecycle_policy" "service" {
+      + id          = (known after apply)
+      + policy      = jsonencode(
+            {
+              + rules = [
+                  + {
+                      + action       = {
+                          + type = "expire"
+                        }
+                      + description  = "Keep last 20 images per repo."
+                      + rulePriority = 1
+                      + selection    = {
+                          + countNumber = 20
+                          + countType   = "imageCountMoreThan"
+                          + tagStatus   = "any"
+                        }
+                    },
+                ]
+            }
+        )
+      + registry_id = (known after apply)
+      + repository  = "devops-g10/web"
+    }
+
+  # aws_ecr_registry_scanning_configuration.enhanced will be created
+  + resource "aws_ecr_registry_scanning_configuration" "enhanced" {
+      + id          = (known after apply)
+      + registry_id = (known after apply)
+      + scan_type   = "ENHANCED"
+
+      + rule {
+          + scan_frequency = "CONTINUOUS_SCAN"
+
+          + repository_filter {
+              + filter      = "devops-g10/*"
+              + filter_type = "WILDCARD"
+            }
+        }
+    }
+
+  # aws_ecr_repository.service["commission"] will be created
+  + resource "aws_ecr_repository" "service" {
+      + arn                  = (known after apply)
+      + force_delete         = false
+      + id                   = (known after apply)
+      + image_tag_mutability = "IMMUTABLE"
+      + name                 = "devops-g10/commission"
+      + registry_id          = (known after apply)
+      + repository_url       = (known after apply)
+      + tags                 = {
+          + "service" = "commission"
+        }
+      + tags_all             = {
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "commission"
+        }
+
+      + encryption_configuration {
+          + encryption_type = "AES256"
+          + kms_key         = (known after apply)
+        }
+
+      + image_scanning_configuration {
+          + scan_on_push = true
+        }
+    }
+
+  # aws_ecr_repository.service["payments"] will be created
+  + resource "aws_ecr_repository" "service" {
+      + arn                  = (known after apply)
+      + force_delete         = false
+      + id                   = (known after apply)
+      + image_tag_mutability = "IMMUTABLE"
+      + name                 = "devops-g10/payments"
+      + registry_id          = (known after apply)
+      + repository_url       = (known after apply)
+      + tags                 = {
+          + "service" = "payments"
+        }
+      + tags_all             = {
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "payments"
+        }
+
+      + encryption_configuration {
+          + encryption_type = "AES256"
+          + kms_key         = (known after apply)
+        }
+
+      + image_scanning_configuration {
+          + scan_on_push = true
+        }
+    }
+
+  # aws_ecr_repository.service["pos"] will be created
+  + resource "aws_ecr_repository" "service" {
+      + arn                  = (known after apply)
+      + force_delete         = false
+      + id                   = (known after apply)
+      + image_tag_mutability = "IMMUTABLE"
+      + name                 = "devops-g10/pos"
+      + registry_id          = (known after apply)
+      + repository_url       = (known after apply)
+      + tags                 = {
+          + "service" = "pos"
+        }
+      + tags_all             = {
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "pos"
+        }
+
+      + encryption_configuration {
+          + encryption_type = "AES256"
+          + kms_key         = (known after apply)
+        }
+
+      + image_scanning_configuration {
+          + scan_on_push = true
+        }
+    }
+
+  # aws_ecr_repository.service["web"] will be created
+  + resource "aws_ecr_repository" "service" {
+      + arn                  = (known after apply)
+      + force_delete         = false
+      + id                   = (known after apply)
+      + image_tag_mutability = "IMMUTABLE"
+      + name                 = "devops-g10/web"
+      + registry_id          = (known after apply)
+      + repository_url       = (known after apply)
+      + tags                 = {
+          + "service" = "web"
+        }
+      + tags_all             = {
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "web"
+        }
+
+      + encryption_configuration {
+          + encryption_type = "AES256"
+          + kms_key         = (known after apply)
+        }
+
+      + image_scanning_configuration {
+          + scan_on_push = true
+        }
+    }
+
+  # aws_ecs_cluster.app will be created
+  + resource "aws_ecs_cluster" "app" {
+      + arn      = (known after apply)
+      + id       = (known after apply)
+      + name     = "devops-g10"
+      + tags     = {
+          + "service" = "ecs"
+        }
+      + tags_all = {
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "ecs"
+        }
+
+      + setting {
+          + name  = "containerInsights"
+          + value = "enabled"
+        }
+    }
+
+  # aws_ecs_cluster_capacity_providers.app will be created
+  + resource "aws_ecs_cluster_capacity_providers" "app" {
+      + capacity_providers = [
+          + "FARGATE",
+        ]
+      + cluster_name       = "devops-g10"
+      + id                 = (known after apply)
+
+      + default_capacity_provider_strategy {
+          + base              = 1
+          + capacity_provider = "FARGATE"
+          + weight            = 1
+        }
+    }
+
+  # aws_ecs_service.web will be created
+  + resource "aws_ecs_service" "web" {
+      + availability_zone_rebalancing      = "DISABLED"
+      + cluster                            = (known after apply)
+      + deployment_maximum_percent         = 200
+      + deployment_minimum_healthy_percent = 100
+      + desired_count                      = 2
+      + enable_ecs_managed_tags            = true
+      + enable_execute_command             = false
+      + iam_role                           = (known after apply)
+      + id                                 = (known after apply)
+      + launch_type                        = "FARGATE"
+      + name                               = "devops-g10-web"
+      + platform_version                   = "LATEST"
+      + propagate_tags                     = "SERVICE"
+      + scheduling_strategy                = "REPLICA"
+      + tags                               = {
+          + "service" = "web"
+        }
+      + tags_all                           = {
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "web"
+        }
+      + task_definition                    = (known after apply)
+      + triggers                           = (known after apply)
+      + wait_for_steady_state              = false
+
+      + deployment_circuit_breaker {
+          + enable   = true
+          + rollback = true
+        }
+
+      + load_balancer {
+          + container_name   = "app"
+          + container_port   = 8080
+          + target_group_arn = (known after apply)
+            # (1 unchanged attribute hidden)
+        }
+
+      + network_configuration {
+          + assign_public_ip = false
+          + security_groups  = (known after apply)
+          + subnets          = (known after apply)
+        }
+    }
+
+  # aws_ecs_task_definition.web will be created
+  + resource "aws_ecs_task_definition" "web" {
+      + arn                      = (known after apply)
+      + arn_without_revision     = (known after apply)
+      + container_definitions    = (sensitive value)
+      + cpu                      = "512"
+      + enable_fault_injection   = (known after apply)
+      + execution_role_arn       = (known after apply)
+      + family                   = "devops-g10-web"
+      + id                       = (known after apply)
+      + memory                   = "1024"
+      + network_mode             = "awsvpc"
+      + requires_compatibilities = [
+          + "FARGATE",
+        ]
+      + revision                 = (known after apply)
+      + skip_destroy             = false
+      + tags                     = {
+          + "service" = "web"
+        }
+      + tags_all                 = {
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "web"
+        }
+      + task_role_arn            = (known after apply)
+      + track_latest             = false
+
+      + runtime_platform {
+          + cpu_architecture        = "ARM64"
+          + operating_system_family = "LINUX"
+        }
+
+      + volume {
+          + configure_at_launch = (known after apply)
+          + name                = "tmp"
+            # (1 unchanged attribute hidden)
+        }
+    }
+
+  # aws_elasticache_replication_group.valkey will be created
+  + resource "aws_elasticache_replication_group" "valkey" {
+      + apply_immediately              = false
+      + arn                            = (known after apply)
+      + at_rest_encryption_enabled     = "true"
+      + auth_token                     = (sensitive value)
+      + auth_token_update_strategy     = "ROTATE"
+      + auto_minor_version_upgrade     = (known after apply)
+      + automatic_failover_enabled     = false
+      + cluster_enabled                = (known after apply)
+      + cluster_mode                   = (known after apply)
+      + configuration_endpoint_address = (known after apply)
+      + data_tiering_enabled           = (known after apply)
+      + description                    = "TillFlow cache-aside Valkey."
+      + engine                         = "valkey"
+      + engine_version                 = "7.2"
+      + engine_version_actual          = (known after apply)
+      + global_replication_group_id    = (known after apply)
+      + id                             = (known after apply)
+      + ip_discovery                   = (known after apply)
+      + maintenance_window             = (known after apply)
+      + member_clusters                = (known after apply)
+      + multi_az_enabled               = false
+      + network_type                   = (known after apply)
+      + node_type                      = "cache.t4g.micro"
+      + num_cache_clusters             = 1
+      + num_node_groups                = (known after apply)
+      + parameter_group_name           = "default.valkey7"
+      + port                           = 6379
+      + primary_endpoint_address       = (known after apply)
+      + reader_endpoint_address        = (known after apply)
+      + replicas_per_node_group        = (known after apply)
+      + replication_group_id           = "devops-g10-valkey"
+      + security_group_ids             = (known after apply)
+      + security_group_names           = (known after apply)
+      + snapshot_retention_limit       = 3
+      + snapshot_window                = "03:00-04:00"
+      + subnet_group_name              = "devops-g10-cache"
+      + tags                           = {
+          + "service" = "cache"
+        }
+      + tags_all                       = {
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "cache"
+        }
+      + transit_encryption_enabled     = true
+      + transit_encryption_mode        = (known after apply)
+    }
+
+  # aws_elasticache_subnet_group.cache will be created
+  + resource "aws_elasticache_subnet_group" "cache" {
+      + arn         = (known after apply)
+      + description = "Managed by Terraform"
+      + id          = (known after apply)
+      + name        = "devops-g10-cache"
+      + subnet_ids  = (known after apply)
+      + tags        = {
+          + "service" = "cache"
+        }
+      + tags_all    = {
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "cache"
+        }
+      + vpc_id      = (known after apply)
+    }
+
+  # aws_iam_openid_connect_provider.github will be updated in-place
+  ~ resource "aws_iam_openid_connect_provider" "github" {
+        id              = "arn:aws:iam::240462142849:oidc-provider/token.actions.githubusercontent.com"
+      ~ tags            = {
+          + "service" = "iam"
+        }
+      ~ tags_all        = {
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "iam"
+        }
+      ~ thumbprint_list = [
+            "6938fd4d98bab03faadb97b34396831e3780aea1",
+          - "1c58a3a8518e8759bf075b76b750d4f2df264fcd",
+        ]
+        # (3 unchanged attributes hidden)
+    }
+
+  # aws_iam_policy.ci_deploy will be created
+  + resource "aws_iam_policy" "ci_deploy" {
+      + arn              = (known after apply)
+      + attachment_count = (known after apply)
+      + description      = "Permissions for the GitHub Actions CI deploy role."
+      + id               = (known after apply)
+      + name             = "devops-g10-ci-deploy"
+      + name_prefix      = (known after apply)
+      + path             = "/"
+      + policy           = jsonencode(
+            {
+              + Statement = [
+                  + {
+                      + Action   = [
+                          + "wafv2:List*",
+                          + "wafv2:Get*",
+                          + "sts:GetCallerIdentity",
+                          + "sqs:List*",
+                          + "sqs:GetQueueAttributes",
+                          + "secretsmanager:ListSecrets",
+                          + "secretsmanager:DescribeSecret",
+                          + "s3:List*",
+                          + "s3:GetObject*",
+                          + "s3:GetBucket*",
+                          + "rds:Describe*",
+                          + "logs:Describe*",
+                          + "kms:List*",
+                          + "kms:Describe*",
+                          + "iam:SimulatePrincipalPolicy",
+                          + "iam:List*",
+                          + "iam:Get*",
+                          + "events:List*",
+                          + "events:Describe*",
+                          + "elasticloadbalancing:Describe*",
+                          + "elasticache:Describe*",
+                          + "ecs:List*",
+                          + "ecs:Describe*",
+                          + "ecr:List*",
+                          + "ecr:Describe*",
+                          + "ecr:BatchGet*",
+                          + "ec2:Describe*",
+                          + "codestar-connections:List*",
+                          + "codestar-connections:Get*",
+                          + "codepipeline:List*",
+                          + "codepipeline:Get*",
+                          + "codebuild:List*",
+                          + "codebuild:Batch*",
+                          + "cloudwatch:List*",
+                          + "cloudwatch:Describe*",
+                          + "apigateway:GET",
+                        ]
+                      + Effect   = "Allow"
+                      + Resource = "*"
+                      + Sid      = "ReadEverythingForPlan"
+                    },
+                  + {
+                      + Action    = [
+                          + "wafv2:*",
+                          + "sqs:*",
+                          + "secretsmanager:*",
+                          + "s3:*",
+                          + "rds:*",
+                          + "logs:*",
+                          + "iam:*",
+                          + "events:*",
+                          + "elasticloadbalancing:*",
+                          + "elasticache:*",
+                          + "ecs:*",
+                          + "ecr:*",
+                          + "ec2:*",
+                          + "codepipeline:*",
+                          + "codebuild:*",
+                          + "cloudwatch:*",
+                          + "apigateway:*",
+                        ]
+                      + Condition = {
+                          + StringEquals = {
+                              + "aws:RequestedRegion" = "eu-central-1"
+                            }
+                        }
+                      + Effect    = "Allow"
+                      + Resource  = "*"
+                      + Sid       = "WriteNamespacedResources"
+                    },
+                  + {
+                      + Action   = [
+                          + "ecr:UploadLayerPart",
+                          + "ecr:PutImage",
+                          + "ecr:InitiateLayerUpload",
+                          + "ecr:GetAuthorizationToken",
+                          + "ecr:CompleteLayerUpload",
+                          + "ecr:BatchCheckLayerAvailability",
+                        ]
+                      + Effect   = "Allow"
+                      + Resource = "*"
+                      + Sid      = "ECRPushImages"
+                    },
+                ]
+              + Version   = "2012-10-17"
+            }
+        )
+      + policy_id        = (known after apply)
+      + tags_all         = {
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "platform"
+        }
+    }
+
+  # aws_iam_policy.commission_task will be created
+  + resource "aws_iam_policy" "commission_task" {
+      + arn              = (known after apply)
+      + attachment_count = (known after apply)
+      + id               = (known after apply)
+      + name             = "devops-g10-commission-task"
+      + name_prefix      = (known after apply)
+      + path             = "/"
+      + policy           = (known after apply)
+      + policy_id        = (known after apply)
+      + tags_all         = {
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "platform"
+        }
+    }
+
+  # aws_iam_policy.payments_task will be created
+  + resource "aws_iam_policy" "payments_task" {
+      + arn              = (known after apply)
+      + attachment_count = (known after apply)
+      + id               = (known after apply)
+      + name             = "devops-g10-payments-task"
+      + name_prefix      = (known after apply)
+      + path             = "/"
+      + policy           = (known after apply)
+      + policy_id        = (known after apply)
+      + tags_all         = {
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "platform"
+        }
+    }
+
+  # aws_iam_policy.task_common will be created
+  + resource "aws_iam_policy" "task_common" {
+      + arn              = (known after apply)
+      + attachment_count = (known after apply)
+      + description      = "Base permissions attached to every service task role (X-Ray, metrics, own logs)."
+      + id               = (known after apply)
+      + name             = "devops-g10-task-common"
+      + name_prefix      = (known after apply)
+      + path             = "/"
+      + policy           = jsonencode(
+            {
+              + Statement = [
+                  + {
+                      + Action   = [
+                          + "xray:PutTraceSegments",
+                          + "xray:PutTelemetryRecords",
+                          + "xray:GetSamplingTargets",
+                          + "xray:GetSamplingStatisticSummaries",
+                          + "xray:GetSamplingRules",
+                        ]
+                      + Effect   = "Allow"
+                      + Resource = "*"
+                    },
+                  + {
+                      + Action    = "cloudwatch:PutMetricData"
+                      + Condition = {
+                          + StringEquals = {
+                              + "cloudwatch:namespace" = "TillFlow"
+                            }
+                        }
+                      + Effect    = "Allow"
+                      + Resource  = "*"
+                    },
+                  + {
+                      + Action   = [
+                          + "logs:PutLogEvents",
+                          + "logs:DescribeLogStreams",
+                          + "logs:CreateLogStream",
+                        ]
+                      + Effect   = "Allow"
+                      + Resource = "arn:aws:logs:eu-central-1:240462142849:log-group:/devops-g10/*"
+                    },
+                ]
+              + Version   = "2012-10-17"
+            }
+        )
+      + policy_id        = (known after apply)
+      + tags_all         = {
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "platform"
+        }
+    }
+
+  # aws_iam_policy.task_exec_secrets will be created
+  + resource "aws_iam_policy" "task_exec_secrets" {
+      + arn              = (known after apply)
+      + attachment_count = (known after apply)
+      + description      = "ECS exec role permission to read our task secrets."
+      + id               = (known after apply)
+      + name             = "devops-g10-task-exec-secrets"
+      + name_prefix      = (known after apply)
+      + path             = "/"
+      + policy           = (known after apply)
+      + policy_id        = (known after apply)
+      + tags_all         = {
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "platform"
+        }
+    }
+
+  # aws_iam_role.ci_deploy will be created
+  + resource "aws_iam_role" "ci_deploy" {
+      + arn                   = (known after apply)
+      + assume_role_policy    = (known after apply)
+      + create_date           = (known after apply)
+      + description           = "GitHub Actions OIDC role — terraform plan/apply + docker push to ECR."
+      + force_detach_policies = false
+      + id                    = (known after apply)
+      + managed_policy_arns   = (known after apply)
+      + max_session_duration  = 3600
+      + name                  = "devops-g10-ci-deploy"
+      + name_prefix           = (known after apply)
+      + path                  = "/"
+      + tags                  = {
+          + "service" = "cicd"
+        }
+      + tags_all              = {
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "cicd"
+        }
+      + unique_id             = (known after apply)
+
+      + inline_policy (known after apply)
+    }
+
+  # aws_iam_role.codebuild will be created
+  + resource "aws_iam_role" "codebuild" {
+      + arn                   = (known after apply)
+      + assume_role_policy    = jsonencode(
+            {
+              + Statement = [
+                  + {
+                      + Action    = "sts:AssumeRole"
+                      + Effect    = "Allow"
+                      + Principal = {
+                          + Service = "codebuild.amazonaws.com"
+                        }
+                    },
+                ]
+              + Version   = "2012-10-17"
+            }
+        )
+      + create_date           = (known after apply)
+      + force_detach_policies = false
+      + id                    = (known after apply)
+      + managed_policy_arns   = (known after apply)
+      + max_session_duration  = 3600
+      + name                  = "devops-g10-codebuild"
+      + name_prefix           = (known after apply)
+      + path                  = "/"
+      + tags                  = {
+          + "service" = "cicd"
+        }
+      + tags_all              = {
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "cicd"
+        }
+      + unique_id             = (known after apply)
+
+      + inline_policy (known after apply)
+    }
+
+  # aws_iam_role.pipeline will be created
+  + resource "aws_iam_role" "pipeline" {
+      + arn                   = (known after apply)
+      + assume_role_policy    = jsonencode(
+            {
+              + Statement = [
+                  + {
+                      + Action    = "sts:AssumeRole"
+                      + Effect    = "Allow"
+                      + Principal = {
+                          + Service = "codepipeline.amazonaws.com"
+                        }
+                    },
+                ]
+              + Version   = "2012-10-17"
+            }
+        )
+      + create_date           = (known after apply)
+      + force_detach_policies = false
+      + id                    = (known after apply)
+      + managed_policy_arns   = (known after apply)
+      + max_session_duration  = 3600
+      + name                  = "devops-g10-pipeline"
+      + name_prefix           = (known after apply)
+      + path                  = "/"
+      + tags                  = {
+          + "service" = "cicd"
+        }
+      + tags_all              = {
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "cicd"
+        }
+      + unique_id             = (known after apply)
+
+      + inline_policy (known after apply)
+    }
+
+  # aws_iam_role.task["commission"] will be created
+  + resource "aws_iam_role" "task" {
+      + arn                   = (known after apply)
+      + assume_role_policy    = jsonencode(
+            {
+              + Statement = [
+                  + {
+                      + Action    = "sts:AssumeRole"
+                      + Effect    = "Allow"
+                      + Principal = {
+                          + Service = "ecs-tasks.amazonaws.com"
+                        }
+                    },
+                ]
+              + Version   = "2012-10-17"
+            }
+        )
+      + create_date           = (known after apply)
+      + force_detach_policies = false
+      + id                    = (known after apply)
+      + managed_policy_arns   = (known after apply)
+      + max_session_duration  = 3600
+      + name                  = "devops-g10-commission-task"
+      + name_prefix           = (known after apply)
+      + path                  = "/"
+      + tags                  = {
+          + "service" = "commission"
+        }
+      + tags_all              = {
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "commission"
+        }
+      + unique_id             = (known after apply)
+
+      + inline_policy (known after apply)
+    }
+
+  # aws_iam_role.task["payments"] will be created
+  + resource "aws_iam_role" "task" {
+      + arn                   = (known after apply)
+      + assume_role_policy    = jsonencode(
+            {
+              + Statement = [
+                  + {
+                      + Action    = "sts:AssumeRole"
+                      + Effect    = "Allow"
+                      + Principal = {
+                          + Service = "ecs-tasks.amazonaws.com"
+                        }
+                    },
+                ]
+              + Version   = "2012-10-17"
+            }
+        )
+      + create_date           = (known after apply)
+      + force_detach_policies = false
+      + id                    = (known after apply)
+      + managed_policy_arns   = (known after apply)
+      + max_session_duration  = 3600
+      + name                  = "devops-g10-payments-task"
+      + name_prefix           = (known after apply)
+      + path                  = "/"
+      + tags                  = {
+          + "service" = "payments"
+        }
+      + tags_all              = {
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "payments"
+        }
+      + unique_id             = (known after apply)
+
+      + inline_policy (known after apply)
+    }
+
+  # aws_iam_role.task["pos"] will be created
+  + resource "aws_iam_role" "task" {
+      + arn                   = (known after apply)
+      + assume_role_policy    = jsonencode(
+            {
+              + Statement = [
+                  + {
+                      + Action    = "sts:AssumeRole"
+                      + Effect    = "Allow"
+                      + Principal = {
+                          + Service = "ecs-tasks.amazonaws.com"
+                        }
+                    },
+                ]
+              + Version   = "2012-10-17"
+            }
+        )
+      + create_date           = (known after apply)
+      + force_detach_policies = false
+      + id                    = (known after apply)
+      + managed_policy_arns   = (known after apply)
+      + max_session_duration  = 3600
+      + name                  = "devops-g10-pos-task"
+      + name_prefix           = (known after apply)
+      + path                  = "/"
+      + tags                  = {
+          + "service" = "pos"
+        }
+      + tags_all              = {
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "pos"
+        }
+      + unique_id             = (known after apply)
+
+      + inline_policy (known after apply)
+    }
+
+  # aws_iam_role.task["web"] will be created
+  + resource "aws_iam_role" "task" {
+      + arn                   = (known after apply)
+      + assume_role_policy    = jsonencode(
+            {
+              + Statement = [
+                  + {
+                      + Action    = "sts:AssumeRole"
+                      + Effect    = "Allow"
+                      + Principal = {
+                          + Service = "ecs-tasks.amazonaws.com"
+                        }
+                    },
+                ]
+              + Version   = "2012-10-17"
+            }
+        )
+      + create_date           = (known after apply)
+      + force_detach_policies = false
+      + id                    = (known after apply)
+      + managed_policy_arns   = (known after apply)
+      + max_session_duration  = 3600
+      + name                  = "devops-g10-web-task"
+      + name_prefix           = (known after apply)
+      + path                  = "/"
+      + tags                  = {
+          + "service" = "web"
+        }
+      + tags_all              = {
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "web"
+        }
+      + unique_id             = (known after apply)
+
+      + inline_policy (known after apply)
+    }
+
+  # aws_iam_role.task_exec["commission"] will be created
+  + resource "aws_iam_role" "task_exec" {
+      + arn                   = (known after apply)
+      + assume_role_policy    = jsonencode(
+            {
+              + Statement = [
+                  + {
+                      + Action    = "sts:AssumeRole"
+                      + Effect    = "Allow"
+                      + Principal = {
+                          + Service = "ecs-tasks.amazonaws.com"
+                        }
+                    },
+                ]
+              + Version   = "2012-10-17"
+            }
+        )
+      + create_date           = (known after apply)
+      + force_detach_policies = false
+      + id                    = (known after apply)
+      + managed_policy_arns   = (known after apply)
+      + max_session_duration  = 3600
+      + name                  = "devops-g10-commission-exec"
+      + name_prefix           = (known after apply)
+      + path                  = "/"
+      + tags                  = {
+          + "service" = "commission"
+        }
+      + tags_all              = {
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "commission"
+        }
+      + unique_id             = (known after apply)
+
+      + inline_policy (known after apply)
+    }
+
+  # aws_iam_role.task_exec["payments"] will be created
+  + resource "aws_iam_role" "task_exec" {
+      + arn                   = (known after apply)
+      + assume_role_policy    = jsonencode(
+            {
+              + Statement = [
+                  + {
+                      + Action    = "sts:AssumeRole"
+                      + Effect    = "Allow"
+                      + Principal = {
+                          + Service = "ecs-tasks.amazonaws.com"
+                        }
+                    },
+                ]
+              + Version   = "2012-10-17"
+            }
+        )
+      + create_date           = (known after apply)
+      + force_detach_policies = false
+      + id                    = (known after apply)
+      + managed_policy_arns   = (known after apply)
+      + max_session_duration  = 3600
+      + name                  = "devops-g10-payments-exec"
+      + name_prefix           = (known after apply)
+      + path                  = "/"
+      + tags                  = {
+          + "service" = "payments"
+        }
+      + tags_all              = {
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "payments"
+        }
+      + unique_id             = (known after apply)
+
+      + inline_policy (known after apply)
+    }
+
+  # aws_iam_role.task_exec["pos"] will be created
+  + resource "aws_iam_role" "task_exec" {
+      + arn                   = (known after apply)
+      + assume_role_policy    = jsonencode(
+            {
+              + Statement = [
+                  + {
+                      + Action    = "sts:AssumeRole"
+                      + Effect    = "Allow"
+                      + Principal = {
+                          + Service = "ecs-tasks.amazonaws.com"
+                        }
+                    },
+                ]
+              + Version   = "2012-10-17"
+            }
+        )
+      + create_date           = (known after apply)
+      + force_detach_policies = false
+      + id                    = (known after apply)
+      + managed_policy_arns   = (known after apply)
+      + max_session_duration  = 3600
+      + name                  = "devops-g10-pos-exec"
+      + name_prefix           = (known after apply)
+      + path                  = "/"
+      + tags                  = {
+          + "service" = "pos"
+        }
+      + tags_all              = {
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "pos"
+        }
+      + unique_id             = (known after apply)
+
+      + inline_policy (known after apply)
+    }
+
+  # aws_iam_role.task_exec["web"] will be created
+  + resource "aws_iam_role" "task_exec" {
+      + arn                   = (known after apply)
+      + assume_role_policy    = jsonencode(
+            {
+              + Statement = [
+                  + {
+                      + Action    = "sts:AssumeRole"
+                      + Effect    = "Allow"
+                      + Principal = {
+                          + Service = "ecs-tasks.amazonaws.com"
+                        }
+                    },
+                ]
+              + Version   = "2012-10-17"
+            }
+        )
+      + create_date           = (known after apply)
+      + force_detach_policies = false
+      + id                    = (known after apply)
+      + managed_policy_arns   = (known after apply)
+      + max_session_duration  = 3600
+      + name                  = "devops-g10-web-exec"
+      + name_prefix           = (known after apply)
+      + path                  = "/"
+      + tags                  = {
+          + "service" = "web"
+        }
+      + tags_all              = {
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "web"
+        }
+      + unique_id             = (known after apply)
+
+      + inline_policy (known after apply)
+    }
+
+  # aws_iam_role_policy.codebuild will be created
+  + resource "aws_iam_role_policy" "codebuild" {
+      + id          = (known after apply)
+      + name        = (known after apply)
+      + name_prefix = (known after apply)
+      + policy      = (known after apply)
+      + role        = "devops-g10-codebuild"
+    }
+
+  # aws_iam_role_policy.pipeline will be created
+  + resource "aws_iam_role_policy" "pipeline" {
+      + id          = (known after apply)
+      + name        = (known after apply)
+      + name_prefix = (known after apply)
+      + policy      = (known after apply)
+      + role        = "devops-g10-pipeline"
+    }
+
+  # aws_iam_role_policy_attachment.ci_deploy will be created
+  + resource "aws_iam_role_policy_attachment" "ci_deploy" {
+      + id         = (known after apply)
+      + policy_arn = (known after apply)
+      + role       = "devops-g10-ci-deploy"
+    }
+
+  # aws_iam_role_policy_attachment.commission_task will be created
+  + resource "aws_iam_role_policy_attachment" "commission_task" {
+      + id         = (known after apply)
+      + policy_arn = (known after apply)
+      + role       = "devops-g10-commission-task"
+    }
+
+  # aws_iam_role_policy_attachment.payments_task will be created
+  + resource "aws_iam_role_policy_attachment" "payments_task" {
+      + id         = (known after apply)
+      + policy_arn = (known after apply)
+      + role       = "devops-g10-payments-task"
+    }
+
+  # aws_iam_role_policy_attachment.task_common["commission"] will be created
+  + resource "aws_iam_role_policy_attachment" "task_common" {
+      + id         = (known after apply)
+      + policy_arn = (known after apply)
+      + role       = "devops-g10-commission-task"
+    }
+
+  # aws_iam_role_policy_attachment.task_common["payments"] will be created
+  + resource "aws_iam_role_policy_attachment" "task_common" {
+      + id         = (known after apply)
+      + policy_arn = (known after apply)
+      + role       = "devops-g10-payments-task"
+    }
+
+  # aws_iam_role_policy_attachment.task_common["pos"] will be created
+  + resource "aws_iam_role_policy_attachment" "task_common" {
+      + id         = (known after apply)
+      + policy_arn = (known after apply)
+      + role       = "devops-g10-pos-task"
+    }
+
+  # aws_iam_role_policy_attachment.task_common["web"] will be created
+  + resource "aws_iam_role_policy_attachment" "task_common" {
+      + id         = (known after apply)
+      + policy_arn = (known after apply)
+      + role       = "devops-g10-web-task"
+    }
+
+  # aws_iam_role_policy_attachment.task_exec_default["commission"] will be created
+  + resource "aws_iam_role_policy_attachment" "task_exec_default" {
+      + id         = (known after apply)
+      + policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+      + role       = "devops-g10-commission-exec"
+    }
+
+  # aws_iam_role_policy_attachment.task_exec_default["payments"] will be created
+  + resource "aws_iam_role_policy_attachment" "task_exec_default" {
+      + id         = (known after apply)
+      + policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+      + role       = "devops-g10-payments-exec"
+    }
+
+  # aws_iam_role_policy_attachment.task_exec_default["pos"] will be created
+  + resource "aws_iam_role_policy_attachment" "task_exec_default" {
+      + id         = (known after apply)
+      + policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+      + role       = "devops-g10-pos-exec"
+    }
+
+  # aws_iam_role_policy_attachment.task_exec_default["web"] will be created
+  + resource "aws_iam_role_policy_attachment" "task_exec_default" {
+      + id         = (known after apply)
+      + policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+      + role       = "devops-g10-web-exec"
+    }
+
+  # aws_iam_role_policy_attachment.task_exec_secrets["commission"] will be created
+  + resource "aws_iam_role_policy_attachment" "task_exec_secrets" {
+      + id         = (known after apply)
+      + policy_arn = (known after apply)
+      + role       = "devops-g10-commission-exec"
+    }
+
+  # aws_iam_role_policy_attachment.task_exec_secrets["payments"] will be created
+  + resource "aws_iam_role_policy_attachment" "task_exec_secrets" {
+      + id         = (known after apply)
+      + policy_arn = (known after apply)
+      + role       = "devops-g10-payments-exec"
+    }
+
+  # aws_iam_role_policy_attachment.task_exec_secrets["pos"] will be created
+  + resource "aws_iam_role_policy_attachment" "task_exec_secrets" {
+      + id         = (known after apply)
+      + policy_arn = (known after apply)
+      + role       = "devops-g10-pos-exec"
+    }
+
+  # aws_iam_role_policy_attachment.task_exec_secrets["web"] will be created
+  + resource "aws_iam_role_policy_attachment" "task_exec_secrets" {
+      + id         = (known after apply)
+      + policy_arn = (known after apply)
+      + role       = "devops-g10-web-exec"
+    }
+
+  # aws_lb.app will be created
+  + resource "aws_lb" "app" {
+      + arn                                                          = (known after apply)
+      + arn_suffix                                                   = (known after apply)
+      + client_keep_alive                                            = 3600
+      + desync_mitigation_mode                                       = "defensive"
+      + dns_name                                                     = (known after apply)
+      + drop_invalid_header_fields                                   = true
+      + enable_deletion_protection                                   = false
+      + enable_http2                                                 = true
+      + enable_tls_version_and_cipher_suite_headers                  = false
+      + enable_waf_fail_open                                         = false
+      + enable_xff_client_port                                       = false
+      + enable_zonal_shift                                           = false
+      + enforce_security_group_inbound_rules_on_private_link_traffic = (known after apply)
+      + id                                                           = (known after apply)
+      + idle_timeout                                                 = 60
+      + internal                                                     = true
+      + ip_address_type                                              = (known after apply)
+      + load_balancer_type                                           = "application"
+      + name                                                         = "devops-g10-alb"
+      + name_prefix                                                  = (known after apply)
+      + preserve_host_header                                         = false
+      + security_groups                                              = (known after apply)
+      + subnets                                                      = (known after apply)
+      + tags                                                         = {
+          + "service" = "alb"
+        }
+      + tags_all                                                     = {
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "alb"
+        }
+      + vpc_id                                                       = (known after apply)
+      + xff_header_processing_mode                                   = "append"
+      + zone_id                                                      = (known after apply)
+
+      + access_logs {
+          + bucket  = "devops-g10-logs-240462142849"
+          + enabled = true
+          + prefix  = "alb"
+        }
+
+      + subnet_mapping (known after apply)
+    }
+
+  # aws_lb_listener.http will be created
+  + resource "aws_lb_listener" "http" {
+      + arn                                                                   = (known after apply)
+      + id                                                                    = (known after apply)
+      + load_balancer_arn                                                     = (known after apply)
+      + port                                                                  = 80
+      + protocol                                                              = "HTTP"
+      + routing_http_request_x_amzn_mtls_clientcert_header_name               = (known after apply)
+      + routing_http_request_x_amzn_mtls_clientcert_issuer_header_name        = (known after apply)
+      + routing_http_request_x_amzn_mtls_clientcert_leaf_header_name          = (known after apply)
+      + routing_http_request_x_amzn_mtls_clientcert_serial_number_header_name = (known after apply)
+      + routing_http_request_x_amzn_mtls_clientcert_subject_header_name       = (known after apply)
+      + routing_http_request_x_amzn_mtls_clientcert_validity_header_name      = (known after apply)
+      + routing_http_request_x_amzn_tls_cipher_suite_header_name              = (known after apply)
+      + routing_http_request_x_amzn_tls_version_header_name                   = (known after apply)
+      + routing_http_response_access_control_allow_credentials_header_value   = (known after apply)
+      + routing_http_response_access_control_allow_headers_header_value       = (known after apply)
+      + routing_http_response_access_control_allow_methods_header_value       = (known after apply)
+      + routing_http_response_access_control_allow_origin_header_value        = (known after apply)
+      + routing_http_response_access_control_expose_headers_header_value      = (known after apply)
+      + routing_http_response_access_control_max_age_header_value             = (known after apply)
+      + routing_http_response_content_security_policy_header_value            = (known after apply)
+      + routing_http_response_server_enabled                                  = (known after apply)
+      + routing_http_response_strict_transport_security_header_value          = (known after apply)
+      + routing_http_response_x_content_type_options_header_value             = (known after apply)
+      + routing_http_response_x_frame_options_header_value                    = (known after apply)
+      + ssl_policy                                                            = (known after apply)
+      + tags_all                                                              = {
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "platform"
+        }
+      + tcp_idle_timeout_seconds                                              = (known after apply)
+
+      + default_action {
+          + order = (known after apply)
+          + type  = "fixed-response"
+
+          + fixed_response {
+              + content_type = "text/plain"
+              + message_body = "not found"
+              + status_code  = "404"
+            }
+        }
+
+      + mutual_authentication (known after apply)
+    }
+
+  # aws_lb_listener_rule.web will be created
+  + resource "aws_lb_listener_rule" "web" {
+      + arn          = (known after apply)
+      + id           = (known after apply)
+      + listener_arn = (known after apply)
+      + priority     = 100
+      + tags_all     = {
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "platform"
+        }
+
+      + action {
+          + order            = (known after apply)
+          + target_group_arn = (known after apply)
+          + type             = "forward"
+        }
+
+      + condition {
+          + path_pattern {
+              + values = [
+                  + "/*",
+                ]
+            }
+        }
+    }
+
+  # aws_lb_target_group.web will be created
+  + resource "aws_lb_target_group" "web" {
+      + arn                                = (known after apply)
+      + arn_suffix                         = (known after apply)
+      + connection_termination             = (known after apply)
+      + deregistration_delay               = "15"
+      + id                                 = (known after apply)
+      + ip_address_type                    = (known after apply)
+      + lambda_multi_value_headers_enabled = false
+      + load_balancer_arns                 = (known after apply)
+      + load_balancing_algorithm_type      = (known after apply)
+      + load_balancing_anomaly_mitigation  = (known after apply)
+      + load_balancing_cross_zone_enabled  = (known after apply)
+      + name                               = "devops-g10-web-tg"
+      + name_prefix                        = (known after apply)
+      + port                               = 8080
+      + preserve_client_ip                 = (known after apply)
+      + protocol                           = "HTTP"
+      + protocol_version                   = (known after apply)
+      + proxy_protocol_v2                  = false
+      + slow_start                         = 0
+      + tags                               = {
+          + "service" = "web"
+        }
+      + tags_all                           = {
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "web"
+        }
+      + target_type                        = "ip"
+      + vpc_id                             = (known after apply)
+
+      + health_check {
+          + enabled             = true
+          + healthy_threshold   = 2
+          + interval            = 10
+          + matcher             = "200"
+          + path                = "/health"
+          + port                = "traffic-port"
+          + protocol            = "HTTP"
+          + timeout             = 3
+          + unhealthy_threshold = 3
+        }
+
+      + stickiness (known after apply)
+
+      + target_failover (known after apply)
+
+      + target_group_health (known after apply)
+
+      + target_health_state (known after apply)
+    }
+
+  # aws_s3_bucket.artifacts will be created
+  + resource "aws_s3_bucket" "artifacts" {
+      + acceleration_status         = (known after apply)
+      + acl                         = (known after apply)
+      + arn                         = (known after apply)
+      + bucket                      = "devops-g10-artifacts-240462142849"
+      + bucket_domain_name          = (known after apply)
+      + bucket_prefix               = (known after apply)
+      + bucket_regional_domain_name = (known after apply)
+      + force_destroy               = false
+      + hosted_zone_id              = (known after apply)
+      + id                          = (known after apply)
+      + object_lock_enabled         = (known after apply)
+      + policy                      = (known after apply)
+      + region                      = (known after apply)
+      + request_payer               = (known after apply)
+      + tags                        = {
+          + "service" = "artifacts"
+        }
+      + tags_all                    = {
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "artifacts"
+        }
+      + website_domain              = (known after apply)
+      + website_endpoint            = (known after apply)
+
+      + cors_rule (known after apply)
+
+      + grant (known after apply)
+
+      + lifecycle_rule (known after apply)
+
+      + logging (known after apply)
+
+      + object_lock_configuration (known after apply)
+
+      + replication_configuration (known after apply)
+
+      + server_side_encryption_configuration (known after apply)
+
+      + versioning (known after apply)
+
+      + website (known after apply)
+    }
+
+  # aws_s3_bucket.backups will be created
+  + resource "aws_s3_bucket" "backups" {
+      + acceleration_status         = (known after apply)
+      + acl                         = (known after apply)
+      + arn                         = (known after apply)
+      + bucket                      = "devops-g10-backups-240462142849"
+      + bucket_domain_name          = (known after apply)
+      + bucket_prefix               = (known after apply)
+      + bucket_regional_domain_name = (known after apply)
+      + force_destroy               = false
+      + hosted_zone_id              = (known after apply)
+      + id                          = (known after apply)
+      + object_lock_enabled         = (known after apply)
+      + policy                      = (known after apply)
+      + region                      = (known after apply)
+      + request_payer               = (known after apply)
+      + tags                        = {
+          + "service" = "backups"
+        }
+      + tags_all                    = {
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "backups"
+        }
+      + website_domain              = (known after apply)
+      + website_endpoint            = (known after apply)
+
+      + cors_rule (known after apply)
+
+      + grant (known after apply)
+
+      + lifecycle_rule (known after apply)
+
+      + logging (known after apply)
+
+      + object_lock_configuration (known after apply)
+
+      + replication_configuration (known after apply)
+
+      + server_side_encryption_configuration (known after apply)
+
+      + versioning (known after apply)
+
+      + website (known after apply)
+    }
+
+  # aws_s3_bucket.logs will be created
+  + resource "aws_s3_bucket" "logs" {
+      + acceleration_status         = (known after apply)
+      + acl                         = (known after apply)
+      + arn                         = (known after apply)
+      + bucket                      = "devops-g10-logs-240462142849"
+      + bucket_domain_name          = (known after apply)
+      + bucket_prefix               = (known after apply)
+      + bucket_regional_domain_name = (known after apply)
+      + force_destroy               = false
+      + hosted_zone_id              = (known after apply)
+      + id                          = (known after apply)
+      + object_lock_enabled         = (known after apply)
+      + policy                      = (known after apply)
+      + region                      = (known after apply)
+      + request_payer               = (known after apply)
+      + tags                        = {
+          + "service" = "logs"
+        }
+      + tags_all                    = {
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "logs"
+        }
+      + website_domain              = (known after apply)
+      + website_endpoint            = (known after apply)
+
+      + cors_rule (known after apply)
+
+      + grant (known after apply)
+
+      + lifecycle_rule (known after apply)
+
+      + logging (known after apply)
+
+      + object_lock_configuration (known after apply)
+
+      + replication_configuration (known after apply)
+
+      + server_side_encryption_configuration (known after apply)
+
+      + versioning (known after apply)
+
+      + website (known after apply)
+    }
+
+  # aws_s3_bucket_lifecycle_configuration.artifacts will be created
+  + resource "aws_s3_bucket_lifecycle_configuration" "artifacts" {
+      + bucket                                 = (known after apply)
+      + expected_bucket_owner                  = (known after apply)
+      + id                                     = (known after apply)
+      + transition_default_minimum_object_size = "all_storage_classes_128K"
+
+      + rule {
+          + id     = "expire-30d"
+          + status = "Enabled"
+            # (1 unchanged attribute hidden)
+
+          + abort_incomplete_multipart_upload {
+              + days_after_initiation = 7
+            }
+
+          + expiration {
+              + days                         = 30
+              + expired_object_delete_marker = false
+            }
+
+          + filter {
+                # (1 unchanged attribute hidden)
+            }
+        }
+    }
+
+  # aws_s3_bucket_lifecycle_configuration.backups will be created
+  + resource "aws_s3_bucket_lifecycle_configuration" "backups" {
+      + bucket                                 = (known after apply)
+      + expected_bucket_owner                  = (known after apply)
+      + id                                     = (known after apply)
+      + transition_default_minimum_object_size = "all_storage_classes_128K"
+
+      + rule {
+          + id     = "glacier-then-expire-1y"
+          + status = "Enabled"
+            # (1 unchanged attribute hidden)
+
+          + expiration {
+              + days                         = 365
+              + expired_object_delete_marker = false
+            }
+
+          + filter {
+                # (1 unchanged attribute hidden)
+            }
+
+          + transition {
+              + days          = 30
+              + storage_class = "GLACIER_IR"
+            }
+        }
+    }
+
+  # aws_s3_bucket_lifecycle_configuration.logs will be created
+  + resource "aws_s3_bucket_lifecycle_configuration" "logs" {
+      + bucket                                 = (known after apply)
+      + expected_bucket_owner                  = (known after apply)
+      + id                                     = (known after apply)
+      + transition_default_minimum_object_size = "all_storage_classes_128K"
+
+      + rule {
+          + id     = "glacier-then-expire"
+          + status = "Enabled"
+            # (1 unchanged attribute hidden)
+
+          + expiration {
+              + days                         = 90
+              + expired_object_delete_marker = false
+            }
+
+          + filter {
+                # (1 unchanged attribute hidden)
+            }
+
+          + transition {
+              + days          = 30
+              + storage_class = "GLACIER_IR"
+            }
+        }
+    }
+
+  # aws_s3_bucket_ownership_controls.artifacts will be created
+  + resource "aws_s3_bucket_ownership_controls" "artifacts" {
+      + bucket = (known after apply)
+      + id     = (known after apply)
+
+      + rule {
+          + object_ownership = "BucketOwnerEnforced"
+        }
+    }
+
+  # aws_s3_bucket_ownership_controls.backups will be created
+  + resource "aws_s3_bucket_ownership_controls" "backups" {
+      + bucket = (known after apply)
+      + id     = (known after apply)
+
+      + rule {
+          + object_ownership = "BucketOwnerEnforced"
+        }
+    }
+
+  # aws_s3_bucket_ownership_controls.logs will be created
+  + resource "aws_s3_bucket_ownership_controls" "logs" {
+      + bucket = (known after apply)
+      + id     = (known after apply)
+
+      + rule {
+          + object_ownership = "BucketOwnerEnforced"
+        }
+    }
+
+  # aws_s3_bucket_policy.logs will be created
+  + resource "aws_s3_bucket_policy" "logs" {
+      + bucket = (known after apply)
+      + id     = (known after apply)
+      + policy = (known after apply)
+    }
+
+  # aws_s3_bucket_public_access_block.artifacts will be created
+  + resource "aws_s3_bucket_public_access_block" "artifacts" {
+      + block_public_acls       = true
+      + block_public_policy     = true
+      + bucket                  = (known after apply)
+      + id                      = (known after apply)
+      + ignore_public_acls      = true
+      + restrict_public_buckets = true
+    }
+
+  # aws_s3_bucket_public_access_block.backups will be created
+  + resource "aws_s3_bucket_public_access_block" "backups" {
+      + block_public_acls       = true
+      + block_public_policy     = true
+      + bucket                  = (known after apply)
+      + id                      = (known after apply)
+      + ignore_public_acls      = true
+      + restrict_public_buckets = true
+    }
+
+  # aws_s3_bucket_public_access_block.logs will be created
+  + resource "aws_s3_bucket_public_access_block" "logs" {
+      + block_public_acls       = true
+      + block_public_policy     = true
+      + bucket                  = (known after apply)
+      + id                      = (known after apply)
+      + ignore_public_acls      = true
+      + restrict_public_buckets = true
+    }
+
+  # aws_s3_bucket_server_side_encryption_configuration.artifacts will be created
+  + resource "aws_s3_bucket_server_side_encryption_configuration" "artifacts" {
+      + bucket = (known after apply)
+      + id     = (known after apply)
+
+      + rule {
+          + bucket_key_enabled = true
+
+          + apply_server_side_encryption_by_default {
+              + sse_algorithm     = "AES256"
+                # (1 unchanged attribute hidden)
+            }
+        }
+    }
+
+  # aws_s3_bucket_server_side_encryption_configuration.backups will be created
+  + resource "aws_s3_bucket_server_side_encryption_configuration" "backups" {
+      + bucket = (known after apply)
+      + id     = (known after apply)
+
+      + rule {
+          + bucket_key_enabled = true
+
+          + apply_server_side_encryption_by_default {
+              + sse_algorithm     = "AES256"
+                # (1 unchanged attribute hidden)
+            }
+        }
+    }
+
+  # aws_s3_bucket_server_side_encryption_configuration.logs will be created
+  + resource "aws_s3_bucket_server_side_encryption_configuration" "logs" {
+      + bucket = (known after apply)
+      + id     = (known after apply)
+
+      + rule {
+          + bucket_key_enabled = true
+
+          + apply_server_side_encryption_by_default {
+              + sse_algorithm     = "AES256"
+                # (1 unchanged attribute hidden)
+            }
+        }
+    }
+
+  # aws_s3_bucket_versioning.artifacts will be created
+  + resource "aws_s3_bucket_versioning" "artifacts" {
+      + bucket = (known after apply)
+      + id     = (known after apply)
+
+      + versioning_configuration {
+          + mfa_delete = (known after apply)
+          + status     = "Enabled"
+        }
+    }
+
+  # aws_s3_bucket_versioning.backups will be created
+  + resource "aws_s3_bucket_versioning" "backups" {
+      + bucket = (known after apply)
+      + id     = (known after apply)
+
+      + versioning_configuration {
+          + mfa_delete = (known after apply)
+          + status     = "Enabled"
+        }
+    }
+
+  # aws_s3_bucket_versioning.logs will be created
+  + resource "aws_s3_bucket_versioning" "logs" {
+      + bucket = (known after apply)
+      + id     = (known after apply)
+
+      + versioning_configuration {
+          + mfa_delete = (known after apply)
+          + status     = "Enabled"
+        }
+    }
+
+  # aws_secretsmanager_secret.cache_auth will be created
+  + resource "aws_secretsmanager_secret" "cache_auth" {
+      + arn                            = (known after apply)
+      + description                    = "Valkey AUTH token."
+      + force_overwrite_replica_secret = false
+      + id                             = (known after apply)
+      + name                           = "devops-g10/cache/auth"
+      + name_prefix                    = (known after apply)
+      + policy                         = (known after apply)
+      + recovery_window_in_days        = 30
+      + tags                           = {
+          + "service" = "cache"
+        }
+      + tags_all                       = {
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "cache"
+        }
+
+      + replica (known after apply)
+    }
+
+  # aws_secretsmanager_secret.daraja will be created
+  + resource "aws_secretsmanager_secret" "daraja" {
+      + arn                            = (known after apply)
+      + description                    = "Daraja 3.0 SANDBOX credentials (consumer key/secret, shortcode, passkey). SANDBOX ONLY."
+      + force_overwrite_replica_secret = false
+      + id                             = (known after apply)
+      + name                           = "devops-g10/daraja"
+      + name_prefix                    = (known after apply)
+      + policy                         = (known after apply)
+      + recovery_window_in_days        = 30
+      + tags                           = {
+          + "populated-by" = "arsema"
+          + "service"      = "payments"
+        }
+      + tags_all                       = {
+          + "capstone"     = "tillflow"
+          + "environment"  = "prod"
+          + "group"        = "g10"
+          + "managed-by"   = "terraform"
+          + "owner"        = "yordanos"
+          + "populated-by" = "arsema"
+          + "service"      = "payments"
+        }
+
+      + replica (known after apply)
+    }
+
+  # aws_secretsmanager_secret.rds_master will be created
+  + resource "aws_secretsmanager_secret" "rds_master" {
+      + arn                            = (known after apply)
+      + description                    = "RDS master credentials for TillFlow — used only for schema bootstrap."
+      + force_overwrite_replica_secret = false
+      + id                             = (known after apply)
+      + name                           = "devops-g10/db/master"
+      + name_prefix                    = (known after apply)
+      + policy                         = (known after apply)
+      + recovery_window_in_days        = 30
+      + tags                           = {
+          + "service" = "rds"
+        }
+      + tags_all                       = {
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "rds"
+        }
+
+      + replica (known after apply)
+    }
+
+  # aws_secretsmanager_secret.slack will be created
+  + resource "aws_secretsmanager_secret" "slack" {
+      + arn                            = (known after apply)
+      + description                    = "Slack incoming-webhook URL for alerts."
+      + force_overwrite_replica_secret = false
+      + id                             = (known after apply)
+      + name                           = "devops-g10/slack-webhook"
+      + name_prefix                    = (known after apply)
+      + policy                         = (known after apply)
+      + recovery_window_in_days        = 30
+      + tags                           = {
+          + "populated-by" = "saloi"
+          + "service"      = "reliability"
+        }
+      + tags_all                       = {
+          + "capstone"     = "tillflow"
+          + "environment"  = "prod"
+          + "group"        = "g10"
+          + "managed-by"   = "terraform"
+          + "owner"        = "yordanos"
+          + "populated-by" = "saloi"
+          + "service"      = "reliability"
+        }
+
+      + replica (known after apply)
+    }
+
+  # aws_secretsmanager_secret_version.cache_auth will be created
+  + resource "aws_secretsmanager_secret_version" "cache_auth" {
+      + arn                  = (known after apply)
+      + has_secret_string_wo = (known after apply)
+      + id                   = (known after apply)
+      + secret_id            = (known after apply)
+      + secret_string        = (sensitive value)
+      + secret_string_wo     = (write-only attribute)
+      + version_id           = (known after apply)
+      + version_stages       = (known after apply)
+    }
+
+  # aws_secretsmanager_secret_version.daraja_placeholder will be created
+  + resource "aws_secretsmanager_secret_version" "daraja_placeholder" {
+      + arn                  = (known after apply)
+      + has_secret_string_wo = (known after apply)
+      + id                   = (known after apply)
+      + secret_id            = (known after apply)
+      + secret_string        = (sensitive value)
+      + secret_string_wo     = (write-only attribute)
+      + version_id           = (known after apply)
+      + version_stages       = (known after apply)
+    }
+
+  # aws_secretsmanager_secret_version.rds_master will be created
+  + resource "aws_secretsmanager_secret_version" "rds_master" {
+      + arn                  = (known after apply)
+      + has_secret_string_wo = (known after apply)
+      + id                   = (known after apply)
+      + secret_id            = (known after apply)
+      + secret_string        = (sensitive value)
+      + secret_string_wo     = (write-only attribute)
+      + version_id           = (known after apply)
+      + version_stages       = (known after apply)
+    }
+
+  # aws_secretsmanager_secret_version.slack_placeholder will be created
+  + resource "aws_secretsmanager_secret_version" "slack_placeholder" {
+      + arn                  = (known after apply)
+      + has_secret_string_wo = (known after apply)
+      + id                   = (known after apply)
+      + secret_id            = (known after apply)
+      + secret_string        = (sensitive value)
+      + secret_string_wo     = (write-only attribute)
+      + version_id           = (known after apply)
+      + version_stages       = (known after apply)
+    }
+
+  # aws_security_group.alb will be created
+  + resource "aws_security_group" "alb" {
+      + arn                    = (known after apply)
+      + description            = "Internal ALB — accepts traffic from API Gateway VPC Link only."
+      + egress                 = (known after apply)
+      + id                     = (known after apply)
+      + ingress                = (known after apply)
+      + name                   = "devops-g10-alb"
+      + name_prefix            = (known after apply)
+      + owner_id               = (known after apply)
+      + revoke_rules_on_delete = false
+      + tags                   = {
+          + "Name"    = "devops-g10-alb"
+          + "service" = "alb"
+        }
+      + tags_all               = {
+          + "Name"        = "devops-g10-alb"
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "alb"
+        }
+      + vpc_id                 = (known after apply)
+    }
+
+  # aws_security_group.cache will be created
+  + resource "aws_security_group" "cache" {
+      + arn                    = (known after apply)
+      + description            = "Valkey — accepts from ECS task SG only."
+      + egress                 = (known after apply)
+      + id                     = (known after apply)
+      + ingress                = (known after apply)
+      + name                   = "devops-g10-cache"
+      + name_prefix            = (known after apply)
+      + owner_id               = (known after apply)
+      + revoke_rules_on_delete = false
+      + tags                   = {
+          + "Name"    = "devops-g10-cache"
+          + "service" = "cache"
+        }
+      + tags_all               = {
+          + "Name"        = "devops-g10-cache"
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "cache"
+        }
+      + vpc_id                 = (known after apply)
+    }
+
+  # aws_security_group.ecs_tasks will be created
+  + resource "aws_security_group" "ecs_tasks" {
+      + arn                    = (known after apply)
+      + description            = "Application containers on ECS Fargate."
+      + egress                 = (known after apply)
+      + id                     = (known after apply)
+      + ingress                = (known after apply)
+      + name                   = "devops-g10-ecs-tasks"
+      + name_prefix            = (known after apply)
+      + owner_id               = (known after apply)
+      + revoke_rules_on_delete = false
+      + tags                   = {
+          + "Name"    = "devops-g10-ecs-tasks"
+          + "service" = "ecs"
+        }
+      + tags_all               = {
+          + "Name"        = "devops-g10-ecs-tasks"
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "ecs"
+        }
+      + vpc_id                 = (known after apply)
+    }
+
+  # aws_security_group.rds will be created
+  + resource "aws_security_group" "rds" {
+      + arn                    = (known after apply)
+      + description            = "PostgreSQL — accepts from ECS task SG only."
+      + egress                 = (known after apply)
+      + id                     = (known after apply)
+      + ingress                = (known after apply)
+      + name                   = "devops-g10-rds"
+      + name_prefix            = (known after apply)
+      + owner_id               = (known after apply)
+      + revoke_rules_on_delete = false
+      + tags                   = {
+          + "Name"    = "devops-g10-rds"
+          + "service" = "rds"
+        }
+      + tags_all               = {
+          + "Name"        = "devops-g10-rds"
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "rds"
+        }
+      + vpc_id                 = (known after apply)
+    }
+
+  # aws_security_group.vpc_endpoints will be created
+  + resource "aws_security_group" "vpc_endpoints" {
+      + arn                    = (known after apply)
+      + description            = "Interface VPC endpoints — HTTPS from ECS task SG."
+      + egress                 = (known after apply)
+      + id                     = (known after apply)
+      + ingress                = (known after apply)
+      + name                   = "devops-g10-vpce"
+      + name_prefix            = (known after apply)
+      + owner_id               = (known after apply)
+      + revoke_rules_on_delete = false
+      + tags                   = {
+          + "Name"    = "devops-g10-vpce"
+          + "service" = "network"
+        }
+      + tags_all               = {
+          + "Name"        = "devops-g10-vpce"
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "network"
+        }
+      + vpc_id                 = (known after apply)
+    }
+
+  # aws_sqs_queue.commission_close will be created
+  + resource "aws_sqs_queue" "commission_close" {
+      + arn                               = (known after apply)
+      + content_based_deduplication       = false
+      + deduplication_scope               = (known after apply)
+      + delay_seconds                     = 0
+      + fifo_queue                        = false
+      + fifo_throughput_limit             = (known after apply)
+      + id                                = (known after apply)
+      + kms_data_key_reuse_period_seconds = 0
+      + max_message_size                  = 262144
+      + message_retention_seconds         = 345600
+      + name                              = "devops-g10-commission-close"
+      + name_prefix                       = (known after apply)
+      + policy                            = (known after apply)
+      + receive_wait_time_seconds         = 0
+      + redrive_allow_policy              = (known after apply)
+      + redrive_policy                    = (known after apply)
+      + sqs_managed_sse_enabled           = true
+      + tags                              = {
+          + "role"    = "primary"
+          + "service" = "commission"
+        }
+      + tags_all                          = {
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "role"        = "primary"
+          + "service"     = "commission"
+        }
+      + url                               = (known after apply)
+      + visibility_timeout_seconds        = 300
+    }
+
+  # aws_sqs_queue.commission_close_dlq will be created
+  + resource "aws_sqs_queue" "commission_close_dlq" {
+      + arn                               = (known after apply)
+      + content_based_deduplication       = false
+      + deduplication_scope               = (known after apply)
+      + delay_seconds                     = 0
+      + fifo_queue                        = false
+      + fifo_throughput_limit             = (known after apply)
+      + id                                = (known after apply)
+      + kms_data_key_reuse_period_seconds = 0
+      + max_message_size                  = 262144
+      + message_retention_seconds         = 1209600
+      + name                              = "devops-g10-commission-close-dlq"
+      + name_prefix                       = (known after apply)
+      + policy                            = (known after apply)
+      + receive_wait_time_seconds         = 0
+      + redrive_allow_policy              = (known after apply)
+      + redrive_policy                    = (known after apply)
+      + sqs_managed_sse_enabled           = true
+      + tags                              = {
+          + "role"    = "dlq"
+          + "service" = "commission"
+        }
+      + tags_all                          = {
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "role"        = "dlq"
+          + "service"     = "commission"
+        }
+      + url                               = (known after apply)
+      + visibility_timeout_seconds        = 300
+    }
+
+  # aws_sqs_queue.payments_callbacks will be created
+  + resource "aws_sqs_queue" "payments_callbacks" {
+      + arn                               = (known after apply)
+      + content_based_deduplication       = false
+      + deduplication_scope               = (known after apply)
+      + delay_seconds                     = 0
+      + fifo_queue                        = false
+      + fifo_throughput_limit             = (known after apply)
+      + id                                = (known after apply)
+      + kms_data_key_reuse_period_seconds = 0
+      + max_message_size                  = 262144
+      + message_retention_seconds         = 345600
+      + name                              = "devops-g10-payments-callbacks"
+      + name_prefix                       = (known after apply)
+      + policy                            = (known after apply)
+      + receive_wait_time_seconds         = 0
+      + redrive_allow_policy              = (known after apply)
+      + redrive_policy                    = (known after apply)
+      + sqs_managed_sse_enabled           = true
+      + tags                              = {
+          + "role"    = "primary"
+          + "service" = "payments"
+        }
+      + tags_all                          = {
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "role"        = "primary"
+          + "service"     = "payments"
+        }
+      + url                               = (known after apply)
+      + visibility_timeout_seconds        = 60
+    }
+
+  # aws_sqs_queue.payments_callbacks_dlq will be created
+  + resource "aws_sqs_queue" "payments_callbacks_dlq" {
+      + arn                               = (known after apply)
+      + content_based_deduplication       = false
+      + deduplication_scope               = (known after apply)
+      + delay_seconds                     = 0
+      + fifo_queue                        = false
+      + fifo_throughput_limit             = (known after apply)
+      + id                                = (known after apply)
+      + kms_data_key_reuse_period_seconds = 0
+      + max_message_size                  = 262144
+      + message_retention_seconds         = 1209600
+      + name                              = "devops-g10-payments-callbacks-dlq"
+      + name_prefix                       = (known after apply)
+      + policy                            = (known after apply)
+      + receive_wait_time_seconds         = 0
+      + redrive_allow_policy              = (known after apply)
+      + redrive_policy                    = (known after apply)
+      + sqs_managed_sse_enabled           = true
+      + tags                              = {
+          + "role"    = "dlq"
+          + "service" = "payments"
+        }
+      + tags_all                          = {
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "role"        = "dlq"
+          + "service"     = "payments"
+        }
+      + url                               = (known after apply)
+      + visibility_timeout_seconds        = 60
+    }
+
+  # aws_sqs_queue_policy.commission_close will be created
+  + resource "aws_sqs_queue_policy" "commission_close" {
+      + id        = (known after apply)
+      + policy    = (known after apply)
+      + queue_url = (known after apply)
+    }
+
+  # aws_ssm_parameter.adot_config will be created
+  + resource "aws_ssm_parameter" "adot_config" {
+      + arn            = (known after apply)
+      + data_type      = (known after apply)
+      + description    = "Shared ADOT collector config. Consumed by every backend task."
+      + has_value_wo   = (known after apply)
+      + id             = (known after apply)
+      + insecure_value = (known after apply)
+      + key_id         = (known after apply)
+      + name           = "/devops-g10/adot/config"
+      + tags           = {
+          + "service" = "adot"
+        }
+      + tags_all       = {
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "adot"
+        }
+      + tier           = "Standard"
+      + type           = "String"
+      + value          = (sensitive value)
+      + value_wo       = (write-only attribute)
+      + version        = (known after apply)
+    }
+
+  # aws_vpc_security_group_egress_rule.alb_to_ecs will be created
+  + resource "aws_vpc_security_group_egress_rule" "alb_to_ecs" {
+      + arn                          = (known after apply)
+      + description                  = "ALB → ECS task app port only."
+      + from_port                    = 8080
+      + id                           = (known after apply)
+      + ip_protocol                  = "tcp"
+      + referenced_security_group_id = (known after apply)
+      + security_group_id            = (known after apply)
+      + security_group_rule_id       = (known after apply)
+      + tags_all                     = {
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "platform"
+        }
+      + to_port                      = 8080
+    }
+
+  # aws_vpc_security_group_egress_rule.ecs_all will be created
+  + resource "aws_vpc_security_group_egress_rule" "ecs_all" {
+      + arn                    = (known after apply)
+      + cidr_ipv4              = "0.0.0.0/0"
+      + description            = "Egress to RDS / cache / Secrets / ECR / Daraja."
+      + id                     = (known after apply)
+      + ip_protocol            = "-1"
+      + security_group_id      = (known after apply)
+      + security_group_rule_id = (known after apply)
+      + tags_all               = {
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "platform"
+        }
+    }
+
+  # aws_vpc_security_group_ingress_rule.alb_from_vpc will be created
+  + resource "aws_vpc_security_group_ingress_rule" "alb_from_vpc" {
+      + arn                    = (known after apply)
+      + cidr_ipv4              = "10.20.0.0/16"
+      + description            = "Allow HTTP from API Gateway VPC Link (inside VPC)."
+      + from_port              = 80
+      + id                     = (known after apply)
+      + ip_protocol            = "tcp"
+      + security_group_id      = (known after apply)
+      + security_group_rule_id = (known after apply)
+      + tags_all               = {
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "platform"
+        }
+      + to_port                = 80
+    }
+
+  # aws_vpc_security_group_ingress_rule.cache_from_ecs will be created
+  + resource "aws_vpc_security_group_ingress_rule" "cache_from_ecs" {
+      + arn                          = (known after apply)
+      + description                  = "Valkey from ECS tasks."
+      + from_port                    = 6379
+      + id                           = (known after apply)
+      + ip_protocol                  = "tcp"
+      + referenced_security_group_id = (known after apply)
+      + security_group_id            = (known after apply)
+      + security_group_rule_id       = (known after apply)
+      + tags_all                     = {
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "platform"
+        }
+      + to_port                      = 6379
+    }
+
+  # aws_vpc_security_group_ingress_rule.ecs_from_alb will be created
+  + resource "aws_vpc_security_group_ingress_rule" "ecs_from_alb" {
+      + arn                          = (known after apply)
+      + description                  = "Traffic from ALB to app port."
+      + from_port                    = 8080
+      + id                           = (known after apply)
+      + ip_protocol                  = "tcp"
+      + referenced_security_group_id = (known after apply)
+      + security_group_id            = (known after apply)
+      + security_group_rule_id       = (known after apply)
+      + tags_all                     = {
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "platform"
+        }
+      + to_port                      = 8080
+    }
+
+  # aws_vpc_security_group_ingress_rule.rds_from_ecs will be created
+  + resource "aws_vpc_security_group_ingress_rule" "rds_from_ecs" {
+      + arn                          = (known after apply)
+      + description                  = "PostgreSQL from ECS tasks."
+      + from_port                    = 5432
+      + id                           = (known after apply)
+      + ip_protocol                  = "tcp"
+      + referenced_security_group_id = (known after apply)
+      + security_group_id            = (known after apply)
+      + security_group_rule_id       = (known after apply)
+      + tags_all                     = {
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "platform"
+        }
+      + to_port                      = 5432
+    }
+
+  # aws_vpc_security_group_ingress_rule.vpce_https_from_ecs will be created
+  + resource "aws_vpc_security_group_ingress_rule" "vpce_https_from_ecs" {
+      + arn                          = (known after apply)
+      + description                  = "HTTPS from ECS tasks."
+      + from_port                    = 443
+      + id                           = (known after apply)
+      + ip_protocol                  = "tcp"
+      + referenced_security_group_id = (known after apply)
+      + security_group_id            = (known after apply)
+      + security_group_rule_id       = (known after apply)
+      + tags_all                     = {
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "platform"
+        }
+      + to_port                      = 443
+    }
+
+  # aws_wafv2_web_acl.app will be created
+  + resource "aws_wafv2_web_acl" "app" {
+      + application_integration_url = (known after apply)
+      + arn                         = (known after apply)
+      + capacity                    = (known after apply)
+      + description                 = "TillFlow edge protection."
+      + id                          = (known after apply)
+      + lock_token                  = (known after apply)
+      + name                        = "devops-g10-waf"
+      + name_prefix                 = (known after apply)
+      + scope                       = "REGIONAL"
+      + tags                        = {
+          + "service" = "waf"
+        }
+      + tags_all                    = {
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "waf"
+        }
+
+      + default_action {
+          + allow {
+            }
+        }
+
+      + rule {
+          + name     = "RateLimitExceptCallback"
+          + priority = 10
+
+          + action {
+              + block {
+                }
+            }
+
+          + statement {
+              + rate_based_statement {
+                  + aggregate_key_type    = "IP"
+                  + evaluation_window_sec = 300
+                  + limit                 = 200
+
+                  + scope_down_statement {
+                      + not_statement {
+                          + statement {
+                              + byte_match_statement {
+                                  + positional_constraint = "STARTS_WITH"
+                                  + search_string         = "/payments/callback"
+
+                                  + field_to_match {
+                                      + uri_path {}
+                                    }
+
+                                  + text_transformation {
+                                      + priority = 0
+                                      + type     = "NONE"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+          + visibility_config {
+              + cloudwatch_metrics_enabled = true
+              + metric_name                = "devops-g10-waf-ratelimit"
+              + sampled_requests_enabled   = true
+            }
+        }
+      + rule {
+          + name     = "AWS-CommonRuleSet"
+          + priority = 1
+
+          + override_action {
+              + none {}
+            }
+
+          + statement {
+              + managed_rule_group_statement {
+                  + name        = "AWSManagedRulesCommonRuleSet"
+                  + vendor_name = "AWS"
+                    # (1 unchanged attribute hidden)
+                }
+            }
+
+          + visibility_config {
+              + cloudwatch_metrics_enabled = true
+              + metric_name                = "devops-g10-waf-common"
+              + sampled_requests_enabled   = true
+            }
+        }
+      + rule {
+          + name     = "AWS-KnownBadInputs"
+          + priority = 2
+
+          + override_action {
+              + none {}
+            }
+
+          + statement {
+              + managed_rule_group_statement {
+                  + name        = "AWSManagedRulesKnownBadInputsRuleSet"
+                  + vendor_name = "AWS"
+                    # (1 unchanged attribute hidden)
+                }
+            }
+
+          + visibility_config {
+              + cloudwatch_metrics_enabled = true
+              + metric_name                = "devops-g10-waf-known-bad"
+              + sampled_requests_enabled   = true
+            }
+        }
+
+      + visibility_config {
+          + cloudwatch_metrics_enabled = true
+          + metric_name                = "devops-g10-waf"
+          + sampled_requests_enabled   = true
+        }
+    }
+
+  # aws_wafv2_web_acl_association.app will be created
+  + resource "aws_wafv2_web_acl_association" "app" {
+      + id           = (known after apply)
+      + resource_arn = (known after apply)
+      + web_acl_arn  = (known after apply)
+    }
+
+  # random_password.cache_auth will be created
+  + resource "random_password" "cache_auth" {
+      + bcrypt_hash = (sensitive value)
+      + id          = (known after apply)
+      + length      = 32
+      + lower       = true
+      + min_lower   = 0
+      + min_numeric = 0
+      + min_special = 0
+      + min_upper   = 0
+      + number      = true
+      + numeric     = true
+      + result      = (sensitive value)
+      + special     = false
+      + upper       = true
+    }
+
+  # random_password.rds_master will be created
+  + resource "random_password" "rds_master" {
+      + bcrypt_hash      = (sensitive value)
+      + id               = (known after apply)
+      + length           = 32
+      + lower            = true
+      + min_lower        = 0
+      + min_numeric      = 0
+      + min_special      = 0
+      + min_upper        = 0
+      + number           = true
+      + numeric          = true
+      + override_special = "!#$%^&*()-_=+[]{}<>?"
+      + result           = (sensitive value)
+      + special          = true
+      + upper            = true
+    }
+
+  # module.vpc.data.aws_iam_policy_document.vpc_flow_log_cloudwatch[0] will be read during apply
+  # (config refers to values not yet known)
+ <= data "aws_iam_policy_document" "vpc_flow_log_cloudwatch" {
+      + id            = (known after apply)
+      + json          = (known after apply)
+      + minified_json = (known after apply)
+
+      + statement {
+          + actions   = [
+              + "logs:CreateLogStream",
+              + "logs:DescribeLogGroups",
+              + "logs:DescribeLogStreams",
+              + "logs:PutLogEvents",
+            ]
+          + effect    = "Allow"
+          + resources = [
+              + (known after apply),
+            ]
+          + sid       = "AWSVPCFlowLogsPushToCloudWatch"
+        }
+    }
+
+  # module.vpc.aws_cloudwatch_log_group.flow_log[0] will be created
+  + resource "aws_cloudwatch_log_group" "flow_log" {
+      + arn               = (known after apply)
+      + id                = (known after apply)
+      + log_group_class   = (known after apply)
+      + name              = (known after apply)
+      + name_prefix       = (known after apply)
+      + retention_in_days = 0
+      + skip_destroy      = false
+      + tags              = {
+          + "service" = "network"
+        }
+      + tags_all          = {
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "network"
+        }
+    }
+
+  # module.vpc.aws_db_subnet_group.database[0] will be created
+  + resource "aws_db_subnet_group" "database" {
+      + arn                     = (known after apply)
+      + description             = "Database subnet group for devops-g10-vpc"
+      + id                      = (known after apply)
+      + name                    = "devops-g10-vpc"
+      + name_prefix             = (known after apply)
+      + subnet_ids              = (known after apply)
+      + supported_network_types = (known after apply)
+      + tags                    = {
+          + "Name"    = "devops-g10-vpc"
+          + "service" = "network"
+        }
+      + tags_all                = {
+          + "Name"        = "devops-g10-vpc"
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "network"
+        }
+      + vpc_id                  = (known after apply)
+    }
+
+  # module.vpc.aws_default_network_acl.this[0] will be created
+  + resource "aws_default_network_acl" "this" {
+      + arn                    = (known after apply)
+      + default_network_acl_id = (known after apply)
+      + id                     = (known after apply)
+      + owner_id               = (known after apply)
+      + tags                   = {
+          + "Name"    = "devops-g10-vpc-default"
+          + "service" = "network"
+        }
+      + tags_all               = {
+          + "Name"        = "devops-g10-vpc-default"
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "network"
+        }
+      + vpc_id                 = (known after apply)
+
+      + egress {
+          + action          = "allow"
+          + from_port       = 0
+          + ipv6_cidr_block = "::/0"
+          + protocol        = "-1"
+          + rule_no         = 101
+          + to_port         = 0
+            # (1 unchanged attribute hidden)
+        }
+      + egress {
+          + action          = "allow"
+          + cidr_block      = "0.0.0.0/0"
+          + from_port       = 0
+          + protocol        = "-1"
+          + rule_no         = 100
+          + to_port         = 0
+            # (1 unchanged attribute hidden)
+        }
+
+      + ingress {
+          + action          = "allow"
+          + from_port       = 0
+          + ipv6_cidr_block = "::/0"
+          + protocol        = "-1"
+          + rule_no         = 101
+          + to_port         = 0
+            # (1 unchanged attribute hidden)
+        }
+      + ingress {
+          + action          = "allow"
+          + cidr_block      = "0.0.0.0/0"
+          + from_port       = 0
+          + protocol        = "-1"
+          + rule_no         = 100
+          + to_port         = 0
+            # (1 unchanged attribute hidden)
+        }
+    }
+
+  # module.vpc.aws_default_route_table.default[0] will be created
+  + resource "aws_default_route_table" "default" {
+      + arn                    = (known after apply)
+      + default_route_table_id = (known after apply)
+      + id                     = (known after apply)
+      + owner_id               = (known after apply)
+      + route                  = (known after apply)
+      + tags                   = {
+          + "Name"    = "devops-g10-vpc-default"
+          + "service" = "network"
+        }
+      + tags_all               = {
+          + "Name"        = "devops-g10-vpc-default"
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "network"
+        }
+      + vpc_id                 = (known after apply)
+
+      + timeouts {
+          + create = "5m"
+          + update = "5m"
+        }
+    }
+
+  # module.vpc.aws_default_security_group.this[0] will be created
+  + resource "aws_default_security_group" "this" {
+      + arn                    = (known after apply)
+      + description            = (known after apply)
+      + egress                 = (known after apply)
+      + id                     = (known after apply)
+      + ingress                = (known after apply)
+      + name                   = (known after apply)
+      + name_prefix            = (known after apply)
+      + owner_id               = (known after apply)
+      + revoke_rules_on_delete = false
+      + tags                   = {
+          + "Name"    = "devops-g10-vpc-default"
+          + "service" = "network"
+        }
+      + tags_all               = {
+          + "Name"        = "devops-g10-vpc-default"
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "network"
+        }
+      + vpc_id                 = (known after apply)
+    }
+
+  # module.vpc.aws_eip.nat[0] will be created
+  + resource "aws_eip" "nat" {
+      + allocation_id        = (known after apply)
+      + arn                  = (known after apply)
+      + association_id       = (known after apply)
+      + carrier_ip           = (known after apply)
+      + customer_owned_ip    = (known after apply)
+      + domain               = "vpc"
+      + id                   = (known after apply)
+      + instance             = (known after apply)
+      + ipam_pool_id         = (known after apply)
+      + network_border_group = (known after apply)
+      + network_interface    = (known after apply)
+      + private_dns          = (known after apply)
+      + private_ip           = (known after apply)
+      + ptr_record           = (known after apply)
+      + public_dns           = (known after apply)
+      + public_ip            = (known after apply)
+      + public_ipv4_pool     = (known after apply)
+      + tags                 = {
+          + "Name"    = "devops-g10-vpc-eu-central-1a"
+          + "service" = "network"
+        }
+      + tags_all             = {
+          + "Name"        = "devops-g10-vpc-eu-central-1a"
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "network"
+        }
+      + vpc                  = (known after apply)
+    }
+
+  # module.vpc.aws_flow_log.this[0] will be created
+  + resource "aws_flow_log" "this" {
+      + arn                      = (known after apply)
+      + iam_role_arn             = (known after apply)
+      + id                       = (known after apply)
+      + log_destination          = (known after apply)
+      + log_destination_type     = "cloud-watch-logs"
+      + log_format               = (known after apply)
+      + log_group_name           = (known after apply)
+      + max_aggregation_interval = 60
+      + tags                     = {
+          + "service" = "network"
+        }
+      + tags_all                 = {
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "network"
+        }
+      + traffic_type             = "ALL"
+      + vpc_id                   = (known after apply)
+    }
+
+  # module.vpc.aws_iam_policy.vpc_flow_log_cloudwatch[0] will be created
+  + resource "aws_iam_policy" "vpc_flow_log_cloudwatch" {
+      + arn              = (known after apply)
+      + attachment_count = (known after apply)
+      + id               = (known after apply)
+      + name             = (known after apply)
+      + name_prefix      = "vpc-flow-log-to-cloudwatch-"
+      + path             = "/"
+      + policy           = (known after apply)
+      + policy_id        = (known after apply)
+      + tags             = {
+          + "service" = "network"
+        }
+      + tags_all         = {
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "network"
+        }
+    }
+
+  # module.vpc.aws_iam_role.vpc_flow_log_cloudwatch[0] will be created
+  + resource "aws_iam_role" "vpc_flow_log_cloudwatch" {
+      + arn                   = (known after apply)
+      + assume_role_policy    = jsonencode(
+            {
+              + Statement = [
+                  + {
+                      + Action    = "sts:AssumeRole"
+                      + Effect    = "Allow"
+                      + Principal = {
+                          + Service = "vpc-flow-logs.amazonaws.com"
+                        }
+                      + Sid       = "AWSVPCFlowLogsAssumeRole"
+                    },
+                ]
+              + Version   = "2012-10-17"
+            }
+        )
+      + create_date           = (known after apply)
+      + force_detach_policies = false
+      + id                    = (known after apply)
+      + managed_policy_arns   = (known after apply)
+      + max_session_duration  = 3600
+      + name                  = (known after apply)
+      + name_prefix           = "vpc-flow-log-role-"
+      + path                  = "/"
+      + tags                  = {
+          + "service" = "network"
+        }
+      + tags_all              = {
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "network"
+        }
+      + unique_id             = (known after apply)
+
+      + inline_policy (known after apply)
+    }
+
+  # module.vpc.aws_iam_role_policy_attachment.vpc_flow_log_cloudwatch[0] will be created
+  + resource "aws_iam_role_policy_attachment" "vpc_flow_log_cloudwatch" {
+      + id         = (known after apply)
+      + policy_arn = (known after apply)
+      + role       = (known after apply)
+    }
+
+  # module.vpc.aws_internet_gateway.this[0] will be created
+  + resource "aws_internet_gateway" "this" {
+      + arn      = (known after apply)
+      + id       = (known after apply)
+      + owner_id = (known after apply)
+      + tags     = {
+          + "Name"    = "devops-g10-vpc"
+          + "service" = "network"
+        }
+      + tags_all = {
+          + "Name"        = "devops-g10-vpc"
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "network"
+        }
+      + vpc_id   = (known after apply)
+    }
+
+  # module.vpc.aws_nat_gateway.this[0] will be created
+  + resource "aws_nat_gateway" "this" {
+      + allocation_id                      = (known after apply)
+      + association_id                     = (known after apply)
+      + connectivity_type                  = "public"
+      + id                                 = (known after apply)
+      + network_interface_id               = (known after apply)
+      + private_ip                         = (known after apply)
+      + public_ip                          = (known after apply)
+      + secondary_private_ip_address_count = (known after apply)
+      + secondary_private_ip_addresses     = (known after apply)
+      + subnet_id                          = (known after apply)
+      + tags                               = {
+          + "Name"    = "devops-g10-vpc-eu-central-1a"
+          + "service" = "network"
+        }
+      + tags_all                           = {
+          + "Name"        = "devops-g10-vpc-eu-central-1a"
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "network"
+        }
+    }
+
+  # module.vpc.aws_route.private_nat_gateway[0] will be created
+  + resource "aws_route" "private_nat_gateway" {
+      + destination_cidr_block = "0.0.0.0/0"
+      + id                     = (known after apply)
+      + instance_id            = (known after apply)
+      + instance_owner_id      = (known after apply)
+      + nat_gateway_id         = (known after apply)
+      + network_interface_id   = (known after apply)
+      + origin                 = (known after apply)
+      + route_table_id         = (known after apply)
+      + state                  = (known after apply)
+
+      + timeouts {
+          + create = "5m"
+        }
+    }
+
+  # module.vpc.aws_route.public_internet_gateway[0] will be created
+  + resource "aws_route" "public_internet_gateway" {
+      + destination_cidr_block = "0.0.0.0/0"
+      + gateway_id             = (known after apply)
+      + id                     = (known after apply)
+      + instance_id            = (known after apply)
+      + instance_owner_id      = (known after apply)
+      + network_interface_id   = (known after apply)
+      + origin                 = (known after apply)
+      + route_table_id         = (known after apply)
+      + state                  = (known after apply)
+
+      + timeouts {
+          + create = "5m"
+        }
+    }
+
+  # module.vpc.aws_route_table.private[0] will be created
+  + resource "aws_route_table" "private" {
+      + arn              = (known after apply)
+      + id               = (known after apply)
+      + owner_id         = (known after apply)
+      + propagating_vgws = (known after apply)
+      + route            = (known after apply)
+      + tags             = {
+          + "Name"    = "devops-g10-vpc-private"
+          + "service" = "network"
+        }
+      + tags_all         = {
+          + "Name"        = "devops-g10-vpc-private"
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "network"
+        }
+      + vpc_id           = (known after apply)
+    }
+
+  # module.vpc.aws_route_table.public[0] will be created
+  + resource "aws_route_table" "public" {
+      + arn              = (known after apply)
+      + id               = (known after apply)
+      + owner_id         = (known after apply)
+      + propagating_vgws = (known after apply)
+      + route            = (known after apply)
+      + tags             = {
+          + "Name"    = "devops-g10-vpc-public"
+          + "service" = "network"
+        }
+      + tags_all         = {
+          + "Name"        = "devops-g10-vpc-public"
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "network"
+        }
+      + vpc_id           = (known after apply)
+    }
+
+  # module.vpc.aws_route_table_association.database[0] will be created
+  + resource "aws_route_table_association" "database" {
+      + id             = (known after apply)
+      + route_table_id = (known after apply)
+      + subnet_id      = (known after apply)
+    }
+
+  # module.vpc.aws_route_table_association.database[1] will be created
+  + resource "aws_route_table_association" "database" {
+      + id             = (known after apply)
+      + route_table_id = (known after apply)
+      + subnet_id      = (known after apply)
+    }
+
+  # module.vpc.aws_route_table_association.private[0] will be created
+  + resource "aws_route_table_association" "private" {
+      + id             = (known after apply)
+      + route_table_id = (known after apply)
+      + subnet_id      = (known after apply)
+    }
+
+  # module.vpc.aws_route_table_association.private[1] will be created
+  + resource "aws_route_table_association" "private" {
+      + id             = (known after apply)
+      + route_table_id = (known after apply)
+      + subnet_id      = (known after apply)
+    }
+
+  # module.vpc.aws_route_table_association.public[0] will be created
+  + resource "aws_route_table_association" "public" {
+      + id             = (known after apply)
+      + route_table_id = (known after apply)
+      + subnet_id      = (known after apply)
+    }
+
+  # module.vpc.aws_route_table_association.public[1] will be created
+  + resource "aws_route_table_association" "public" {
+      + id             = (known after apply)
+      + route_table_id = (known after apply)
+      + subnet_id      = (known after apply)
+    }
+
+  # module.vpc.aws_subnet.database[0] will be created
+  + resource "aws_subnet" "database" {
+      + arn                                            = (known after apply)
+      + assign_ipv6_address_on_creation                = false
+      + availability_zone                              = "eu-central-1a"
+      + availability_zone_id                           = (known after apply)
+      + cidr_block                                     = "10.20.20.0/24"
+      + enable_dns64                                   = false
+      + enable_resource_name_dns_a_record_on_launch    = false
+      + enable_resource_name_dns_aaaa_record_on_launch = false
+      + id                                             = (known after apply)
+      + ipv6_cidr_block_association_id                 = (known after apply)
+      + ipv6_native                                    = false
+      + map_public_ip_on_launch                        = false
+      + owner_id                                       = (known after apply)
+      + private_dns_hostname_type_on_launch            = (known after apply)
+      + tags                                           = {
+          + "Name"    = "devops-g10-vpc-db-eu-central-1a"
+          + "service" = "network"
+        }
+      + tags_all                                       = {
+          + "Name"        = "devops-g10-vpc-db-eu-central-1a"
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "network"
+        }
+      + vpc_id                                         = (known after apply)
+    }
+
+  # module.vpc.aws_subnet.database[1] will be created
+  + resource "aws_subnet" "database" {
+      + arn                                            = (known after apply)
+      + assign_ipv6_address_on_creation                = false
+      + availability_zone                              = "eu-central-1b"
+      + availability_zone_id                           = (known after apply)
+      + cidr_block                                     = "10.20.21.0/24"
+      + enable_dns64                                   = false
+      + enable_resource_name_dns_a_record_on_launch    = false
+      + enable_resource_name_dns_aaaa_record_on_launch = false
+      + id                                             = (known after apply)
+      + ipv6_cidr_block_association_id                 = (known after apply)
+      + ipv6_native                                    = false
+      + map_public_ip_on_launch                        = false
+      + owner_id                                       = (known after apply)
+      + private_dns_hostname_type_on_launch            = (known after apply)
+      + tags                                           = {
+          + "Name"    = "devops-g10-vpc-db-eu-central-1b"
+          + "service" = "network"
+        }
+      + tags_all                                       = {
+          + "Name"        = "devops-g10-vpc-db-eu-central-1b"
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "network"
+        }
+      + vpc_id                                         = (known after apply)
+    }
+
+  # module.vpc.aws_subnet.private[0] will be created
+  + resource "aws_subnet" "private" {
+      + arn                                            = (known after apply)
+      + assign_ipv6_address_on_creation                = false
+      + availability_zone                              = "eu-central-1a"
+      + availability_zone_id                           = (known after apply)
+      + cidr_block                                     = "10.20.10.0/24"
+      + enable_dns64                                   = false
+      + enable_resource_name_dns_a_record_on_launch    = false
+      + enable_resource_name_dns_aaaa_record_on_launch = false
+      + id                                             = (known after apply)
+      + ipv6_cidr_block_association_id                 = (known after apply)
+      + ipv6_native                                    = false
+      + map_public_ip_on_launch                        = false
+      + owner_id                                       = (known after apply)
+      + private_dns_hostname_type_on_launch            = (known after apply)
+      + tags                                           = {
+          + "Name"    = "devops-g10-vpc-private-eu-central-1a"
+          + "service" = "network"
+        }
+      + tags_all                                       = {
+          + "Name"        = "devops-g10-vpc-private-eu-central-1a"
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "network"
+        }
+      + vpc_id                                         = (known after apply)
+    }
+
+  # module.vpc.aws_subnet.private[1] will be created
+  + resource "aws_subnet" "private" {
+      + arn                                            = (known after apply)
+      + assign_ipv6_address_on_creation                = false
+      + availability_zone                              = "eu-central-1b"
+      + availability_zone_id                           = (known after apply)
+      + cidr_block                                     = "10.20.11.0/24"
+      + enable_dns64                                   = false
+      + enable_resource_name_dns_a_record_on_launch    = false
+      + enable_resource_name_dns_aaaa_record_on_launch = false
+      + id                                             = (known after apply)
+      + ipv6_cidr_block_association_id                 = (known after apply)
+      + ipv6_native                                    = false
+      + map_public_ip_on_launch                        = false
+      + owner_id                                       = (known after apply)
+      + private_dns_hostname_type_on_launch            = (known after apply)
+      + tags                                           = {
+          + "Name"    = "devops-g10-vpc-private-eu-central-1b"
+          + "service" = "network"
+        }
+      + tags_all                                       = {
+          + "Name"        = "devops-g10-vpc-private-eu-central-1b"
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "network"
+        }
+      + vpc_id                                         = (known after apply)
+    }
+
+  # module.vpc.aws_subnet.public[0] will be created
+  + resource "aws_subnet" "public" {
+      + arn                                            = (known after apply)
+      + assign_ipv6_address_on_creation                = false
+      + availability_zone                              = "eu-central-1a"
+      + availability_zone_id                           = (known after apply)
+      + cidr_block                                     = "10.20.0.0/24"
+      + enable_dns64                                   = false
+      + enable_resource_name_dns_a_record_on_launch    = false
+      + enable_resource_name_dns_aaaa_record_on_launch = false
+      + id                                             = (known after apply)
+      + ipv6_cidr_block_association_id                 = (known after apply)
+      + ipv6_native                                    = false
+      + map_public_ip_on_launch                        = false
+      + owner_id                                       = (known after apply)
+      + private_dns_hostname_type_on_launch            = (known after apply)
+      + tags                                           = {
+          + "Name"    = "devops-g10-vpc-public-eu-central-1a"
+          + "service" = "network"
+        }
+      + tags_all                                       = {
+          + "Name"        = "devops-g10-vpc-public-eu-central-1a"
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "network"
+        }
+      + vpc_id                                         = (known after apply)
+    }
+
+  # module.vpc.aws_subnet.public[1] will be created
+  + resource "aws_subnet" "public" {
+      + arn                                            = (known after apply)
+      + assign_ipv6_address_on_creation                = false
+      + availability_zone                              = "eu-central-1b"
+      + availability_zone_id                           = (known after apply)
+      + cidr_block                                     = "10.20.1.0/24"
+      + enable_dns64                                   = false
+      + enable_resource_name_dns_a_record_on_launch    = false
+      + enable_resource_name_dns_aaaa_record_on_launch = false
+      + id                                             = (known after apply)
+      + ipv6_cidr_block_association_id                 = (known after apply)
+      + ipv6_native                                    = false
+      + map_public_ip_on_launch                        = false
+      + owner_id                                       = (known after apply)
+      + private_dns_hostname_type_on_launch            = (known after apply)
+      + tags                                           = {
+          + "Name"    = "devops-g10-vpc-public-eu-central-1b"
+          + "service" = "network"
+        }
+      + tags_all                                       = {
+          + "Name"        = "devops-g10-vpc-public-eu-central-1b"
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "network"
+        }
+      + vpc_id                                         = (known after apply)
+    }
+
+  # module.vpc.aws_vpc.this[0] will be created
+  + resource "aws_vpc" "this" {
+      + arn                                  = (known after apply)
+      + cidr_block                           = "10.20.0.0/16"
+      + default_network_acl_id               = (known after apply)
+      + default_route_table_id               = (known after apply)
+      + default_security_group_id            = (known after apply)
+      + dhcp_options_id                      = (known after apply)
+      + enable_dns_hostnames                 = true
+      + enable_dns_support                   = true
+      + enable_network_address_usage_metrics = (known after apply)
+      + id                                   = (known after apply)
+      + instance_tenancy                     = "default"
+      + ipv6_association_id                  = (known after apply)
+      + ipv6_cidr_block                      = (known after apply)
+      + ipv6_cidr_block_network_border_group = (known after apply)
+      + main_route_table_id                  = (known after apply)
+      + owner_id                             = (known after apply)
+      + tags                                 = {
+          + "Name"    = "devops-g10-vpc"
+          + "service" = "network"
+        }
+      + tags_all                             = {
+          + "Name"        = "devops-g10-vpc"
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "network"
+        }
+    }
+
+  # module.vpc_endpoints.aws_vpc_endpoint.this["ecr_api"] will be created
+  + resource "aws_vpc_endpoint" "this" {
+      + arn                   = (known after apply)
+      + cidr_blocks           = (known after apply)
+      + dns_entry             = (known after apply)
+      + id                    = (known after apply)
+      + ip_address_type       = (known after apply)
+      + network_interface_ids = (known after apply)
+      + owner_id              = (known after apply)
+      + policy                = (known after apply)
+      + prefix_list_id        = (known after apply)
+      + private_dns_enabled   = true
+      + requester_managed     = (known after apply)
+      + route_table_ids       = (known after apply)
+      + security_group_ids    = (known after apply)
+      + service_name          = "com.amazonaws.eu-central-1.ecr.api"
+      + service_region        = (known after apply)
+      + state                 = (known after apply)
+      + subnet_ids            = (known after apply)
+      + tags                  = {
+          + "Name"    = "devops-g10-vpce-ecr-api"
+          + "service" = "network"
+        }
+      + tags_all              = {
+          + "Name"        = "devops-g10-vpce-ecr-api"
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "network"
+        }
+      + vpc_endpoint_type     = "Interface"
+      + vpc_id                = (known after apply)
+
+      + dns_options (known after apply)
+
+      + subnet_configuration (known after apply)
+
+      + timeouts {
+          + create = "10m"
+          + delete = "10m"
+          + update = "10m"
+        }
+    }
+
+  # module.vpc_endpoints.aws_vpc_endpoint.this["ecr_dkr"] will be created
+  + resource "aws_vpc_endpoint" "this" {
+      + arn                   = (known after apply)
+      + cidr_blocks           = (known after apply)
+      + dns_entry             = (known after apply)
+      + id                    = (known after apply)
+      + ip_address_type       = (known after apply)
+      + network_interface_ids = (known after apply)
+      + owner_id              = (known after apply)
+      + policy                = (known after apply)
+      + prefix_list_id        = (known after apply)
+      + private_dns_enabled   = true
+      + requester_managed     = (known after apply)
+      + route_table_ids       = (known after apply)
+      + security_group_ids    = (known after apply)
+      + service_name          = "com.amazonaws.eu-central-1.ecr.dkr"
+      + service_region        = (known after apply)
+      + state                 = (known after apply)
+      + subnet_ids            = (known after apply)
+      + tags                  = {
+          + "Name"    = "devops-g10-vpce-ecr-dkr"
+          + "service" = "network"
+        }
+      + tags_all              = {
+          + "Name"        = "devops-g10-vpce-ecr-dkr"
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "network"
+        }
+      + vpc_endpoint_type     = "Interface"
+      + vpc_id                = (known after apply)
+
+      + dns_options (known after apply)
+
+      + subnet_configuration (known after apply)
+
+      + timeouts {
+          + create = "10m"
+          + delete = "10m"
+          + update = "10m"
+        }
+    }
+
+  # module.vpc_endpoints.aws_vpc_endpoint.this["logs"] will be created
+  + resource "aws_vpc_endpoint" "this" {
+      + arn                   = (known after apply)
+      + cidr_blocks           = (known after apply)
+      + dns_entry             = (known after apply)
+      + id                    = (known after apply)
+      + ip_address_type       = (known after apply)
+      + network_interface_ids = (known after apply)
+      + owner_id              = (known after apply)
+      + policy                = (known after apply)
+      + prefix_list_id        = (known after apply)
+      + private_dns_enabled   = true
+      + requester_managed     = (known after apply)
+      + route_table_ids       = (known after apply)
+      + security_group_ids    = (known after apply)
+      + service_name          = "com.amazonaws.eu-central-1.logs"
+      + service_region        = (known after apply)
+      + state                 = (known after apply)
+      + subnet_ids            = (known after apply)
+      + tags                  = {
+          + "Name"    = "devops-g10-vpce-logs"
+          + "service" = "network"
+        }
+      + tags_all              = {
+          + "Name"        = "devops-g10-vpce-logs"
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "network"
+        }
+      + vpc_endpoint_type     = "Interface"
+      + vpc_id                = (known after apply)
+
+      + dns_options (known after apply)
+
+      + subnet_configuration (known after apply)
+
+      + timeouts {
+          + create = "10m"
+          + delete = "10m"
+          + update = "10m"
+        }
+    }
+
+  # module.vpc_endpoints.aws_vpc_endpoint.this["s3"] will be created
+  + resource "aws_vpc_endpoint" "this" {
+      + arn                   = (known after apply)
+      + cidr_blocks           = (known after apply)
+      + dns_entry             = (known after apply)
+      + id                    = (known after apply)
+      + ip_address_type       = (known after apply)
+      + network_interface_ids = (known after apply)
+      + owner_id              = (known after apply)
+      + policy                = (known after apply)
+      + prefix_list_id        = (known after apply)
+      + private_dns_enabled   = (known after apply)
+      + requester_managed     = (known after apply)
+      + route_table_ids       = (known after apply)
+      + security_group_ids    = (known after apply)
+      + service_name          = "com.amazonaws.eu-central-1.s3"
+      + service_region        = (known after apply)
+      + state                 = (known after apply)
+      + subnet_ids            = (known after apply)
+      + tags                  = {
+          + "Name"    = "devops-g10-vpce-s3"
+          + "service" = "network"
+        }
+      + tags_all              = {
+          + "Name"        = "devops-g10-vpce-s3"
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "network"
+        }
+      + vpc_endpoint_type     = "Gateway"
+      + vpc_id                = (known after apply)
+
+      + dns_options (known after apply)
+
+      + subnet_configuration (known after apply)
+
+      + timeouts {
+          + create = "10m"
+          + delete = "10m"
+          + update = "10m"
+        }
+    }
+
+  # module.vpc_endpoints.aws_vpc_endpoint.this["secretsmanager"] will be created
+  + resource "aws_vpc_endpoint" "this" {
+      + arn                   = (known after apply)
+      + cidr_blocks           = (known after apply)
+      + dns_entry             = (known after apply)
+      + id                    = (known after apply)
+      + ip_address_type       = (known after apply)
+      + network_interface_ids = (known after apply)
+      + owner_id              = (known after apply)
+      + policy                = (known after apply)
+      + prefix_list_id        = (known after apply)
+      + private_dns_enabled   = true
+      + requester_managed     = (known after apply)
+      + route_table_ids       = (known after apply)
+      + security_group_ids    = (known after apply)
+      + service_name          = "com.amazonaws.eu-central-1.secretsmanager"
+      + service_region        = (known after apply)
+      + state                 = (known after apply)
+      + subnet_ids            = (known after apply)
+      + tags                  = {
+          + "Name"    = "devops-g10-vpce-secrets"
+          + "service" = "network"
+        }
+      + tags_all              = {
+          + "Name"        = "devops-g10-vpce-secrets"
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "network"
+        }
+      + vpc_endpoint_type     = "Interface"
+      + vpc_id                = (known after apply)
+
+      + dns_options (known after apply)
+
+      + subnet_configuration (known after apply)
+
+      + timeouts {
+          + create = "10m"
+          + delete = "10m"
+          + update = "10m"
+        }
+    }
+
+  # module.vpc_endpoints.aws_vpc_endpoint.this["ssm"] will be created
+  + resource "aws_vpc_endpoint" "this" {
+      + arn                   = (known after apply)
+      + cidr_blocks           = (known after apply)
+      + dns_entry             = (known after apply)
+      + id                    = (known after apply)
+      + ip_address_type       = (known after apply)
+      + network_interface_ids = (known after apply)
+      + owner_id              = (known after apply)
+      + policy                = (known after apply)
+      + prefix_list_id        = (known after apply)
+      + private_dns_enabled   = true
+      + requester_managed     = (known after apply)
+      + route_table_ids       = (known after apply)
+      + security_group_ids    = (known after apply)
+      + service_name          = "com.amazonaws.eu-central-1.ssm"
+      + service_region        = (known after apply)
+      + state                 = (known after apply)
+      + subnet_ids            = (known after apply)
+      + tags                  = {
+          + "Name"    = "devops-g10-vpce-ssm"
+          + "service" = "network"
+        }
+      + tags_all              = {
+          + "Name"        = "devops-g10-vpce-ssm"
+          + "capstone"    = "tillflow"
+          + "environment" = "prod"
+          + "group"       = "g10"
+          + "managed-by"  = "terraform"
+          + "owner"       = "yordanos"
+          + "service"     = "network"
+        }
+      + vpc_endpoint_type     = "Interface"
+      + vpc_id                = (known after apply)
+
+      + dns_options (known after apply)
+
+      + subnet_configuration (known after apply)
+
+      + timeouts {
+          + create = "10m"
+          + delete = "10m"
+          + update = "10m"
+        }
+    }
+
+Plan: 152 to add, 1 to change, 0 to destroy.
+
+Changes to Outputs:
+  + alb_dns_name       = (known after apply)
+  + api_gateway_url    = (known after apply)
+  + ci_deploy_role_arn = (known after apply)
+  + ecr_repositories   = {
+      + commission = (known after apply)
+      + payments   = (known after apply)
+      + pos        = (known after apply)
+      + web        = (known after apply)
+    }
+  + ecs_cluster        = "devops-g10"
+  + private_subnets    = [
+      + (known after apply),
+      + (known after apply),
+    ]
+  + rds_endpoint       = (known after apply)
+  ~ s3_buckets         = {
+      ~ artifacts = null -> "devops-g10-artifacts-240462142849"
+      ~ backups   = null -> "devops-g10-backups-240462142849"
+      ~ logs      = null -> "devops-g10-logs-240462142849"
+    }
+  ~ secrets            = {
+      + cache_auth = (known after apply)
+      + daraja     = (known after apply)
+      + rds_master = (known after apply)
+      + slack      = (known after apply)
+    }
+  + valkey_endpoint    = (known after apply)
+  + vpc_id             = (known after apply)
+
+─────────────────────────────────────────────────────────────────────────────
+
+Saved the plan to: plan.bin
+
+To perform exactly these actions, run the following command to apply:
+    terraform apply "plan.bin"
+Releasing state lock. This may take a few moments...
