@@ -8,7 +8,7 @@
 # ---------------------------------------------------------------------
 resource "aws_security_group" "alb" {
   name        = "${var.name_prefix}-alb"
-  description = "Internal ALB — accepts traffic from API Gateway VPC Link only."
+  description = "Internal ALB; accepts traffic from API Gateway VPC Link only."
   vpc_id      = module.vpc.vpc_id
 
   tags = {
@@ -28,7 +28,7 @@ resource "aws_vpc_security_group_ingress_rule" "alb_from_vpc" {
 
 resource "aws_vpc_security_group_egress_rule" "alb_to_ecs" {
   security_group_id            = aws_security_group.alb.id
-  description                  = "ALB → ECS task app port only."
+  description                  = "ALB to ECS task app port only."
   referenced_security_group_id = aws_security_group.ecs_tasks.id
   from_port                    = 8080
   to_port                      = 8080
@@ -71,7 +71,7 @@ resource "aws_vpc_security_group_egress_rule" "ecs_all" {
 # ---------------------------------------------------------------------
 resource "aws_security_group" "rds" {
   name        = "${var.name_prefix}-rds"
-  description = "PostgreSQL — accepts from ECS task SG only."
+  description = "PostgreSQL; accepts from ECS task SG only."
   vpc_id      = module.vpc.vpc_id
 
   tags = {
@@ -94,7 +94,7 @@ resource "aws_vpc_security_group_ingress_rule" "rds_from_ecs" {
 # ---------------------------------------------------------------------
 resource "aws_security_group" "cache" {
   name        = "${var.name_prefix}-cache"
-  description = "Valkey — accepts from ECS task SG only."
+  description = "Valkey; accepts from ECS task SG only."
   vpc_id      = module.vpc.vpc_id
 
   tags = {
@@ -117,7 +117,7 @@ resource "aws_vpc_security_group_ingress_rule" "cache_from_ecs" {
 # ---------------------------------------------------------------------
 resource "aws_security_group" "vpc_endpoints" {
   name        = "${var.name_prefix}-vpce"
-  description = "Interface VPC endpoints — HTTPS from ECS task SG."
+  description = "Interface VPC endpoints; HTTPS from ECS task SG."
   vpc_id      = module.vpc.vpc_id
 
   tags = {

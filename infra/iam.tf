@@ -1,14 +1,7 @@
-# ---------------------------------------------------------------------
-# GitHub Actions OIDC — one provider, one deploy role.
-# ---------------------------------------------------------------------
-resource "aws_iam_openid_connect_provider" "github" {
-  url             = "https://token.actions.githubusercontent.com"
-  client_id_list  = ["sts.amazonaws.com"]
-  thumbprint_list = ["6938fd4d98bab03faadb97b34396831e3780aea1"]
-
-  tags = {
-    service = "iam"
-  }
+# Account already has this provider (lab). We cannot create or tag it
+# (iam:TagOpenIDConnectProvider is denied). Read it only.
+data "aws_iam_openid_connect_provider" "github" {
+  url = "https://token.actions.githubusercontent.com"
 }
 
 data "aws_iam_policy_document" "gha_trust" {
@@ -18,7 +11,7 @@ data "aws_iam_policy_document" "gha_trust" {
 
     principals {
       type        = "Federated"
-      identifiers = [aws_iam_openid_connect_provider.github.arn]
+      identifiers = [data.aws_iam_openid_connect_provider.github.arn]
     }
 
     condition {
@@ -35,6 +28,9 @@ data "aws_iam_policy_document" "gha_trust" {
         "repo:${var.github_org}/${var.github_repo}:ref:refs/heads/main",
         "repo:${var.github_org}/${var.github_repo}:ref:refs/heads/develop",
         "repo:${var.github_org}/${var.github_repo}:pull_request",
+        # If a workflow job sets `environment: production`, GitHub emits
+        # this subject instead of the branch ref.
+        "repo:${var.github_org}/${var.github_repo}:environment:production",
       ]
     }
   }
@@ -42,7 +38,7 @@ data "aws_iam_policy_document" "gha_trust" {
 
 resource "aws_iam_role" "ci_deploy" {
   name               = "${var.name_prefix}-ci-deploy"
-  description        = "GitHub Actions OIDC role — terraform plan/apply + docker push to ECR."
+  description        = "GitHub Actions OIDC role for terraform plan/apply and ECR push."
   assume_role_policy = data.aws_iam_policy_document.gha_trust.json
 
   tags = {
@@ -144,6 +140,23 @@ data "aws_iam_policy_document" "ci_deploy" {
     ]
     resources = ["*"]
   }
+
+  # IAM is global, so PassRole does not satisfy aws:RequestedRegion on
+  # the write statement above. Needed to register ECS task defs from CI.
+  statement {
+    sid    = "PassTaskRolesToECS"
+    effect = "Allow"
+    actions = ["iam:PassRole"]
+    resources = [
+      "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/${var.name_prefix}-*-task",
+      "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/${var.name_prefix}-*-exec",
+    ]
+    condition {
+      test     = "StringEquals"
+      variable = "iam:PassedToService"
+      values   = ["ecs-tasks.amazonaws.com"]
+    }
+  }
 }
 
 resource "aws_iam_policy" "ci_deploy" {
@@ -180,8 +193,8 @@ resource "aws_iam_role" "task_exec" {
 }
 
 resource "aws_iam_role_policy_attachment" "task_exec_default" {
-  for_each   = aws_iam_role.task_exec
-  role       = each.value.name
+  for_each   = toset(local.services)
+  role       = aws_iam_role.task_exec[each.key].name
   policy_arn = "arn:${data.aws_partition.current.partition}:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
@@ -211,8 +224,8 @@ resource "aws_iam_policy" "task_exec_secrets" {
 }
 
 resource "aws_iam_role_policy_attachment" "task_exec_secrets" {
-  for_each   = aws_iam_role.task_exec
-  role       = each.value.name
+  for_each   = toset(local.services)
+  role       = aws_iam_role.task_exec[each.key].name
   policy_arn = aws_iam_policy.task_exec_secrets.arn
 }
 
@@ -265,8 +278,8 @@ resource "aws_iam_policy" "task_common" {
 }
 
 resource "aws_iam_role_policy_attachment" "task_common" {
-  for_each   = aws_iam_role.task
-  role       = each.value.name
+  for_each   = toset(local.services)
+  role       = aws_iam_role.task[each.key].name
   policy_arn = aws_iam_policy.task_common.arn
 }
 
