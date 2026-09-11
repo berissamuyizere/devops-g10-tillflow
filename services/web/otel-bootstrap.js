@@ -11,10 +11,10 @@
 const { NodeSDK } = require('@opentelemetry/sdk-node');
 const { OTLPTraceExporter } = require('@opentelemetry/exporter-trace-otlp-http');
 const { getNodeAutoInstrumentations } = require('@opentelemetry/auto-instrumentations-node');
-const { Resource } = require('@opentelemetry/resources');
+const { resourceFromAttributes } = require('@opentelemetry/resources');
 const {
-  SEMRESATTRS_SERVICE_NAME,
-  SEMRESATTRS_DEPLOYMENT_ENVIRONMENT,
+  ATTR_SERVICE_NAME,
+  ATTR_SERVICE_NAMESPACE,
 } = require('@opentelemetry/semantic-conventions');
 
 const serviceName = process.env.OTEL_SERVICE_NAME || 'web';
@@ -23,11 +23,11 @@ const otlpEndpoint =
   process.env.OTEL_EXPORTER_OTLP_ENDPOINT || 'http://localhost:4318';
 
 const sdk = new NodeSDK({
-  resource: new Resource({
-    [SEMRESATTRS_SERVICE_NAME]: serviceName,
-    [SEMRESATTRS_DEPLOYMENT_ENVIRONMENT]: environment,
-    'service.namespace': 'tillflow',
-    'group': 'g10',
+  resource: resourceFromAttributes({
+    [ATTR_SERVICE_NAME]: serviceName,
+    [ATTR_SERVICE_NAMESPACE]: 'tillflow',
+    'deployment.environment': environment,
+    group: 'g10',
   }),
   traceExporter: new OTLPTraceExporter({
     url: `${otlpEndpoint.replace(/\/+$/, '')}/v1/traces`,

@@ -159,6 +159,7 @@ jobs:
             image \
               --severity HIGH,CRITICAL \
               --ignore-unfixed \
+              --scanners vuln \
               --exit-code 1 \
               --no-progress \
               "${{ steps.build.outputs.image }}"
