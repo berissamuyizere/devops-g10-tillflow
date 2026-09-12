@@ -246,9 +246,27 @@ jobs:
             echo "Could not resolve API Gateway URL" >&2
             exit 1
           fi
-          echo "Smoking ${API_URL}"
-          curl -sSf --retry 8 --retry-all-errors --retry-delay 5 \
-            "${API_URL}/health" | tee smoke-health.json
+          echo "Smoking ${API_URL}/health"
+          dump_path() {
+            echo "---- target health ----"
+            TG=$(aws elbv2 describe-target-groups --names devops-g10-web-tg \
+              --query 'TargetGroups[0].TargetGroupArn' --output text)
+            aws elbv2 describe-target-health --target-group-arn "$TG" || true
+            echo "---- vpc link ----"
+            aws apigatewayv2 get-vpc-links \
+              --query "Items[?contains(Name, 'devops-g10')]" || true
+            echo "---- recent api gateway logs ----"
+            aws logs filter-log-events \
+              --log-group-name /devops-g10/api-gateway \
+              --start-time $(( $(date +%s) * 1000 - 600000 )) \
+              --limit 20 \
+              --query 'events[].message' --output text || true
+          }
+          if ! curl -sSf --retry 8 --retry-all-errors --retry-delay 5 \
+            "${API_URL}/health" | tee smoke-health.json; then
+            dump_path
+            exit 1
+          fi
           echo
           curl -sSf --retry 5 --retry-all-errors --retry-delay 3 \
             "${API_URL}/version" | tee smoke-version.json

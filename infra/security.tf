@@ -1,10 +1,36 @@
 # Security groups. Kept in one file so the ingress/egress story is auditable.
 # Named ports only — no wildcard 0.0.0.0/0 except where explicitly required.
+#
+# Path: API Gateway → VPC Link ENIs → ALB:80 → ECS tasks:8080.
+# Each hop has its own SG. Do not reuse the ALB SG on the VPC Link:
+# that SG's egress is ECS:8080 only, so the Link ENIs cannot reach the
+# ALB listener and the public API returns 503.
 
 # ---------------------------------------------------------------------
-# ALB — reachable only from API Gateway's VPC Link ENIs.
-# Because API Gateway VPC Link uses ENIs in our own subnets, allowing the
-# VPC CIDR is safe and simpler than plumbing SG rules against ENI SGs.
+# API Gateway VPC Link ENIs — initiate HTTP to the internal ALB only.
+# ---------------------------------------------------------------------
+resource "aws_security_group" "vpclink" {
+  name        = "${var.name_prefix}-vpclink"
+  description = "API Gateway VPC Link ENIs; egress to internal ALB only."
+  vpc_id      = module.vpc.vpc_id
+
+  tags = {
+    Name    = "${var.name_prefix}-vpclink"
+    service = "api-gateway"
+  }
+}
+
+resource "aws_vpc_security_group_egress_rule" "vpclink_to_alb" {
+  security_group_id            = aws_security_group.vpclink.id
+  description                  = "VPC Link ENIs to ALB HTTP listener."
+  referenced_security_group_id = aws_security_group.alb.id
+  from_port                    = 80
+  to_port                      = 80
+  ip_protocol                  = "tcp"
+}
+
+# ---------------------------------------------------------------------
+# ALB — reachable only from API Gateway VPC Link ENIs.
 # ---------------------------------------------------------------------
 resource "aws_security_group" "alb" {
   name        = "${var.name_prefix}-alb"
@@ -17,13 +43,13 @@ resource "aws_security_group" "alb" {
   }
 }
 
-resource "aws_vpc_security_group_ingress_rule" "alb_from_vpc" {
-  security_group_id = aws_security_group.alb.id
-  description       = "Allow HTTP from API Gateway VPC Link (inside VPC)."
-  cidr_ipv4         = module.vpc.vpc_cidr_block
-  from_port         = 80
-  to_port           = 80
-  ip_protocol       = "tcp"
+resource "aws_vpc_security_group_ingress_rule" "alb_from_vpclink" {
+  security_group_id            = aws_security_group.alb.id
+  description                  = "HTTP from API Gateway VPC Link ENIs."
+  referenced_security_group_id = aws_security_group.vpclink.id
+  from_port                    = 80
+  to_port                      = 80
+  ip_protocol                  = "tcp"
 }
 
 resource "aws_vpc_security_group_egress_rule" "alb_to_ecs" {
