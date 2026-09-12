@@ -12,15 +12,19 @@
 # the build pipeline simple (one image per service). Once we have a shared
 # base ECR repo (planned G2), downstream services will FROM this base.
 
-FROM node:20.17-alpine3.20
+FROM node:20.20.2-alpine3.22
 
 # Non-root user; UID matches ECS task definition.
 RUN addgroup -g 10001 app && \
     adduser  -D -H -u 10001 -G app -s /sbin/nologin app
 
 # Common OS tools we depend on: wget for HEALTHCHECK, dumb-init for signal
-# handling, tzdata for Africa/Nairobi timestamps.
-RUN apk add --no-cache dumb-init wget tzdata ca-certificates && \
+# handling, tzdata for Africa/Nairobi timestamps. Drop npm/yarn from the
+# runtime so Trivy does not fail the image on the package manager's tree.
+RUN apk upgrade --no-cache && \
+    apk add --no-cache dumb-init wget tzdata ca-certificates && \
+    rm -rf /usr/local/lib/node_modules/npm /usr/local/bin/npm \
+           /usr/local/bin/npx /opt/yarn-v* /usr/local/bin/yarn && \
     ln -sf /usr/share/zoneinfo/Africa/Nairobi /etc/localtime
 
 # Landing dir for the shared bootstrap files.
