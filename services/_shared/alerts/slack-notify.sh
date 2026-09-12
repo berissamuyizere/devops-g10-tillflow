@@ -4,24 +4,34 @@
 # Reads the webhook URL from AWS Secrets Manager (devops-g10/slack-webhook)
 # so it is never in Git, TF state, or build logs.
 #
-# Usage:
-#   slack-notify.sh <tone: info|warning|danger> <service> <symptom> <observed> <runbook-anchor>
+# Contract: docs/runbook.md "Slack alert contract".
+# Lambda (devops-g10-slack-notify) must emit the same fields even if it
+# does not exec this script.
 #
-# All arguments required. Uses the Slack alert contract from
-# docs/threat-model.md / Saloi's alert contract.
+# Usage:
+#   slack-notify.sh <tone: info|warning|danger> \
+#     <service> <symptom> <slo-impact> <observed> \
+#     <grafana-panel> <runbook-anchor> <owner> <first-action>
+#
+# All nine arguments after the script are required. runbook-anchor is
+# the heading slug without '#', e.g. pos-5xx.
 
 set -eu
 
-if [ "$#" -lt 5 ]; then
-  echo "usage: $0 <tone> <service> <symptom> <observed> <runbook-anchor>" >&2
+if [ "$#" -lt 9 ]; then
+  echo "usage: $0 <tone> <service> <symptom> <slo-impact> <observed> <grafana-panel> <runbook-anchor> <owner> <first-action>" >&2
   exit 2
 fi
 
 TONE="$1"
 SERVICE="$2"
 SYMPTOM="$3"
-OBSERVED="$4"
-RUNBOOK="$5"
+SLO_IMPACT="$4"
+OBSERVED="$5"
+GRAFANA="$6"
+RUNBOOK="$7"
+OWNER="$8"
+FIRST_ACTION="$9"
 
 case "$TONE" in
   info)    COLOR="#2b7cff" ;;
@@ -39,22 +49,32 @@ if [ -z "${WEBHOOK}" ] || [ "${WEBHOOK}" = "PLACEHOLDER" ]; then
   exit 1
 fi
 
+RUNBOOK_URL="https://github.com/berissamuyizere/devops-g10-tillflow/blob/main/docs/runbook.md#${RUNBOOK}"
+
 PAYLOAD=$(jq -n \
-  --arg color   "$COLOR" \
-  --arg service "$SERVICE" \
-  --arg symptom "$SYMPTOM" \
-  --arg observed "$OBSERVED" \
-  --arg runbook "$RUNBOOK" \
-  --arg env "${ENVIRONMENT:-prod}" \
+  --arg color        "$COLOR" \
+  --arg service      "$SERVICE" \
+  --arg symptom      "$SYMPTOM" \
+  --arg slo_impact   "$SLO_IMPACT" \
+  --arg observed     "$OBSERVED" \
+  --arg grafana      "$GRAFANA" \
+  --arg runbook      "$RUNBOOK_URL" \
+  --arg owner        "$OWNER" \
+  --arg first_action "$FIRST_ACTION" \
+  --arg env          "${ENVIRONMENT:-prod}" \
   '{
     attachments: [{
       color: $color,
       title: ("[\($env)] \($service) — \($symptom)"),
       fields: [
-        { title: "Observed",     value: $observed, short: false },
-        { title: "Runbook",      value: ("https://github.com/berissamuyizere/devops-g10-tillflow/blob/main/docs/runbook.md#" + $runbook), short: false },
-        { title: "Owner",        value: "see CODEOWNERS", short: true },
-        { title: "First action", value: "see runbook", short: true }
+        { title: "Environment",      value: $env,          short: true },
+        { title: "Service",          value: $service,      short: true },
+        { title: "SLO impact",       value: $slo_impact,   short: false },
+        { title: "Observed",         value: $observed,     short: false },
+        { title: "Grafana panel",    value: $grafana,      short: false },
+        { title: "Runbook",          value: $runbook,      short: false },
+        { title: "Owner",            value: $owner,        short: true },
+        { title: "First safe action", value: $first_action, short: false }
       ],
       footer: "devops-g10-tillflow",
       ts: (now | floor)

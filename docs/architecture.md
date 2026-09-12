@@ -84,7 +84,7 @@ Decisions locked in [tenant/sale ADR](adr-001-tenant-sale-data-model.md) and [id
 
 ## Observability path
 
-Apps export OTLP to the localhost ADOT sidecar. JSON logs carry `trace_id` / `span_id`. Target traces for G3: sale → payment → callback/reconcile, and scheduled commission → B2C. Grafana shows uptime, SLO target, budget burn, RED, and saturation ([`docs/slo-error-budgets.md`](slo-error-budgets.md)).
+Apps export OTLP to the localhost ADOT sidecar. JSON logs carry `trace_id` / `span_id`. Target traces for G3: sale → payment → callback/reconcile, and scheduled commission → B2C. Grafana is Amazon Managed Grafana in `eu-central-1` ([ADR-005](adrs/ADR-005-observability.md)) and shows uptime, SLO target, budget burn, RED, and saturation ([`docs/slo-error-budgets.md`](slo-error-budgets.md)).
 
 ## Related decisions
 
@@ -94,4 +94,6 @@ Apps export OTLP to the localhost ADOT sidecar. JSON logs carry `trace_id` / `sp
 | Tenant / sale model | [ADR](adr-001-tenant-sale-data-model.md) |
 | Idempotency + replay | [ADR-002](adrs/ADR-002-idempotency-and-replay-safety.md) |
 | Draft SLOs | [slo-error-budgets.md](slo-error-budgets.md) |
+| Grafana workspace | [ADR-005](adrs/ADR-005-observability.md) |
+| Alerts + runbook | [alerts.md](alerts.md), [runbook.md](runbook.md) |
 | Threats | [threat-model.md](threat-model.md) |
