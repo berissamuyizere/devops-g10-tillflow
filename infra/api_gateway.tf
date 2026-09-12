@@ -1,9 +1,15 @@
 # HTTP API in front of the ALB via VPC Link, per ADR-004.
 
 resource "aws_apigatewayv2_vpc_link" "app" {
-  name               = "${var.name_prefix}-vpclink"
-  security_group_ids = [aws_security_group.alb.id]
+  name               = "${var.name_prefix}-api-vpclink"
+  security_group_ids = [aws_security_group.vpclink.id]
   subnet_ids         = module.vpc.private_subnets
+
+  # security_group_ids is ForceNew. Rename so create_before_destroy can
+  # bring the new link up before the old devops-g10-vpclink is deleted.
+  lifecycle {
+    create_before_destroy = true
+  }
 
   tags = {
     service = "api-gateway"
