@@ -20,8 +20,10 @@ area's PRs.
 | `docs/threat-model.md` | Arsema |
 | `docs/slo-error-budgets.md` | Saloi |
 | Tenant / sale data model ADR | Berissa |
-| Region + naming ADR | Yordanos |
-| Idempotency + replay ADR | Arsema |
+| ADR-001 region + naming | Yordanos |
+| ADR-002 idempotency + replay | Arsema |
+| ADR-003 platform data services | Yordanos |
+| ADR-004 CI/CD + golden path | Yordanos |
 
 ## Minimum personal proof per area
 

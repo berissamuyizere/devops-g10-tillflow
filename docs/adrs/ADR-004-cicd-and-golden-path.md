@@ -26,12 +26,14 @@ runs end-to-end for at least one service.
     variables are set, the same job also runs `terraform plan`
     against live state and uploads `plan.bin`.
   - `release.yml` on push to `main` (and `workflow_dispatch`):
-    path-filtered `terraform apply` via GitHub OIDC into
-    `devops-g10-ci-deploy`, then (if `services/web` or `_shared`
-    changed) SHA-tagged `linux/arm64` image build, Trivy, SBOM,
-    ECR push, ECS rolling update by digest, smoke of `/health` and
-    `/version` through API Gateway. The PR is the review gate; there
-    is no second required-reviewer Environment after merge.
+    path-filtered `terraform plan` via GitHub OIDC, upload of the
+    saved `plan.bin`, then `terraform apply` of **that** plan behind
+    the GitHub Environment `production` (required reviewers). After
+    apply (or skip), if `services/web` or `_shared` changed: SHA-tagged
+    `linux/arm64` image build, Trivy, SBOM, ECR push, ECS rolling
+    update by digest, smoke of `/health` and `/version` through API
+    Gateway. The PR reviews the change; the Environment approves the
+    exact plan that is applied.
 - **AWS CodePipeline — optional ECR → ECS.**
   - Still provisioned in `pipeline.tf` when `codeconnections_arn` is
     set. Terraform cannot complete the GitHub App handshake, so
@@ -94,9 +96,11 @@ Closes the threat-model residual on API Gateway rate limits.
 - One GitHub OIDC provider in the account
   (`token.actions.githubusercontent.com`).
 - One CI deploy role `devops-g10-ci-deploy`, trusted for
-  `repo:berissamuyizere/devops-g10-tillflow:ref:refs/heads/main` and
-  `:pull_request` for plan-only. Permissions scoped to the resources
-  Terraform manages, not `*`.
+  `pr.yml` / `release.yml` via `job_workflow_ref` (and exact `sub`
+  values for `main` / `develop` / `pull_request`). IAM writes are
+  limited to `devops-g10-*` roles and policies; S3 / Secrets / SSM
+  writes are prefix-scoped. Regional data-plane APIs stay locked to
+  `eu-central-1`.
 - Per-service task roles (`devops-g10-<svc>-task`) and exec roles
   (`devops-g10-<svc>-exec`), least privilege — exec pulls from ECR
   and writes logs, task reads its own Secrets Manager entries only.
@@ -121,9 +125,11 @@ Closes the threat-model residual on API Gateway rate limits.
 - **CodePipeline as the only deploy path.** Blocked on a one-time
   GitHub App connection Terraform cannot create. GitHub Actions +
   OIDC already has the CI role, so apply + `web` deploy run there.
-- **GitHub Environment `production` required reviewer on apply.**
-  Re-introduces a click after merge. The PR (with live `terraform
-  plan`) is the gate.
+- **Apply the live-recomputed plan in the same job as plan.**
+  Rejected after G1 review: the brief requires an approved apply, and
+  a re-plan at merge time is not the plan anyone reviewed. Plan is
+  saved as an artifact; apply waits on Environment `production`
+  required reviewers and applies that file only.
 
 ## Consequences
 

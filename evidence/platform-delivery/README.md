@@ -8,9 +8,10 @@ DRI: Yordanos.
   prefix ([ADR-001](../../docs/adrs/ADR-001-region-and-naming.md)).
 - Data services (RDS Postgres, Valkey, S3, SQS, EventBridge)
   ([ADR-003](../../docs/adrs/ADR-003-platform-data-services.md)).
-- Golden-path service (`web`) deployed via CodePipeline with the app +
-  ADOT sidecar containers both `RUNNING`
+- Golden-path service (`web`) deployed via GitHub Actions `release.yml`
+  with the app + ADOT sidecar containers both `RUNNING`
   ([ADR-004](../../docs/adrs/ADR-004-cicd-and-golden-path.md)).
+  CodePipeline stays off (`codeconnections_arn` unset).
 - GitHub Actions OIDC → `devops-g10-ci-deploy` role, no long-lived keys.
 - Immutable-tag ECR repos, enhanced scanning, no `latest` in any task
   definition.
@@ -18,10 +19,39 @@ DRI: Yordanos.
   `group=g10, owner=yordanos, environment=prod, service=<svc>,
    managed-by=terraform, capstone=tillflow`.
 
+## What is in this folder (G1 HOLD re-run)
+
+The first committed `plan.txt` was from an older tree that still
+*managed* the GitHub OIDC provider and is not evidence of the current
+code. `bootstrap-apply.txt` is the original one-time bootstrap — the
+state bucket already existed in this lab account (`~ update`), so a
+from-zero `+ create` cannot be replayed here without deleting live
+state.
+
+Current-tree proof (replace on every clean run):
+
+| File | What it shows |
+|---|---|
+| `plan.txt` | Root `terraform plan` of **this** tree. OIDC is a `data` source, not a managed resource. |
+| `outputs.json` | Live ALB DNS + API Gateway URL. |
+| `smoke-health.json` / `smoke-version.json` | Public `/health` and `/version` through API Gateway. |
+| `ecs-tasks.json` / `ecs-task-detail.json` / `ecs-containers.txt` | `app` + `adot` both RUNNING; app image is a digest, not nginx. |
+| `tag-audit.json` / `tag-audit.txt` | `capstone=tillflow` resources and the six required tags. |
+| `release-apply.txt` | Transcript of the successful `main` Release apply (GitHub Actions). |
+| `bootstrap-apply.txt` | Historical first bootstrap (do not treat as a current-tree plan). |
+
+Regenerate live files (does not touch Terraform state):
+
+```bash
+export AWS_PROFILE=g10-yordanos AWS_REGION=eu-central-1
+./evidence/platform-delivery/collect.sh
+```
+
 ## Reproduction
 
 Everything below is deterministic. Set `PREFIX=devops-g10` and
-`REGION=eu-central-1`.
+`REGION=eu-central-1`. The state bucket is one-time; a second
+bootstrap in this account will `~ update` it.
 
 ### 1. Bootstrap
 
