@@ -258,6 +258,7 @@ jobs:
               | .containerDefinitions |= map(
                   if .name == $cname then
                     .image = $image
+                    | .dependsOn = [{containerName: "adot", condition: "HEALTHY"}]
                     | .environment = (
                         ((.environment // []) | map(select(.name != "COMMIT_SHA" and .name != "IMAGE_DIGEST")))
                         + [
@@ -265,6 +266,14 @@ jobs:
                             {name: "IMAGE_DIGEST", value: $digest}
                           ]
                       )
+                  elif .name == "adot" then
+                    .healthCheck = {
+                      command: ["CMD", "/healthcheck"],
+                      interval: 10,
+                      timeout: 5,
+                      retries: 5,
+                      startPeriod: 30
+                    }
                   else . end
                 )' \
             td-raw.json > td.json

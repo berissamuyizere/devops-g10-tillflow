@@ -40,6 +40,10 @@ Current-tree proof (replace on every clean run):
 | `release-apply.txt` | Transcript of the successful `main` Release apply (GitHub Actions). |
 | `bootstrap-apply.txt` | Historical first bootstrap (do not treat as a current-tree plan). |
 
+After the ADOT `/healthcheck` deploy, re-run `collect.sh` so
+`ecs-containers.txt` shows `app` + `adot` both RUNNING/HEALTHY on the
+**current** merge SHA (not an older smoke commit).
+
 Regenerate live files (does not touch Terraform state):
 
 ```bash

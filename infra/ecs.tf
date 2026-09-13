@@ -67,6 +67,7 @@ resource "aws_ssm_parameter" "adot_config" {
     extensions:
       health_check:
         endpoint: 0.0.0.0:13133
+        path: /
     service:
       extensions: [health_check]
       pipelines:
@@ -184,12 +185,16 @@ resource "aws_ecs_task_definition" "web" {
           awslogs-stream-prefix = "adot"
         }
       }
+      # Image is FROM scratch — no shell, curl, or wget. The collector
+      # ships /healthcheck (Go HTTP GET to 127.0.0.1:13133/). Must be
+      # exec form (CMD), not CMD-SHELL, or the sidecar never goes HEALTHY
+      # and the app dependsOn blocks boot.
       healthCheck = {
-        command     = ["CMD-SHELL", "curl -sf http://127.0.0.1:13133/ || wget -qO- http://127.0.0.1:13133/ || exit 1"]
+        command     = ["CMD", "/healthcheck"]
         interval    = 10
-        timeout     = 3
-        retries     = 3
-        startPeriod = 10
+        timeout     = 5
+        retries     = 5
+        startPeriod = 30
       }
     },
   ])
