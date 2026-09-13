@@ -15,6 +15,8 @@ mkdir -p "$OUT"
 echo "== smoke =="
 curl -sS "${API_URL}/health"  | tee "$OUT/smoke-health.json"
 echo
+curl -sS "${API_URL}/ready"   | tee "$OUT/smoke-ready.json"
+echo
 curl -sS "${API_URL}/version" | tee "$OUT/smoke-version.json"
 echo
 

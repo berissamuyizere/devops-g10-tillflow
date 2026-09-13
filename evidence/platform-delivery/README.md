@@ -34,7 +34,7 @@ Current-tree proof (replace on every clean run):
 |---|---|
 | `plan.txt` | Root `terraform plan` of **this** tree. OIDC is a `data` source, not a managed resource. |
 | `outputs.json` | Live ALB DNS + API Gateway URL. |
-| `smoke-health.json` / `smoke-version.json` | Public `/health` and `/version` through API Gateway. |
+| `smoke-health.json` / `smoke-ready.json` / `smoke-version.json` | Public `/health`, `/ready`, and `/version` through API Gateway. |
 | `ecs-tasks.json` / `ecs-task-detail.json` / `ecs-containers.txt` | `app` + `adot` both RUNNING; app image is a digest, not nginx. |
 | `tag-audit.json` / `tag-audit.txt` | `capstone=tillflow` resources and the six required tags. |
 | `release-apply.txt` | Transcript of the successful `main` Release apply (GitHub Actions). |
@@ -139,20 +139,23 @@ jq '.tasks[0].containers[] | {name, lastStatus, image}' ecs-task-detail.json \
 ```bash
 API_URL=$(terraform output -raw api_gateway_url)
 curl -sSf "$API_URL/health"  | tee smoke-health.json
+curl -sSf "$API_URL/ready"   | tee smoke-ready.json
 curl -sSf "$API_URL/version" | tee smoke-version.json
 ```
 
-Expect `/version` to contain the exact commit SHA that CodePipeline just
+Expect `/version` to contain the exact commit SHA that `release.yml` just
 deployed.
 
-### 6. Pipeline transcript
+### 6. Release transcript (not CodePipeline)
+
+CodePipeline stays off (`codeconnections_arn` unset). Capture the GitHub
+Actions Release run that applied `plan.bin` behind Environment
+`production`, then deployed `web` to ECS stability.
 
 ```bash
-aws codepipeline get-pipeline-state --name devops-g10-web \
-  --region eu-central-1 > pipeline-state.json
-
-aws codepipeline list-pipeline-executions --pipeline-name devops-g10-web \
-  --region eu-central-1 --max-items 5 > pipeline-runs.json
+# From the successful Release run on main:
+#  - terraform apply job log → release-apply.txt
+#  - smoke artifacts → smoke-*.json
 ```
 
 ## Files to commit here
@@ -164,8 +167,8 @@ directory:
 - `plan.txt`, `apply.txt`, `outputs.json`
 - `tag-audit.json`, `tag-audit.txt`
 - `ecs-tasks.json`, `ecs-task-detail.json`, `ecs-containers.txt`
-- `smoke-health.json`, `smoke-version.json`
-- `pipeline-state.json`, `pipeline-runs.json`
+- `smoke-health.json`, `smoke-ready.json`, `smoke-version.json`
+- Release run URL / `release-apply.txt` (GitHub Actions; CodePipeline is off)
 
 Along with:
 
