@@ -52,11 +52,15 @@ Chicken-and-egg: the **first** apply (CI role + platform) happens
 locally. After those two variables exist, do not apply from a laptop
 again. Merge to `main` runs `.github/workflows/release.yml`:
 
-1. `terraform apply` when `infra/**` changed
-2. web image build → ECR → ECS rolling update → `/health` + `/version`
+1. `terraform plan` when `infra/**` changed; the saved `plan.bin` is
+   uploaded as an artifact
+2. `terraform apply` of **that** file, after a required reviewer
+   approves the GitHub Environment `production`
+   ([setup](../docs/github-environment-production.md))
+3. web image build → ECR → ECS rolling update → `/health` + `/version`
    smoke when `services/web/**` or `services/_shared/**` changed
 
-`workflow_dispatch` on that workflow re-runs both jobs.
+`workflow_dispatch` on that workflow re-runs the same path.
 
 CodePipeline is optional. Only pass `codeconnections_arn` if you have
 already created the GitHub App connection in the console.

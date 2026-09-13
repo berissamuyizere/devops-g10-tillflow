@@ -26,10 +26,9 @@ AVD-AWS-0132 exp:2026-12-01
 # --------------------------------------------------------------------
 # AVD-AWS-0345 — IAM policy allows `s3:*`.
 # The CI deploy role (`devops-g10-ci-deploy`) needs to manage every S3
-# bucket Terraform creates. Scope is limited by an `aws:RequestedRegion`
-# condition to eu-central-1 (see infra/iam.tf, "WriteNamespacedResources"
-# statement). ADR-004 records this decision. Owner: yordanos.
-# Re-review: 2026-12-01.
+# bucket Terraform creates. Actions stay `s3:*` but resources are
+# `arn:aws:s3:::devops-g10-*` only (see infra/iam.tf, WriteNamespacedS3).
+# ADR-004 records this decision. Owner: yordanos. Re-review: 2026-12-01.
 AVD-AWS-0345 exp:2026-12-01
 
 # --------------------------------------------------------------------
