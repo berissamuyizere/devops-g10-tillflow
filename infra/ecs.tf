@@ -154,6 +154,7 @@ resource "aws_ecs_task_definition" "web" {
             awslogs-stream-prefix = "app"
           }
         }
+        linuxParameters = { initProcessEnabled = true }
         healthCheck = {
           command     = ["CMD-SHELL", "wget -qO- http://127.0.0.1:8080/health || exit 1"]
           interval    = 10
@@ -169,8 +170,10 @@ resource "aws_ecs_task_definition" "web" {
       image                  = var.adot_collector_image
       essential              = false
       readonlyRootFilesystem = true
-      user                   = "10001:10001"
-      command                = ["--config=env:AOT_CONFIG_CONTENT"]
+      # Do not override USER. The scratch image runs as `aoc`; forcing
+      # 10001 can make /healthcheck or the collector binary unusable.
+      command         = ["--config=env:AOT_CONFIG_CONTENT"]
+      linuxParameters = { initProcessEnabled = true }
       environment = [
         { name = "AOT_CONFIG_CONTENT", value = aws_ssm_parameter.adot_config.value },
       ]
