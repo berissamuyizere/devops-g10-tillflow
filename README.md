@@ -53,7 +53,14 @@ CODEOWNERS
 
 ## Bootstrap / deploy / destroy
 
-Not available yet — Platform (Yordanos) lands Terraform and one-command bootstrap at **G1**. Until then: clone this repo, read the docs above, and open PRs against `develop` with review from the area cross-reviewer.
+G1 is live in `eu-central-1`. Public smoke:
+
+`https://f9nla14lfh.execute-api.eu-central-1.amazonaws.com/health`
+
+- **PRs** → `develop`, then `develop` → `main`. Cross-reviewer reviews the area.
+- **Apply on `main`** waits on the GitHub Environment `production` (required reviewers) and applies the saved `plan.bin` — it does not re-plan.
+- **Bootstrap** (state bucket + lock table) is one-time: `infra/bootstrap/`. See [`evidence/platform-delivery/README.md`](evidence/platform-delivery/README.md).
+- **Destroy** is out of band; do not `terraform destroy` the shared platform.
 
 ## Group facts
 

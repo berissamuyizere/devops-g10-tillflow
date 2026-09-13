@@ -43,9 +43,11 @@ group creates from here on uses the `devops-g10-` prefix.
   its own ADR.
 - Every resource we create — ECS clusters/services, RDS/ElastiCache,
   SQS queues, EventBridge buses/rules, IAM roles, S3 buckets, log
-  groups, CloudWatch alarms — is named with the `devops-g10-` prefix.
-  S3 buckets additionally take an account-ID suffix for global
-  uniqueness (see `docs/naming.md`).
+  groups, CloudWatch alarms — is named with the `devops-g10-` prefix
+  (`name_prefix = "devops-g10"`, then `"${var.name_prefix}-<component>"`).
+  Do not insert a `tillflow` segment in the name; that belongs on the
+  `capstone=tillflow` tag. S3 buckets additionally take an account-ID
+  suffix for global uniqueness (see `docs/naming.md`).
 - Grading, cost tracking, and cleanup scripts can filter on
   `devops-g10-*` and on region `eu-central-1` with no ambiguity.
 

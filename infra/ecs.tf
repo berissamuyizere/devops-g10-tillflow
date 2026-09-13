@@ -91,16 +91,19 @@ resource "aws_cloudwatch_log_group" "adot_metrics" {
 
 # ---------------------------------------------------------------------
 # Web task definition.
-# `web_image_digest` is null on first apply — we launch a placeholder
-# nginx so the task boots and passes /health via the ALB, then the
-# pipeline replaces it with our built image and re-registers the task
-# def.
+# `web_image_digest` is null on first apply. Stock nginx 404s /health
+# (ALB + ECS both probe that path), so the placeholder is busybox httpd
+# writing a 200 on /health under /tmp (writable; rootfs is read-only).
+# The pipeline then replaces the image with the real Node digest.
 # ---------------------------------------------------------------------
 locals {
-  web_image = coalesce(
-    var.web_image_digest,
-    "public.ecr.aws/nginx/nginx:1.27-alpine-slim"
-  )
+  web_placeholder_image = "public.ecr.aws/docker/library/busybox:1.37.0"
+  web_uses_placeholder  = var.web_image_digest == null
+  web_image             = coalesce(var.web_image_digest, local.web_placeholder_image)
+  web_placeholder_command = [
+    "sh", "-c",
+    "mkdir -p /tmp/www && printf '%s\\n' '{\"status\":\"ok\",\"service\":\"web\"}' > /tmp/www/health && exec httpd -f -p 8080 -h /tmp/www",
+  ]
 }
 
 resource "aws_ecs_task_definition" "web" {
@@ -119,41 +122,47 @@ resource "aws_ecs_task_definition" "web" {
   }
 
   container_definitions = jsonencode([
-    {
-      name                   = "app"
-      image                  = local.web_image
-      essential              = true
-      readonlyRootFilesystem = true
-      user                   = "10001:10001"
-      portMappings = [
-        { containerPort = 8080, protocol = "tcp" },
-      ]
-      environment = [
-        { name = "PORT", value = "8080" },
-        { name = "OTEL_EXPORTER_OTLP_ENDPOINT", value = "http://localhost:4318" },
-        { name = "OTEL_SERVICE_NAME", value = "web" },
-        { name = "OTEL_RESOURCE_ATTRIBUTES", value = "service.namespace=tillflow,deployment.environment=${var.environment}" },
-        { name = "LOG_LEVEL", value = "info" },
-      ]
-      mountPoints = [
-        { sourceVolume = "tmp", containerPath = "/tmp", readOnly = false },
-      ]
-      logConfiguration = {
-        logDriver = "awslogs"
-        options = {
-          awslogs-group         = aws_cloudwatch_log_group.web.name
-          awslogs-region        = var.region
-          awslogs-stream-prefix = "app"
+    merge(
+      {
+        name                   = "app"
+        image                  = local.web_image
+        essential              = true
+        readonlyRootFilesystem = true
+        user                   = "10001:10001"
+        portMappings = [
+          { containerPort = 8080, protocol = "tcp" },
+        ]
+        environment = [
+          { name = "PORT", value = "8080" },
+          { name = "OTEL_EXPORTER_OTLP_ENDPOINT", value = "http://localhost:4318" },
+          { name = "OTEL_SERVICE_NAME", value = "web" },
+          { name = "OTEL_RESOURCE_ATTRIBUTES", value = "service.namespace=tillflow,deployment.environment=${var.environment}" },
+          { name = "LOG_LEVEL", value = "info" },
+        ]
+        mountPoints = [
+          { sourceVolume = "tmp", containerPath = "/tmp", readOnly = false },
+        ]
+        dependsOn = [
+          { containerName = "adot", condition = "HEALTHY" },
+        ]
+        logConfiguration = {
+          logDriver = "awslogs"
+          options = {
+            awslogs-group         = aws_cloudwatch_log_group.web.name
+            awslogs-region        = var.region
+            awslogs-stream-prefix = "app"
+          }
         }
-      }
-      healthCheck = {
-        command     = ["CMD-SHELL", "wget -qO- http://127.0.0.1:8080/health || exit 1"]
-        interval    = 10
-        timeout     = 3
-        retries     = 3
-        startPeriod = 20
-      }
-    },
+        healthCheck = {
+          command     = ["CMD-SHELL", "wget -qO- http://127.0.0.1:8080/health || exit 1"]
+          interval    = 10
+          timeout     = 3
+          retries     = 3
+          startPeriod = 20
+        }
+      },
+      local.web_uses_placeholder ? { command = local.web_placeholder_command } : {}
+    ),
     {
       name                   = "adot"
       image                  = var.adot_collector_image
@@ -174,6 +183,13 @@ resource "aws_ecs_task_definition" "web" {
           awslogs-region        = var.region
           awslogs-stream-prefix = "adot"
         }
+      }
+      healthCheck = {
+        command     = ["CMD-SHELL", "curl -sf http://127.0.0.1:13133/ || wget -qO- http://127.0.0.1:13133/ || exit 1"]
+        interval    = 10
+        timeout     = 3
+        retries     = 3
+        startPeriod = 10
       }
     },
   ])

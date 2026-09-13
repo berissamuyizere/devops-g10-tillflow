@@ -155,7 +155,10 @@ data "aws_iam_policy_document" "ci_deploy" {
     ]
   }
 
-  # Namespaced write on the resources Terraform manages.
+  # Regional data-plane writes. EC2/ELB/RDS/API Gateway do not take a
+  # stable devops-g10-* ARN on Create*, so these stay region-locked.
+  # IAM / S3 / Secrets / SSM are scoped to the prefix in the statements
+  # below — do not put iam:* here (privilege escalation).
   statement {
     sid    = "WriteNamespacedResources"
     effect = "Allow"
@@ -164,7 +167,6 @@ data "aws_iam_policy_document" "ci_deploy" {
       "elasticloadbalancing:*",
       "rds:*",
       "elasticache:*",
-      "s3:*",
       "sqs:*",
       "logs:*",
       "cloudwatch:*",
@@ -175,9 +177,6 @@ data "aws_iam_policy_document" "ci_deploy" {
       "wafv2:*",
       "codepipeline:*",
       "codebuild:*",
-      "iam:*",
-      "secretsmanager:*",
-      "ssm:*",
     ]
     resources = ["*"]
     condition {
@@ -185,6 +184,81 @@ data "aws_iam_policy_document" "ci_deploy" {
       variable = "aws:RequestedRegion"
       values   = [var.region]
     }
+  }
+
+  statement {
+    sid    = "WriteNamespacedIAM"
+    effect = "Allow"
+    actions = [
+      "iam:CreateRole",
+      "iam:DeleteRole",
+      "iam:TagRole",
+      "iam:UntagRole",
+      "iam:UpdateRole",
+      "iam:UpdateAssumeRolePolicy",
+      "iam:UpdateRoleDescription",
+      "iam:PutRolePolicy",
+      "iam:DeleteRolePolicy",
+      "iam:AttachRolePolicy",
+      "iam:DetachRolePolicy",
+      "iam:CreatePolicy",
+      "iam:DeletePolicy",
+      "iam:CreatePolicyVersion",
+      "iam:DeletePolicyVersion",
+      "iam:SetDefaultPolicyVersion",
+      "iam:TagPolicy",
+      "iam:UntagPolicy",
+    ]
+    resources = [
+      "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/${var.name_prefix}-*",
+      "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:policy/${var.name_prefix}-*",
+    ]
+  }
+
+  statement {
+    sid    = "CreateAllowedServiceLinkedRoles"
+    effect = "Allow"
+    actions = [
+      "iam:CreateServiceLinkedRole",
+    ]
+    resources = [
+      "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/aws-service-role/*",
+    ]
+    condition {
+      test     = "StringEquals"
+      variable = "iam:AWSServiceName"
+      values = [
+        "inspector2.amazonaws.com",
+        "rds.amazonaws.com",
+        "elasticache.amazonaws.com",
+        "elasticloadbalancing.amazonaws.com",
+      ]
+    }
+  }
+
+  statement {
+    sid    = "WriteNamespacedS3"
+    effect = "Allow"
+    actions = [
+      "s3:*",
+    ]
+    resources = [
+      "arn:${data.aws_partition.current.partition}:s3:::${var.name_prefix}-*",
+      "arn:${data.aws_partition.current.partition}:s3:::${var.name_prefix}-*/*",
+    ]
+  }
+
+  statement {
+    sid    = "WriteNamespacedSecretsAndSSM"
+    effect = "Allow"
+    actions = [
+      "secretsmanager:*",
+      "ssm:*",
+    ]
+    resources = [
+      "arn:${data.aws_partition.current.partition}:secretsmanager:${var.region}:${data.aws_caller_identity.current.account_id}:secret:${var.name_prefix}/*",
+      "arn:${data.aws_partition.current.partition}:ssm:${var.region}:${data.aws_caller_identity.current.account_id}:parameter/${var.name_prefix}/*",
+    ]
   }
 
   # Docker push.
