@@ -229,7 +229,16 @@ jobs:
           path: sbom-web.spdx.json
 
       - name: Push image
-        run: docker push "${{ steps.build.outputs.image }}"
+        run: |
+          set -euo pipefail
+          if aws ecr describe-images \
+            --repository-name "${{ env.ECR_REPO_NAME }}" \
+            --image-ids imageTag="${GITHUB_SHA}" \
+            >/dev/null 2>&1; then
+            echo "ECR tag ${GITHUB_SHA} already exists (immutable); reuse digest"
+          else
+            docker push "${{ steps.build.outputs.image }}"
+          fi
 
       - name: Resolve digest + rolling-update ECS
         run: |
@@ -246,11 +255,17 @@ jobs:
             --task-definition "${{ env.ECS_TASK_FAMILY }}" \
             --query taskDefinition > td-raw.json
 
+          ADOT_CONFIG=$(aws ssm get-parameter \
+            --name /devops-g10/adot/config \
+            --query Parameter.Value \
+            --output text)
+
           jq \
             --arg image "${IMAGE_URI}" \
             --arg commit "${GITHUB_SHA}" \
             --arg digest "${DIGEST}" \
             --arg cname "${{ env.ECS_CONTAINER }}" \
+            --arg adot_config "${ADOT_CONFIG}" \
             'del(
                 .taskDefinitionArn, .revision, .status, .requiresAttributes,
                 .compatibilities, .registeredAt, .registeredBy, .deregisteredAt
@@ -258,6 +273,8 @@ jobs:
               | .containerDefinitions |= map(
                   if .name == $cname then
                     .image = $image
+                    | del(.command, .entryPoint)
+                    | .dependsOn = [{containerName: "adot", condition: "HEALTHY"}]
                     | .environment = (
                         ((.environment // []) | map(select(.name != "COMMIT_SHA" and .name != "IMAGE_DIGEST")))
                         + [
@@ -265,6 +282,19 @@ jobs:
                             {name: "IMAGE_DIGEST", value: $digest}
                           ]
                       )
+                  elif .name == "adot" then
+                    del(.user)
+                    | .environment = (
+                        ((.environment // []) | map(select(.name != "AOT_CONFIG_CONTENT")))
+                        + [{name: "AOT_CONFIG_CONTENT", value: $adot_config}]
+                      )
+                    | .healthCheck = {
+                      command: ["CMD", "/healthcheck"],
+                      interval: 10,
+                      timeout: 5,
+                      retries: 5,
+                      startPeriod: 30
+                    }
                   else . end
                 )' \
             td-raw.json > td.json
@@ -320,16 +350,22 @@ jobs:
           fi
           echo
           curl -sSf --retry 5 --retry-all-errors --retry-delay 3 \
+            "${API_URL}/ready" | tee smoke-ready.json
+          echo
+          curl -sSf --retry 5 --retry-all-errors --retry-delay 3 \
             "${API_URL}/version" | tee smoke-version.json
           echo
           python3 - <<'PY'
           import json, os, sys
           health = json.load(open("smoke-health.json"))
+          ready = json.load(open("smoke-ready.json"))
           version = json.load(open("smoke-version.json"))
           sha = os.environ["GITHUB_SHA"]
           if health.get("status") != "ok":
               sys.exit(f"health not ok: {health}")
+          if ready.get("status") != "ready":
+              sys.exit(f"ready not ready: {ready}")
           if version.get("commit") != sha:
               sys.exit(f"version commit {version.get('commit')} != {sha}")
-          print("smoke ok", health, version)
+          print("smoke ok", health, ready, version)
           PY
