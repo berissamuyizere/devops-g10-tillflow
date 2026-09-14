@@ -25,11 +25,12 @@ describe('sale state machine helpers', () => {
     );
   });
 
-  it('allows POS cancel from created or awaiting_payment, not from paid', () => {
+  it('allows POS cancel only from created (G2 freeze)', () => {
     assert.equal(canTransition(STATUSES.CREATED, STATUSES.CANCELLED, ACTORS.POS), true);
+    // Frozen for G2: once awaiting_payment, the attendant can no longer cancel.
     assert.equal(
       canTransition(STATUSES.AWAITING_PAYMENT, STATUSES.CANCELLED, ACTORS.POS),
-      true
+      false
     );
     assert.equal(canTransition(STATUSES.PAID, STATUSES.CANCELLED, ACTORS.POS), false);
   });

@@ -85,7 +85,6 @@ Line items are immutable after insert. Corrections mean cancel (if not `paid`) a
 
 ```
 created → awaiting_payment → paid
-                ↘ cancelled
 created → cancelled
 ```
 
@@ -94,9 +93,11 @@ created → cancelled
 | `created` | Sale persisted; no payment command yet | POS on `POST /sales` |
 | `awaiting_payment` | Payments has accepted a charge for this `sale_id` | POS, only after Payments acknowledges the command |
 | `paid` | Money confirmed. **Only status Commission may use** | POS, only after Payments signals success. `paid_at` set once |
-| `cancelled` | Voided before pay. Terminal | POS owner/attendant; never from `paid` |
+| `cancelled` | Voided before pay. Terminal | POS owner/attendant, **only from `created`** |
 
 A Daraja **timeout is not a decline**. POS does not move `awaiting_payment` to `cancelled` or `paid` on timeout. That decision stays with Payments (query/reconcile). Replay of a paid signal is a no-op: status stays `paid`, `paid_at` unchanged, totals unchanged.
+
+**G2 refinement (frozen in `docs/contracts/pos-payments-api.md`):** cancel is allowed **only from `created`**. Once a sale is `awaiting_payment`, the attendant/owner can no longer cancel it — only Payments may transition it. This closes the race where an attendant cancel and a success callback arrive together and leave money against a cancelled sale.
 
 ### Idempotent sale create
 

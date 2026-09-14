@@ -12,8 +12,14 @@ const ACTORS = Object.freeze({
 });
 
 /**
- * Legal transitions for the POS-owned sale state machine (ADR-001).
- * Timeout must never move awaiting_payment → cancelled/paid from POS.
+ * Legal transitions for the POS-owned sale state machine (ADR-001,
+ * frozen for G2 by docs/contracts/pos-payments-api.md).
+ *
+ * G2 freeze: once a sale is `awaiting_payment` the attendant/owner can no
+ * longer change it. Only Payments may transition it (→ paid), or leave it
+ * pending for reconcile. This stops an attendant cancel from racing a
+ * success callback and leaving money against a cancelled sale. A timeout
+ * must never move awaiting_payment → cancelled/paid from POS.
  */
 const ALLOWED = Object.freeze({
   [STATUSES.CREATED]: {
@@ -22,7 +28,6 @@ const ALLOWED = Object.freeze({
   },
   [STATUSES.AWAITING_PAYMENT]: {
     [STATUSES.PAID]: ACTORS.PAYMENTS,
-    [STATUSES.CANCELLED]: ACTORS.POS,
   },
   [STATUSES.PAID]: {},
   [STATUSES.CANCELLED]: {},
