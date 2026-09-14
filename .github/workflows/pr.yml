@@ -206,6 +206,20 @@ jobs:
         if: steps.run.outputs.go == 'true'
         run: npm run lint --if-present
 
+      - name: Install POS deps for the contract test (payments)
+        if: matrix.service == 'payments' && steps.run.outputs.go == 'true'
+        working-directory: services/pos
+        run: npm ci --no-audit --no-fund --no-progress
+
+      - name: Start Postgres + migrate POS for the contract test (payments)
+        if: matrix.service == 'payments' && steps.run.outputs.go == 'true'
+        working-directory: services/pos
+        env:
+          DATABASE_URL: postgres://pos:pos@127.0.0.1:5433/tillflow_pos
+        run: |
+          docker compose up -d --wait
+          npm run migrate
+
       - name: Test
         if: steps.run.outputs.go == 'true'
         env:
@@ -215,6 +229,15 @@ jobs:
           PAYMENTS_SERVICE_TOKEN: dev-payments-token
           MPESA_MODE: fake
         run: npm test --if-present
+
+      - name: Contract test against the real POS (payments)
+        if: matrix.service == 'payments' && steps.run.outputs.go == 'true'
+        env:
+          DATABASE_URL: postgres://payments:payments@127.0.0.1:5434/tillflow_payments
+          POS_DATABASE_URL: postgres://pos:pos@127.0.0.1:5433/tillflow_pos
+          PAYMENTS_SERVICE_TOKEN: dev-payments-token
+          MPESA_MODE: fake
+        run: npm run test:contract
 
       - name: Docker build (validate)
         if: steps.run.outputs.go == 'true'
