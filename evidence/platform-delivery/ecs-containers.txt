@@ -1,0 +1,2 @@
+{'name': 'app', 'lastStatus': 'RUNNING', 'healthStatus': 'HEALTHY', 'image': '240462142849.dkr.ecr.eu-central-1.amazonaws.com/devops-g10/web@sha256:5f09ee41af045b3e2c04948e11ab6dac9ec6b094859013058406b44a8295f838'}
+{'name': 'adot', 'lastStatus': 'RUNNING', 'healthStatus': 'HEALTHY', 'image': 'public.ecr.aws/aws-observability/aws-otel-collector:v0.43.1'}
