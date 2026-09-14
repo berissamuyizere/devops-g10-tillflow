@@ -1,6 +1,7 @@
 const { STATUSES, evaluate, statusForResultCode } = require('./state');
 const { hashChargeRequest } = require('../hash');
 const { MpesaTimeoutError, MpesaRejectedError } = require('../../../_shared/mpesa');
+const { PosConflictError } = require('../pos/client');
 
 const UNIQUE_VIOLATION = '23505';
 
@@ -26,6 +27,9 @@ function mapPayment(row) {
     confirmed_at: row.confirmed_at,
     paid_at: row.paid_at,
     timed_out_at: row.timed_out_at,
+    pos_awaiting_synced_at: row.pos_awaiting_synced_at,
+    pos_paid_synced_at: row.pos_paid_synced_at,
+    pos_sync_error: row.pos_sync_error,
   };
 }
 
@@ -204,10 +208,7 @@ async function sendStkPush(db, mpesa, pos, payment, { callbackUrl }) {
   });
 
   if (settled?.payment && settled.payment.status === STATUSES.PENDING) {
-    try {
-      await pos.markAwaitingPayment(payment.sale_id, payment.id);
-    } catch {
-    }
+    await syncAwaitingPayment(db, pos, settled.payment);
   }
 
   return {
@@ -223,12 +224,24 @@ async function settleConfirmedPayment(db, pos, paymentId, paidAt = new Date()) {
     return { payment: current, changed: false };
   }
 
-  await pos.markPaid(current.sale_id, current.id, paidAt);
+  try {
+    await pos.markPaid(current.sale_id, current.id, paidAt);
+  } catch (err) {
+    await db.query(`UPDATE payments.payments SET pos_sync_error = $1 WHERE id = $2`, [
+      `paid: ${err.code || 'ERROR'}: ${err.message}`,
+      paymentId,
+    ]);
+    throw err;
+  }
 
   return db.withTransaction(async (client) => {
     const row = await lockPayment(client, paymentId);
     if (!row) return { payment: null, changed: false };
-    return applyTransition(client, row, STATUSES.PAID, { paid_at: paidAt });
+    return applyTransition(client, row, STATUSES.PAID, {
+      paid_at: paidAt,
+      pos_paid_synced_at: new Date(),
+      pos_sync_error: null,
+    });
   });
 }
 
@@ -288,8 +301,76 @@ async function reconcilePayment(db, mpesa, pos, paymentId) {
   return { ...result, reason: `settled_${target}` };
 }
 
+async function syncAwaitingPayment(db, pos, payment) {
+  try {
+    await pos.markAwaitingPayment(payment.sale_id, payment.id);
+    await db.query(
+      `UPDATE payments.payments
+       SET pos_awaiting_synced_at = now(), pos_sync_error = NULL
+       WHERE id = $1`,
+      [payment.id]
+    );
+    return { synced: true, reason: 'ok' };
+  } catch (err) {
+    const conflict = err instanceof PosConflictError;
+    await db.query(`UPDATE payments.payments SET pos_sync_error = $1 WHERE id = $2`, [
+      `awaiting-payment: ${err.code || 'ERROR'}: ${err.message}`,
+      payment.id,
+    ]);
+    return {
+      synced: false,
+      reason: conflict ? 'pos_conflict' : 'pos_unavailable',
+      retryable: !conflict,
+      error: err,
+    };
+  }
+}
+
+async function findUnsyncedPayments(db, limit = 100) {
+  const res = await db.query(
+    `SELECT * FROM payments.payments
+     WHERE (status = 'confirmed' AND pos_paid_synced_at IS NULL)
+        OR (status = 'pending' AND pos_awaiting_synced_at IS NULL)
+     ORDER BY updated_at ASC
+     LIMIT $1`,
+    [limit]
+  );
+  return res.rows.map(mapPayment);
+}
+
+async function sweepPosSync(db, pos, { limit = 100 } = {}) {
+  const stuck = await findUnsyncedPayments(db, limit);
+  const results = { scanned: stuck.length, settled: 0, resynced: 0, conflicts: 0, failed: 0 };
+
+  for (const payment of stuck) {
+    if (payment.status === STATUSES.CONFIRMED) {
+      try {
+        const settled = await settleConfirmedPayment(db, pos, payment.id, new Date());
+        if (settled.changed) results.settled += 1;
+      } catch (err) {
+        results.failed += 1;
+        await db.query(`UPDATE payments.payments SET pos_sync_error = $1 WHERE id = $2`, [
+          `paid: ${err.code || 'ERROR'}: ${err.message}`,
+          payment.id,
+        ]);
+      }
+      continue;
+    }
+
+    const sync = await syncAwaitingPayment(db, pos, payment);
+    if (sync.synced) results.resynced += 1;
+    else if (sync.reason === 'pos_conflict') results.conflicts += 1;
+    else results.failed += 1;
+  }
+
+  return results;
+}
+
 module.exports = {
   reservePayment,
+  syncAwaitingPayment,
+  findUnsyncedPayments,
+  sweepPosSync,
   sendStkPush,
   settleConfirmedPayment,
   reconcilePayment,

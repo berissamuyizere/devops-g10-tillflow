@@ -43,6 +43,7 @@ See [`src/payments/state.js`](src/payments/state.js).
 | `GET` | `/internal/v1/payments/:id` | POS | `X-Pos-Token` |
 | `GET` | `/internal/v1/sales/:saleId/payment` | POS | `X-Pos-Token` |
 | `POST` | `/internal/v1/payments/:id/reconcile` | POS / scheduler | `X-Pos-Token` |
+| `POST` | `/internal/v1/pos-sync/sweep` | scheduler / runbook | `X-Pos-Token` |
 | `POST` | `/payments/callback` | Daraja | HMAC signature |
 | `POST` | `/internal/v1/payouts` | Commission | `X-Commission-Token` |
 | `GET` | `/internal/v1/payouts/:id` | Commission | `X-Commission-Token` |
@@ -120,11 +121,125 @@ POS uses 5433 and Payments uses 5434, so both can run side by side.
 | `test/state-machine.test.js` | transition table and result-code mapping (no DB) |
 | `test/callback-auth.test.js` | HMAC signing, verification, canonicalisation (no DB) |
 | `test/mpesa-fake.test.js` | the fake adapter's determinism (no DB) |
+| `test/pos-wiring.test.js` | POS sync recording, conflicts, outages, the sweeper |
+| `test/contract-pos-live.contract.js` | **the real POS service**, over real HTTP |
+| `test/trace-propagation.contract.js` | one trace id across both services, two real processes |
 
-The first three need Postgres; the last three do not.
+`npm test` runs everything matching `test/*.test.js`. The contract test is
+excluded from that glob on purpose and runs separately.
 
 These are the **invariant tests** half of the G2 proof obligation in ADR-002.
 The other half is a trace across sale → payment → callback/reconciliation.
+
+## POS wiring
+
+Payments never writes sale rows. The only sale state lives in POS, and Payments
+moves it strictly through the frozen contract
+([docs/contracts/pos-payments-api.md](../../docs/contracts/pos-payments-api.md)),
+authenticated with `X-Payments-Token`:
+
+1. **Read the sale** before anything else. `total_minor` and `mpesa_till` come
+   from that response — never from the charge request body or a callback.
+2. **`POST .../awaiting-payment`** once the STK command is accepted.
+3. **`POST .../paid`** once a callback or a reconcile query confirms money moved.
+
+### When POS disagrees or disappears
+
+The three outcomes of a POS call are genuinely different and are not collapsed:
+
+| POS says | Meaning | What Payments does |
+|---|---|---|
+| `200` | applied | stamp `pos_awaiting_synced_at` / `pos_paid_synced_at` |
+| `409 ILLEGAL_TRANSITION` | a decision — the sale was cancelled first | record `pos_sync_error`, **keep the payment alive** |
+| `5xx` / unreachable | unknown | record `pos_sync_error`, retry via the sweeper |
+
+A POS problem must never unwind a charge that has already reached Daraja. So a
+409 on `awaiting-payment` does **not** fail the payment: the customer may still
+have been debited, and only reconciliation can settle that. It is recorded
+loudly instead.
+
+`settleConfirmedPayment` calls POS *before* marking the payment `paid`, because
+POS's `markPaid` is idempotent. If POS is down the payment stays `confirmed`
+with `pos_sync_error` set — visible, and recoverable. The callback returns a
+non-2xx so Daraja retries rather than believing we handled it.
+
+### The sweeper
+
+`POST /internal/v1/pos-sync/sweep` re-drives everything that fell behind:
+`confirmed` payments whose `paid` call never landed, and `pending` payments
+whose `awaiting-payment` call never landed. It only repeats calls the contract
+defines as idempotent, so it is safe to run at any time and a second run is a
+no-op. Query `pos_sync_error IS NOT NULL` to see what is currently out of sync.
+
+## Contract test
+
+`test/contract-pos-live.contract.js` boots the **real** `services/pos` Express
+app against a real POS database and points the real `createPosClient` at it over
+HTTP. Every other test uses an in-memory fake POS, which proves our logic but
+not that our client matches what POS actually serves — this one would catch a
+renamed field, a changed status code, or a different auth header before the
+joint G2 evidence run rather than during it.
+
+```bash
+cd services/pos      && docker compose up -d --wait && npm ci && npm run migrate
+cd services/payments && docker compose up -d --wait && npm run migrate
+
+DATABASE_URL=postgres://payments:payments@127.0.0.1:5434/tillflow_payments \
+POS_DATABASE_URL=postgres://pos:pos@127.0.0.1:5433/tillflow_pos \
+  npm run test:contract
+```
+
+It runs in CI on every PR that touches `services/payments/**` or
+`services/_shared/**`.
+
+One wrinkle worth knowing: the test builds POS's logger with
+`require('../../pos/node_modules/pino')`. POS's `pino-http` breaks on a logger
+instance created by Payments' own pino copy, because pino identifies loggers by
+internal symbols that differ between installs.
+
+## G2 trace evidence
+
+The G2 proof is invariant tests **and** a trace. The tests are done; the trace
+has to be captured from the live API once POS and Payments are both on ECS.
+
+### What is already proven
+
+`test/trace-propagation.contract.js` boots POS and Payments as two real OS
+processes with OTel enabled, exports to a throwaway in-process OTLP collector,
+drives the happy path, and asserts that POS and Payments spans share **one**
+trace id and that POS's spans have a parent. Last local run: 102 spans across
+`payments + pos` on a single trace.
+
+This matters because context has to survive the Payments → POS hop, which goes
+over `fetch`. That works only because `@opentelemetry/auto-instrumentations-node`
+pulls in `@opentelemetry/instrumentation-undici`. If that instrumentation is
+ever dropped, the G2 trace silently becomes *two disconnected traces* — which
+you would otherwise discover during the demo.
+
+### Capturing the evidence
+
+`npm run evidence:g2` drives the full scripted happy path against any two base
+URLs, with a caller-generated `traceparent` so the trace id is known up front
+and can be looked up in X-Ray or Grafana afterwards.
+
+```bash
+POS_BASE_URL=https://<api-gw>/pos \
+PAYMENTS_BASE_URL=https://<api-gw>/payments \
+TENANT_ID=<uuid> ATTENDANT_ID=<uuid> \
+POS_SERVICE_TOKEN=... DARAJA_CALLBACK_SECRET=... \
+  npm run evidence:g2
+```
+
+It runs: create sale → replay the sale key → charge → replay the charge key →
+callback → replay the callback → read final state, asserting one sale, one
+charge, one `paid_at`, and no second STK. It writes a JSON summary to
+`evidence/payments-integrity/g2-happy-path-<trace>.json` and exits non-zero if
+any check fails.
+
+**Only a run against the live API counts as G2 evidence.** A local run proves
+the script works; it does not prove the deployed system does. Nothing is
+committed to `evidence/` until it comes from the real thing — point
+`EVIDENCE_DIR` somewhere else for local runs.
 
 ## Docker
 
@@ -153,6 +268,7 @@ on `/health`, no `latest` tag.
 | `POS_SERVICE_TOKEN` | `dev-pos-token` | what POS presents to us |
 | `COMMISSION_SERVICE_TOKEN` | `dev-commission-token` | what Commission presents to us |
 | `MPESA_B2C_SHORTCODE` | `600000` | |
+| `POS_TIMEOUT_MS` | `3000` | per-request timeout on POS calls |
 
 Real Daraja credentials live in Secrets Manager under `devops-g10/daraja` and
 are never committed, never in env files, never in Terraform plaintext.
