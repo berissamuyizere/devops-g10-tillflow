@@ -1,0 +1,120 @@
+{
+    "tasks": [
+        {
+            "attachments": [
+                {
+                    "id": "d66061cd-95ef-405e-bca6-d16eae4e8aa4",
+                    "type": "ElasticNetworkInterface",
+                    "status": "ATTACHED",
+                    "details": [
+                        {
+                            "name": "subnetId",
+                            "value": "subnet-0dff0f1bc9e4c8ba1"
+                        },
+                        {
+                            "name": "networkInterfaceId",
+                            "value": "eni-0670bd08944124cfc"
+                        },
+                        {
+                            "name": "macAddress",
+                            "value": "06:49:a8:f3:a7:39"
+                        },
+                        {
+                            "name": "privateDnsName",
+                            "value": "ip-10-20-11-147.eu-central-1.compute.internal"
+                        },
+                        {
+                            "name": "privateIPv4Address",
+                            "value": "10.20.11.147"
+                        }
+                    ]
+                }
+            ],
+            "attributes": [
+                {
+                    "name": "ecs.cpu-architecture",
+                    "value": "arm64"
+                }
+            ],
+            "availabilityZone": "eu-central-1b",
+            "clusterArn": "arn:aws:ecs:eu-central-1:240462142849:cluster/devops-g10",
+            "connectivity": "CONNECTED",
+            "connectivityAt": "2026-09-13T19:56:23.927000+03:00",
+            "containers": [
+                {
+                    "containerArn": "arn:aws:ecs:eu-central-1:240462142849:container/devops-g10/14a983b39da246a988e4d567bea94371/43091366-bad4-4afc-9134-fcf07a8bfbfc",
+                    "taskArn": "arn:aws:ecs:eu-central-1:240462142849:task/devops-g10/14a983b39da246a988e4d567bea94371",
+                    "name": "app",
+                    "image": "240462142849.dkr.ecr.eu-central-1.amazonaws.com/devops-g10/web@sha256:5f09ee41af045b3e2c04948e11ab6dac9ec6b094859013058406b44a8295f838",
+                    "imageDigest": "sha256:5f09ee41af045b3e2c04948e11ab6dac9ec6b094859013058406b44a8295f838",
+                    "runtimeId": "14a983b39da246a988e4d567bea94371-0527074092",
+                    "lastStatus": "RUNNING",
+                    "networkBindings": [],
+                    "networkInterfaces": [
+                        {
+                            "attachmentId": "d66061cd-95ef-405e-bca6-d16eae4e8aa4",
+                            "privateIpv4Address": "10.20.11.147"
+                        }
+                    ],
+                    "healthStatus": "HEALTHY",
+                    "cpu": "0"
+                },
+                {
+                    "containerArn": "arn:aws:ecs:eu-central-1:240462142849:container/devops-g10/14a983b39da246a988e4d567bea94371/eb1c3ed7-f120-4807-84c8-db4ae419642f",
+                    "taskArn": "arn:aws:ecs:eu-central-1:240462142849:task/devops-g10/14a983b39da246a988e4d567bea94371",
+                    "name": "adot",
+                    "image": "public.ecr.aws/aws-observability/aws-otel-collector:v0.43.1",
+                    "imageDigest": "sha256:db725ac7007ef1d9b5a357a59f3b964ab9e1df23ebb0dfc694275019048b489b",
+                    "runtimeId": "14a983b39da246a988e4d567bea94371-1020010547",
+                    "lastStatus": "RUNNING",
+                    "networkBindings": [],
+                    "networkInterfaces": [
+                        {
+                            "attachmentId": "d66061cd-95ef-405e-bca6-d16eae4e8aa4",
+                            "privateIpv4Address": "10.20.11.147"
+                        }
+                    ],
+                    "healthStatus": "HEALTHY",
+                    "cpu": "0"
+                }
+            ],
+            "cpu": "512",
+            "createdAt": "2026-09-13T19:56:20.418000+03:00",
+            "desiredStatus": "RUNNING",
+            "enableExecuteCommand": false,
+            "group": "service:devops-g10-web",
+            "healthStatus": "HEALTHY",
+            "lastStatus": "RUNNING",
+            "launchType": "FARGATE",
+            "memory": "1024",
+            "overrides": {
+                "containerOverrides": [
+                    {
+                        "name": "app"
+                    },
+                    {
+                        "name": "adot"
+                    }
+                ],
+                "inferenceAcceleratorOverrides": []
+            },
+            "platformVersion": "1.4.0",
+            "platformFamily": "Linux",
+            "pullStartedAt": "2026-09-13T19:56:30.509000+03:00",
+            "pullStoppedAt": "2026-09-13T19:56:36.746000+03:00",
+            "startedAt": "2026-09-13T19:56:45.417000+03:00",
+            "startedBy": "ecs-svc/3458301248702282191",
+            "tags": [],
+            "taskArn": "arn:aws:ecs:eu-central-1:240462142849:task/devops-g10/14a983b39da246a988e4d567bea94371",
+            "taskDefinitionArn": "arn:aws:ecs:eu-central-1:240462142849:task-definition/devops-g10-web:5",
+            "version": 5,
+            "ephemeralStorage": {
+                "sizeInGiB": 20
+            },
+            "fargateEphemeralStorage": {
+                "sizeInGiB": 20
+            }
+        }
+    ],
+    "failures": []
+}
