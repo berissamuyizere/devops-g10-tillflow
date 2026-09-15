@@ -473,8 +473,15 @@ jobs:
             --launch-type FARGATE \
             --network-configuration "awsvpcConfiguration={subnets=[${SUBNETS}],securityGroups=[${SGS}],assignPublicIp=DISABLED}" \
             --query 'tasks[0].taskArn' --output text)
+          TASK_ID="${TASK_ARN##*/}"
           echo "bootstrap task ${TASK_ARN}"
           aws ecs wait tasks-stopped --cluster devops-g10 --tasks "${TASK_ARN}"
+          aws ecs describe-tasks --cluster devops-g10 --tasks "${TASK_ARN}" \
+            --query 'tasks[0].{stoppedReason:stoppedReason,containers:containers[].{name:name,exitCode:exitCode,reason:reason}}' \
+            --output json
+          echo "--- CloudWatch logs ---"
+          aws logs tail /devops-g10/db-migrate --since 30m \
+            --log-stream-name-prefix "bootstrap/bootstrap/${TASK_ID}" 2>&1 || true
           EXIT=$(aws ecs describe-tasks --cluster devops-g10 --tasks "${TASK_ARN}" \
             --query 'tasks[0].containers[0].exitCode' --output text)
           echo "bootstrap exit=${EXIT}"
@@ -507,10 +514,22 @@ jobs:
             --network-configuration "awsvpcConfiguration={subnets=[${SUBNETS}],securityGroups=[${SGS}],assignPublicIp=DISABLED}" \
             --overrides "${OVERRIDES}" \
             --query 'tasks[0].taskArn' --output text)
+          TASK_ID="${TASK_ARN##*/}"
           echo "pos migrate ${TASK_ARN}"
           aws ecs wait tasks-stopped --cluster devops-g10 --tasks "${TASK_ARN}"
+          echo "--- describe-tasks ---"
+          aws ecs describe-tasks --cluster devops-g10 --tasks "${TASK_ARN}" \
+            --query 'tasks[0].{stoppedReason:stoppedReason,containers:containers[].{name:name,exitCode:exitCode,reason:reason}}' \
+            --output json
+          echo "--- app CloudWatch logs ---"
+          aws logs tail /devops-g10/pos --since 30m \
+            --log-stream-name-prefix "app/app/${TASK_ID}" 2>&1 || true
+          echo "--- adot CloudWatch logs ---"
+          aws logs tail /devops-g10/adot/pos --since 30m \
+            --log-stream-name-prefix "adot/adot/${TASK_ID}" 2>&1 || true
           EXIT=$(aws ecs describe-tasks --cluster devops-g10 --tasks "${TASK_ARN}" \
             --query 'tasks[0].containers[?name==`app`].exitCode | [0]' --output text)
+          echo "pos migrate exit=${EXIT}"
           test "${EXIT}" = "0"
 
       - name: Migrate Payments schema
@@ -540,8 +559,20 @@ jobs:
             --network-configuration "awsvpcConfiguration={subnets=[${SUBNETS}],securityGroups=[${SGS}],assignPublicIp=DISABLED}" \
             --overrides "${OVERRIDES}" \
             --query 'tasks[0].taskArn' --output text)
+          TASK_ID="${TASK_ARN##*/}"
           echo "payments migrate ${TASK_ARN}"
           aws ecs wait tasks-stopped --cluster devops-g10 --tasks "${TASK_ARN}"
+          echo "--- describe-tasks ---"
+          aws ecs describe-tasks --cluster devops-g10 --tasks "${TASK_ARN}" \
+            --query 'tasks[0].{stoppedReason:stoppedReason,containers:containers[].{name:name,exitCode:exitCode,reason:reason}}' \
+            --output json
+          echo "--- app CloudWatch logs ---"
+          aws logs tail /devops-g10/payments --since 30m \
+            --log-stream-name-prefix "app/app/${TASK_ID}" 2>&1 || true
+          echo "--- adot CloudWatch logs ---"
+          aws logs tail /devops-g10/adot/payments --since 30m \
+            --log-stream-name-prefix "adot/adot/${TASK_ID}" 2>&1 || true
           EXIT=$(aws ecs describe-tasks --cluster devops-g10 --tasks "${TASK_ARN}" \
             --query 'tasks[0].containers[?name==`app`].exitCode | [0]' --output text)
+          echo "payments migrate exit=${EXIT}"
           test "${EXIT}" = "0"
