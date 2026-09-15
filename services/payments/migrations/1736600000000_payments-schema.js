@@ -7,7 +7,10 @@ const CALLBACK_OUTCOMES =
   "'rejected_amount_mismatch','rejected_illegal_transition','rejected_malformed')";
 
 exports.up = (pgm) => {
-  pgm.createSchema('payments', { ifNotExists: true });
+  // Schema is provisioned out-of-band by the db-bootstrap task (ADR-003).
+  // Least-priv service role has no CREATE on the database, so createSchema
+  // — even IF NOT EXISTS — would fail with 42501. Local dev gets the
+  // schema from bin/migrate.js via --create-schema.
 
   pgm.createTable(
     { schema: 'payments', name: 'payments' },
