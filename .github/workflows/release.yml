@@ -412,12 +412,14 @@ jobs:
           PY
               ;;
             pos)
-              # Unauthenticated POST must hit POS (400), not web 501 or ALB 404.
+              # Unauthenticated POST must hit POS (401 from auth middleware),
+              # not web 501 or ALB 404. 401 proves the request reached POS and
+              # its auth ran before body validation.
               CODE=$(curl -sS -o /tmp/pos-body.json -w "%{http_code}" --retry 8 --retry-all-errors --retry-delay 3 \
                 -X POST "${API_URL}/sales" -H 'content-type: application/json' -d '{}')
               echo "POST /sales -> ${CODE}"
               cat /tmp/pos-body.json; echo
-              test "${CODE}" = "400"
+              test "${CODE}" = "401"
               DIGEST=$(aws ecs describe-task-definition --task-definition "${{ matrix.ecs_family }}" \
                 --query 'taskDefinition.containerDefinitions[?name==`app`].image' --output text)
               echo "${DIGEST}" | grep -q '@sha256:'
