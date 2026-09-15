@@ -10,9 +10,15 @@ async function main() {
   const direction = process.argv[2] || 'up';
   const env = { ...process.env };
 
+  // Local/CI (DATABASE_URL): connecting user owns the DB — safe to create
+  // schemas. RDS (Secrets Manager): least-priv role, schemas pre-created by
+  // the db-bootstrap task; passing --create-schema would trigger 42501.
+  let canCreateSchema = Boolean(env.DATABASE_URL);
+
   if (!env.DATABASE_URL) {
     const cfg = await resolveDbConfig();
     env.DATABASE_URL = cfg.connectionString;
+    canCreateSchema = cfg.source === 'DATABASE_URL';
     // RDS requires TLS; mirror the app pool's rejectUnauthorized:false via
     // libpq's PGSSLMODE. Skip only when caller already set it or DB_SSL=false.
     if (!env.PGSSLMODE && cfg.source !== 'DATABASE_URL' && env.DB_SSL !== 'false') {
@@ -31,16 +37,18 @@ async function main() {
 
   const schema = process.env.DB_SCHEMA || 'payments';
   const bin = path.join(__dirname, '..', 'node_modules', '.bin', 'node-pg-migrate');
+  // See canCreateSchema comment above: only pass --create-schema when the
+  // connecting role owns the DB (local/CI). On RDS the schemas were pre-
+  // created by the db-bootstrap task; the least-priv role would 42501.
   const args = [
     direction,
     '--migrations-dir',
     'migrations',
     '--schema',
     schema,
-    '--create-schema',
     '--migrations-schema',
     schema,
-    '--create-migrations-schema',
+    ...(canCreateSchema ? ['--create-schema', '--create-migrations-schema'] : []),
   ];
   const result = spawnSync(bin, args, { stdio: 'inherit', env });
   process.exit(result.status === null ? 1 : result.status);
