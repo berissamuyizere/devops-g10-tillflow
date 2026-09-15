@@ -11,7 +11,8 @@
     "test": "node --test --test-concurrency=1 test/*.test.js",
     "lint": "eslint .",
     "test:contract": "node --test --test-concurrency=1 test/*.contract.js",
-    "evidence:g2": "node scripts/g2-happy-path.js"
+    "evidence:g2": "node scripts/g2-happy-path.js",
+    "evidence:timeout": "node scripts/g2-timeout.js"
   },
   "engines": {
     "node": ">=20.17.0"

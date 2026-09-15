@@ -16,6 +16,17 @@ const OUT_DIR =
 const steps = [];
 let failures = 0;
 
+function xrayCompatibleTraceId() {
+  const epochHex = Math.floor(Date.now() / 1000)
+    .toString(16)
+    .padStart(8, '0');
+  return epochHex + randomBytes(12).toString('hex');
+}
+
+function xrayTraceId(w3cTraceId) {
+  return `1-${w3cTraceId.slice(0, 8)}-${w3cTraceId.slice(8)}`;
+}
+
 function check(name, actual, expected) {
   const ok = JSON.stringify(actual) === JSON.stringify(expected);
   if (!ok) failures += 1;
@@ -31,7 +42,7 @@ async function main() {
     process.exit(2);
   }
 
-  const traceId = randomBytes(16).toString('hex');
+  const traceId = xrayCompatibleTraceId();
   const traceparent = `00-${traceId}-${randomBytes(8).toString('hex')}-01`;
   const saleKey = `g2-sale-${randomUUID().slice(0, 8)}`;
   const chargeKey = `g2-charge-${randomUUID().slice(0, 8)}`;
@@ -141,6 +152,7 @@ async function main() {
   const evidence = {
     captured_at: new Date().toISOString(),
     trace_id: traceId,
+    xray_trace_id: xrayTraceId(traceId),
     traceparent,
     pos_base_url: POS,
     payments_base_url: PAYMENTS,
@@ -160,7 +172,8 @@ async function main() {
 
   console.log(`\n${failures === 0 ? 'ALL CHECKS PASSED' : `${failures} CHECK(S) FAILED`}`);
   console.log(`evidence written to ${outFile}`);
-  console.log(`look this trace up in X-Ray / Grafana by trace_id ${traceId}\n`);
+  console.log(`X-Ray trace id: ${xrayTraceId(traceId)}`);
+  console.log(`W3C trace id  : ${traceId}\n`);
   process.exit(failures === 0 ? 0 : 1);
 }
 
