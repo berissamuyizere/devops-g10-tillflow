@@ -170,8 +170,13 @@ jobs:
       && !cancelled()
       && (needs.plan.result == 'success' || needs.plan.result == 'skipped')
       && (needs.apply.result == 'success' || needs.apply.result == 'skipped')
-    runs-on: ubuntu-latest
-    timeout-minutes: 40
+    # Native ARM64 runner: builds linux/arm64 without QEMU. QEMU user-mode
+    # was crashing during `npm ci` on the OTel/native-crypto graph
+    # ("qemu: uncaught target signal 4 (Illegal instruction) - core dumped"),
+    # which left buildx waiting on a dead layer until the job hit its
+    # timeout. Native runner side-steps the whole emulation path.
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 25
     strategy:
       fail-fast: false
       matrix:
@@ -225,8 +230,8 @@ jobs:
         id: ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      - uses: docker/setup-qemu-action@v3
-        if: steps.gate.outputs.run == 'true'
+      # No setup-qemu: we're on a native linux/arm64 runner, so builds
+      # for --platform linux/arm64 are native and don't need emulation.
       - uses: docker/setup-buildx-action@v3
         if: steps.gate.outputs.run == 'true'
 
