@@ -1,8 +1,5 @@
-# TillFlow pos — golden path image (copied from services/web, renamed).
-# Multi-stage: builder installs deps, runtime is a minimal Alpine + Node.
-
-# --- stage: build -------------------------------------------------------
-FROM node:20.17-alpine3.20 AS build
+# TillFlow pos — golden path (aligned with services/web for Trivy).
+FROM node:20.20.2-alpine3.22 AS build
 
 WORKDIR /app
 COPY package.json package-lock.json* ./
@@ -10,12 +7,14 @@ RUN npm ci --omit=dev
 
 COPY . .
 
-# --- stage: runtime -----------------------------------------------------
-FROM node:20.17-alpine3.20 AS runtime
+FROM node:20.20.2-alpine3.22 AS runtime
 
 RUN addgroup -g 10001 app && \
     adduser  -D -H -u 10001 -G app -s /sbin/nologin app && \
+    apk upgrade --no-cache && \
     apk add --no-cache dumb-init wget tzdata ca-certificates && \
+    rm -rf /usr/local/lib/node_modules/npm /usr/local/bin/npm \
+           /usr/local/bin/npx /opt/yarn-v* /usr/local/bin/yarn && \
     ln -sf /usr/share/zoneinfo/Africa/Nairobi /etc/localtime
 
 WORKDIR /app

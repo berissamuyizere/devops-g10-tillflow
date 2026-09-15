@@ -343,6 +343,9 @@ data "aws_iam_policy_document" "task_exec_secrets" {
       aws_secretsmanager_secret.slack.arn,
       aws_secretsmanager_secret.rds_master.arn,
       aws_secretsmanager_secret.cache_auth.arn,
+      aws_secretsmanager_secret.service_tokens.arn,
+      aws_secretsmanager_secret.db_pos.arn,
+      aws_secretsmanager_secret.db_payments.arn,
     ]
   }
   statement {
@@ -420,12 +423,34 @@ resource "aws_iam_role_policy_attachment" "task_common" {
 
 # --- Service-specific task role permissions ---
 
-# Payments: read Daraja secret, publish to callback queue, read/dequeue.
-data "aws_iam_policy_document" "payments_task" {
+# POS: read its DB secret (app resolves DB_SECRET_ID at boot).
+data "aws_iam_policy_document" "pos_task" {
   statement {
     effect    = "Allow"
     actions   = ["secretsmanager:GetSecretValue"]
-    resources = [aws_secretsmanager_secret.daraja.arn]
+    resources = [aws_secretsmanager_secret.db_pos.arn]
+  }
+}
+
+resource "aws_iam_policy" "pos_task" {
+  name   = "${var.name_prefix}-pos-task"
+  policy = data.aws_iam_policy_document.pos_task.json
+}
+
+resource "aws_iam_role_policy_attachment" "pos_task" {
+  role       = aws_iam_role.task["pos"].name
+  policy_arn = aws_iam_policy.pos_task.arn
+}
+
+# Payments: Daraja secret, DB secret, callback queue.
+data "aws_iam_policy_document" "payments_task" {
+  statement {
+    effect  = "Allow"
+    actions = ["secretsmanager:GetSecretValue"]
+    resources = [
+      aws_secretsmanager_secret.daraja.arn,
+      aws_secretsmanager_secret.db_payments.arn,
+    ]
   }
   statement {
     effect = "Allow"

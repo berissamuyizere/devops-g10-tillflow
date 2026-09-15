@@ -223,8 +223,10 @@ URLs, with a caller-generated `traceparent` so the trace id is known up front
 and can be looked up in X-Ray or Grafana afterwards.
 
 ```bash
-POS_BASE_URL=https://<api-gw>/pos \
-PAYMENTS_BASE_URL=https://<api-gw>/payments \
+# Same public API Gateway URL — ALB path-routes to POS vs Payments.
+API_URL=$(cd ../../infra && terraform output -raw api_gateway_url)
+POS_BASE_URL=$API_URL \
+PAYMENTS_BASE_URL=$API_URL \
 TENANT_ID=<uuid> ATTENDANT_ID=<uuid> \
 POS_SERVICE_TOKEN=... DARAJA_CALLBACK_SECRET=... \
   npm run evidence:g2
@@ -259,14 +261,15 @@ on `/health`, no `latest` tag.
 
 | Variable | Default | Notes |
 |---|---|---|
-| `DATABASE_URL` | — | required |
-| `MPESA_MODE` | `fake` | `daraja` in production only |
-| `DARAJA_CALLBACK_SECRET` | `dev-callback-secret` | HMAC key; Secrets Manager in production |
-| `DARAJA_CALLBACK_URL` | `https://localhost/payments/callback` | absolute HTTPS URL given to Daraja |
-| `POS_BASE_URL` | `http://pos:8080` | |
-| `PAYMENTS_SERVICE_TOKEN` | `dev-payments-token` | what *we* present to POS |
-| `POS_SERVICE_TOKEN` | `dev-pos-token` | what POS presents to us |
-| `COMMISSION_SERVICE_TOKEN` | `dev-commission-token` | what Commission presents to us |
+| `DATABASE_URL` | — | local/CI |
+| `DB_SECRET_ID` | — | ECS: `devops-g10/db/payments` (Secrets Manager) |
+| `MPESA_MODE` | `fake` | `daraja` only at G3 |
+| `DARAJA_CALLBACK_SECRET` | from `devops-g10/service-tokens` | HMAC key |
+| `DARAJA_CALLBACK_URL` | API GW `/payments/callback` | set by platform |
+| `POS_BASE_URL` | internal ALB DNS | Payments → POS in-VPC |
+| `PAYMENTS_SERVICE_TOKEN` | from `devops-g10/service-tokens` | what we present to POS |
+| `POS_SERVICE_TOKEN` | from `devops-g10/service-tokens` | what POS presents to us |
+| `COMMISSION_SERVICE_TOKEN` | from `devops-g10/service-tokens` | what Commission presents to us |
 | `MPESA_B2C_SHORTCODE` | `600000` | |
 | `POS_TIMEOUT_MS` | `3000` | per-request timeout on POS calls |
 
