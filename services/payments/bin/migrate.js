@@ -13,12 +13,18 @@ async function main() {
   if (!env.DATABASE_URL) {
     const cfg = await resolveDbConfig();
     env.DATABASE_URL = cfg.connectionString;
+    // RDS requires TLS; mirror the app pool's rejectUnauthorized:false via
+    // libpq's PGSSLMODE. Skip only when caller already set it or DB_SSL=false.
+    if (!env.PGSSLMODE && cfg.source !== 'DATABASE_URL' && env.DB_SSL !== 'false') {
+      env.PGSSLMODE = 'no-verify';
+    }
     console.log(
       JSON.stringify({
         level: 'info',
         service: 'payments',
         msg: 'migrate_db_resolved',
         source: cfg.source,
+        sslmode: env.PGSSLMODE || 'default',
       })
     );
   }
