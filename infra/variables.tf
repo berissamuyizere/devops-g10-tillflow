@@ -50,8 +50,20 @@ variable "web_image_digest" {
     Full ECR image reference for the web service, including digest.
     Example: 123456789012.dkr.ecr.eu-central-1.amazonaws.com/devops-g10/web@sha256:...
     Set to null on the first apply; the pipeline updates the ECS task
-    definition with the real digest after the first CodeBuild run.
+    definition with the real digest after the first deploy.
   EOT
+  type        = string
+  default     = null
+}
+
+variable "pos_image_digest" {
+  description = "Full ECR image reference for POS including digest. Null = busybox /health placeholder."
+  type        = string
+  default     = null
+}
+
+variable "payments_image_digest" {
+  description = "Full ECR image reference for Payments including digest. Null = busybox /health placeholder."
   type        = string
   default     = null
 }

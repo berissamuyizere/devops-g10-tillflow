@@ -56,9 +56,35 @@ output "s3_buckets" {
 
 output "secrets" {
   value = {
-    daraja     = aws_secretsmanager_secret.daraja.arn
-    slack      = aws_secretsmanager_secret.slack.arn
-    rds_master = aws_secretsmanager_secret.rds_master.arn
-    cache_auth = aws_secretsmanager_secret.cache_auth.arn
+    daraja         = aws_secretsmanager_secret.daraja.arn
+    slack          = aws_secretsmanager_secret.slack.arn
+    rds_master     = aws_secretsmanager_secret.rds_master.arn
+    cache_auth     = aws_secretsmanager_secret.cache_auth.arn
+    service_tokens = aws_secretsmanager_secret.service_tokens.arn
+    db_pos         = aws_secretsmanager_secret.db_pos.arn
+    db_payments    = aws_secretsmanager_secret.db_payments.arn
+  }
+}
+
+output "ecs_services" {
+  value = {
+    web      = aws_ecs_service.web.name
+    pos      = aws_ecs_service.pos.name
+    payments = aws_ecs_service.payments.name
+  }
+}
+
+output "db_bootstrap_task_family" {
+  description = "Run once after apply: aws ecs run-task --task-definition <this>"
+  value       = aws_ecs_task_definition.db_bootstrap.family
+}
+
+output "g2_base_urls" {
+  description = "Happy-path base URLs (same API Gateway; ALB path-routes to each service)."
+  value = {
+    api_gateway  = aws_apigatewayv2_api.app.api_endpoint
+    pos          = aws_apigatewayv2_api.app.api_endpoint
+    payments     = aws_apigatewayv2_api.app.api_endpoint
+    pos_internal = "http://${aws_lb.app.dns_name}"
   }
 }

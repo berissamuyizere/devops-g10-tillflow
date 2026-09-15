@@ -19,9 +19,9 @@ See [ADR-001](../docs/adrs/ADR-001-region-and-naming.md),
 | `s3.tf` | Artifacts, logs, backups buckets (state lives in `bootstrap/`). |
 | `rds.tf` `cache.tf` | Postgres 16 single-AZ, Valkey 7.2. |
 | `sqs.tf` `eventbridge.tf` | Async queues + DLQs, daily commission cron. |
-| `secrets.tf` | Daraja + Slack placeholders (values set out-of-band). |
-| `iam.tf` | GitHub OIDC + `devops-g10-ci-deploy`, per-service task/exec roles. |
-| `ecs.tf` | Cluster + `web` Fargate service with app + ADOT sidecar. |
+| `ecs.tf` `ecs_backend.tf` | Cluster + web/pos/payments Fargate (app + ADOT). |
+| `db_migrate.tf` | One-off DB bootstrap task (schemas/roles). |
+| `secrets.tf` | Daraja, Slack, service tokens, per-service DB secrets. |
 | `pipeline.tf` | CodeBuild + CodePipeline for `web`. |
 | `outputs.tf` | Every consumer-visible value. |
 
@@ -57,10 +57,20 @@ again. Merge to `main` runs `.github/workflows/release.yml`:
 2. `terraform apply` of **that** file, after a required reviewer
    approves the GitHub Environment `production`
    ([setup](../docs/github-environment-production.md))
-3. web image build → ECR → ECS rolling update → `/health` + `/version`
-   smoke when `services/web/**` or `services/_shared/**` changed
+3. image build → ECR → ECS rolling update → smoke when `services/{web,pos,payments}`
+   change (matrix). After pos/payments: DB bootstrap + `node bin/migrate.js up`.
 
 `workflow_dispatch` on that workflow re-runs the same path.
+
+### G2 — POS + Payments
+
+After this stack is applied on `main`:
+
+1. Release builds `devops-g10/pos` and `devops-g10/payments`, rolls ECS, smokes path routing.
+2. `db-migrate` job runs `devops-g10-db-bootstrap` (schemas/roles), then
+   `node bin/migrate.js up` for each service image.
+3. Happy path (Arsema/Berissa): same `api_gateway_url` as both base URLs;
+   tokens from `devops-g10/service-tokens`.
 
 CodePipeline is optional. Only pass `codeconnections_arn` if you have
 already created the GitHub App connection in the console.

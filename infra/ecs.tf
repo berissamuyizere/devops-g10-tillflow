@@ -1,6 +1,5 @@
-# ECS Fargate cluster + `web` golden-path service.
-# POS / Payments / Commission task definitions land in G2 following the same
-# shape as `web` here.
+# ECS Fargate cluster + golden-path services.
+# web: G1. pos + payments: G2 (see ecs_backend.tf). Commission: later.
 
 resource "aws_ecs_cluster" "app" {
   name = var.name_prefix
