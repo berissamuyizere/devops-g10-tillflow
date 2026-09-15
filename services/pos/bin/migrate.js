@@ -36,13 +36,15 @@ async function main() {
   const bin = path.join(__dirname, '..', 'node_modules', '.bin', 'node-pg-migrate');
   // Pass schema flags explicitly: keep the migrations tracking table inside
   // the service schema so the least-privilege `pos` role owns it.
+  // Schemas are pre-created by the one-off db-bootstrap task under the RDS
+  // master role (ADR-003). The devops_g10_pos role only has USAGE/CREATE on
+  // schema `pos`, so we must NOT pass --create-schema here — Postgres checks
+  // CREATE-on-database before the IF-NOT-EXISTS shortcut and returns 42501.
   const args = [
     direction,
     '--migrations-dir', 'migrations',
     '--schema', schema,
-    '--create-schema',
     '--migrations-schema', schema,
-    '--create-migrations-schema',
   ];
   const result = spawnSync(bin, args, { stdio: 'inherit', env });
   process.exit(result.status === null ? 1 : result.status);

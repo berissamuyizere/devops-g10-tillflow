@@ -31,16 +31,19 @@ async function main() {
 
   const schema = process.env.DB_SCHEMA || 'payments';
   const bin = path.join(__dirname, '..', 'node_modules', '.bin', 'node-pg-migrate');
+  // Schemas are pre-created by the one-off db-bootstrap task under the RDS
+  // master role (ADR-003). The devops_g10_payments role only has
+  // USAGE/CREATE on schema `payments`, so we must NOT pass --create-schema
+  // here — Postgres checks CREATE-on-database before IF-NOT-EXISTS and
+  // returns 42501.
   const args = [
     direction,
     '--migrations-dir',
     'migrations',
     '--schema',
     schema,
-    '--create-schema',
     '--migrations-schema',
     schema,
-    '--create-migrations-schema',
   ];
   const result = spawnSync(bin, args, { stdio: 'inherit', env });
   process.exit(result.status === null ? 1 : result.status);
