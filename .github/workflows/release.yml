@@ -182,14 +182,14 @@ jobs:
             ecs_family: devops-g10-web
             tg_name: devops-g10-web-tg
             build_context: services/web
-            dockerfile: Dockerfile
+            dockerfile: services/web/Dockerfile
           - service: pos
             ecr_repo: devops-g10/pos
             ecs_service: devops-g10-pos
             ecs_family: devops-g10-pos
             tg_name: devops-g10-pos-tg
             build_context: services/pos
-            dockerfile: Dockerfile
+            dockerfile: services/pos/Dockerfile
           - service: payments
             ecr_repo: devops-g10/payments
             ecs_service: devops-g10-payments
