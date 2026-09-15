@@ -25,6 +25,11 @@ async function resetData() {
 function createFakePos(options = {}) {
   const sales = new Map();
   const calls = { getSale: 0, markAwaitingPayment: 0, markPaid: 0 };
+  const control = { down: options.down === true, failAwaitingPayment: options.failAwaitingPayment };
+  const { PosConflictError, PosUnavailableError } = require('../../src/pos/client');
+
+  const posConflict = (m) => new PosConflictError(m, 'ILLEGAL_TRANSITION');
+  const posDown = () => new PosUnavailableError('pos unreachable: simulated outage');
 
   function addSale(overrides = {}) {
     const sale = {
@@ -45,27 +50,34 @@ function createFakePos(options = {}) {
     addSale,
     sales,
     calls,
+    control,
     async getSale(saleId) {
       calls.getSale += 1;
       return sales.get(saleId) || null;
     },
     async markAwaitingPayment(saleId) {
       calls.markAwaitingPayment += 1;
-      if (options.failAwaitingPayment) throw new Error('pos unavailable');
+      if (control.down || control.failAwaitingPayment) throw posDown();
       const sale = sales.get(saleId);
       if (!sale) return null;
-      if (sale.status === 'created') sale.status = 'awaiting_payment';
+      if (sale.status === 'awaiting_payment') return sale;
+      if (sale.status !== 'created') {
+        throw posConflict(`illegal transition ${sale.status} -> awaiting_payment`);
+      }
+      sale.status = 'awaiting_payment';
       return sale;
     },
     async markPaid(saleId, _paymentId, paidAt) {
       calls.markPaid += 1;
+      if (control.down) throw posDown();
       const sale = sales.get(saleId);
       if (!sale) return null;
-
-      if (sale.status !== 'paid') {
-        sale.status = 'paid';
-        sale.paid_at = paidAt;
+      if (sale.status === 'paid') return sale;
+      if (sale.status !== 'awaiting_payment') {
+        throw posConflict(`illegal transition ${sale.status} -> paid`);
       }
+      sale.status = 'paid';
+      sale.paid_at = paidAt;
       return sale;
     },
   };

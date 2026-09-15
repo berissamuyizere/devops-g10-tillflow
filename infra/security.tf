@@ -52,6 +52,17 @@ resource "aws_vpc_security_group_ingress_rule" "alb_from_vpclink" {
   ip_protocol                  = "tcp"
 }
 
+# Payments → POS over the internal ALB (same path rules as the public API).
+# Without this, POS_BASE_URL cannot hairpin through the ALB from ECS.
+resource "aws_vpc_security_group_ingress_rule" "alb_from_ecs" {
+  security_group_id            = aws_security_group.alb.id
+  description                  = "HTTP from ECS tasks (service-to-service via internal ALB)."
+  referenced_security_group_id = aws_security_group.ecs_tasks.id
+  from_port                    = 80
+  to_port                      = 80
+  ip_protocol                  = "tcp"
+}
+
 resource "aws_vpc_security_group_egress_rule" "alb_to_ecs" {
   security_group_id            = aws_security_group.alb.id
   description                  = "ALB to ECS task app port only."

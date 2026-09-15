@@ -1,4 +1,5 @@
-FROM node:20.17-alpine3.20 AS build
+# TillFlow payments — build from repo root (needs services/_shared/mpesa).
+FROM node:20.20.2-alpine3.22 AS build
 
 WORKDIR /app/services/payments
 COPY services/payments/package.json services/payments/package-lock.json* ./
@@ -7,11 +8,14 @@ RUN npm ci --omit=dev
 COPY services/payments/ ./
 COPY services/_shared/mpesa/ /app/services/_shared/mpesa/
 
-FROM node:20.17-alpine3.20 AS runtime
+FROM node:20.20.2-alpine3.22 AS runtime
 
 RUN addgroup -g 10001 app && \
     adduser  -D -H -u 10001 -G app -s /sbin/nologin app && \
+    apk upgrade --no-cache && \
     apk add --no-cache dumb-init wget tzdata ca-certificates && \
+    rm -rf /usr/local/lib/node_modules/npm /usr/local/bin/npm \
+           /usr/local/bin/npx /opt/yarn-v* /usr/local/bin/yarn && \
     ln -sf /usr/share/zoneinfo/Africa/Nairobi /etc/localtime
 
 WORKDIR /app/services/payments

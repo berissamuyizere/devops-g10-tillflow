@@ -2,9 +2,29 @@
 
 **Owner (POS side):** Berissa  
 **Consumer:** Arsema (Payments)  
-**Status:** Proposed for agreement before Payments callback handling  
+**Status:** Accepted — frozen for G2 (2026-09-14)  
 
-Freeze this shape before G2 callback work. Changes need a PR reviewed by both CODEOWNERS on the money path.
+This shape is frozen for G2. Any change needs a PR reviewed by both money-path
+CODEOWNERS (`@berissamuyizere` and `@arsemagebremichael`).
+
+## Invariants frozen for G2
+
+1. **Sale totals never change after creation.** Line items and `total_minor`
+   are immutable once the sale exists; POS exposes no endpoint to edit them.
+   Payments charges the `total_minor` returned by the sale read — never a
+   second, client-supplied amount.
+2. **The attendant cannot change a sale once it is `awaiting_payment`.** The
+   only attendant/owner-driven status change is cancel, and cancel is allowed
+   **only from `created`**. After Payments has accepted a charge
+   (`awaiting_payment`), POS rejects any attendant status change with **409
+   `ILLEGAL_TRANSITION`**. This prevents a cancel racing a success callback.
+3. **Only Payments moves a sale to `awaiting_payment` or `paid`,** and only via
+   the `/internal/v1/*` endpoints authenticated with the service token.
+4. **A timeout is not a decline.** POS never moves `awaiting_payment` to
+   `paid` or `cancelled` on its own; the sale stays pending until Payments
+   confirms or reconciles.
+5. **Paid is terminal and replay-safe.** A repeated `paid` call is a 200 no-op
+   with the original `paid_at` and totals unchanged.
 
 ## Auth
 

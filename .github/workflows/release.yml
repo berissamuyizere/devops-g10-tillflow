@@ -4,14 +4,14 @@ name: Release
 #   1. path-detect
 #   2. terraform plan (saved artifact) when infra changed
 #   3. terraform apply of THAT plan behind environment `production`
-#      (required reviewers — do not re-plan after approval)
-#   4. build / scan / push / ECS rolling update / smoke when web changed
+#   4. build / scan / push / ECS roll for web | pos | payments
+#   5. DB bootstrap + migrate when pos/payments images change
 #
-# Not in this workflow (one-time, cannot be Terraform/OIDC bootstrapped):
-#   - infra/bootstrap (state bucket + lock table) — already applied
-#   - GitHub Actions variables AWS_CI_ROLE_ARN, TF_STATE_BUCKET
+# Not in this workflow (one-time / out-of-band):
+#   - infra/bootstrap (state bucket + lock table)
+#   - GitHub variables AWS_CI_ROLE_ARN, TF_STATE_BUCKET
 #   - GitHub Environment `production` required reviewers
-#   - secret *values* (Daraja, Slack) — ARNs exist, fill out-of-band
+#   - Daraja sandbox secret values (G3)
 
 on:
   push:
@@ -28,10 +28,7 @@ permissions:
 
 env:
   AWS_REGION: eu-central-1
-  ECR_REPO_NAME: devops-g10/web
   ECS_CLUSTER: devops-g10
-  ECS_SERVICE: devops-g10-web
-  ECS_TASK_FAMILY: devops-g10-web
   ECS_CONTAINER: app
 
 jobs:
@@ -41,6 +38,9 @@ jobs:
     outputs:
       infra: ${{ steps.out.outputs.infra }}
       web: ${{ steps.out.outputs.web }}
+      pos: ${{ steps.out.outputs.pos }}
+      payments: ${{ steps.out.outputs.payments }}
+      backend: ${{ steps.out.outputs.backend }}
     steps:
       - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v3
@@ -54,14 +54,32 @@ jobs:
               - 'services/web/**'
               - 'services/_shared/**'
               - '.github/workflows/release.yml'
+            pos:
+              - 'services/pos/**'
+              - 'services/_shared/**'
+              - '.github/workflows/release.yml'
+            payments:
+              - 'services/payments/**'
+              - 'services/_shared/**'
+              - '.github/workflows/release.yml'
       - id: out
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             echo "infra=true" >> "$GITHUB_OUTPUT"
             echo "web=true" >> "$GITHUB_OUTPUT"
+            echo "pos=true" >> "$GITHUB_OUTPUT"
+            echo "payments=true" >> "$GITHUB_OUTPUT"
+            echo "backend=true" >> "$GITHUB_OUTPUT"
           else
             echo "infra=${{ steps.filter.outputs.infra }}" >> "$GITHUB_OUTPUT"
             echo "web=${{ steps.filter.outputs.web }}" >> "$GITHUB_OUTPUT"
+            echo "pos=${{ steps.filter.outputs.pos }}" >> "$GITHUB_OUTPUT"
+            echo "payments=${{ steps.filter.outputs.payments }}" >> "$GITHUB_OUTPUT"
+            if [ "${{ steps.filter.outputs.pos }}" = "true" ] || [ "${{ steps.filter.outputs.payments }}" = "true" ] || [ "${{ steps.filter.outputs.infra }}" = "true" ]; then
+              echo "backend=true" >> "$GITHUB_OUTPUT"
+            else
+              echo "backend=false" >> "$GITHUB_OUTPUT"
+            fi
           fi
 
   plan:
@@ -75,19 +93,16 @@ jobs:
         working-directory: infra
     steps:
       - uses: actions/checkout@v4
-
       - uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.15.8
           terraform_wrapper: false
-
       - name: Configure AWS credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v5
         with:
           role-to-assume: ${{ vars.AWS_CI_ROLE_ARN }}
           aws-region: eu-central-1
           audience: sts.amazonaws.com
-
       - name: terraform init
         run: |
           terraform init \
@@ -95,12 +110,10 @@ jobs:
             -backend-config="dynamodb_table=devops-g10-tflock" \
             -backend-config="region=eu-central-1" \
             -backend-config="key=platform/terraform.tfstate"
-
       - name: terraform plan
         run: |
           terraform plan -input=false -no-color -lock-timeout=5m -out=plan.bin
           terraform show -no-color plan.bin | tee plan.txt
-
       - name: Upload saved plan
         uses: actions/upload-artifact@v4
         with:
@@ -122,25 +135,21 @@ jobs:
         working-directory: infra
     steps:
       - uses: actions/checkout@v4
-
       - uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.15.8
           terraform_wrapper: false
-
       - name: Configure AWS credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v5
         with:
           role-to-assume: ${{ vars.AWS_CI_ROLE_ARN }}
           aws-region: eu-central-1
           audience: sts.amazonaws.com
-
       - name: Download saved plan
         uses: actions/download-artifact@v4
         with:
           name: terraform-plan-${{ github.sha }}
           path: infra
-
       - name: terraform init
         run: |
           terraform init \
@@ -148,28 +157,63 @@ jobs:
             -backend-config="dynamodb_table=devops-g10-tflock" \
             -backend-config="region=eu-central-1" \
             -backend-config="key=platform/terraform.tfstate"
-
       - name: terraform apply saved plan
         run: terraform apply -input=false plan.bin
-
       - name: Output
         run: terraform output -no-color
 
-  web:
-    name: web build + deploy
+  deploy:
+    name: build + deploy (${{ matrix.service }})
     needs: [changes, plan, apply]
     if: >-
       always()
       && !cancelled()
       && (needs.plan.result == 'success' || needs.plan.result == 'skipped')
       && (needs.apply.result == 'success' || needs.apply.result == 'skipped')
-      && needs.changes.outputs.web == 'true'
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - service: web
+            ecr_repo: devops-g10/web
+            ecs_service: devops-g10-web
+            ecs_family: devops-g10-web
+            tg_name: devops-g10-web-tg
+            build_context: services/web
+            dockerfile: Dockerfile
+          - service: pos
+            ecr_repo: devops-g10/pos
+            ecs_service: devops-g10-pos
+            ecs_family: devops-g10-pos
+            tg_name: devops-g10-pos-tg
+            build_context: services/pos
+            dockerfile: Dockerfile
+          - service: payments
+            ecr_repo: devops-g10/payments
+            ecs_service: devops-g10-payments
+            ecs_family: devops-g10-payments
+            tg_name: devops-g10-payments-tg
+            build_context: .
+            dockerfile: services/payments/Dockerfile
     steps:
+      - name: Should this service run?
+        id: gate
+        run: |
+          case "${{ matrix.service }}" in
+            web) FLAG="${{ needs.changes.outputs.web }}" ;;
+            pos) FLAG="${{ needs.changes.outputs.pos }}" ;;
+            payments) FLAG="${{ needs.changes.outputs.payments }}" ;;
+          esac
+          echo "run=${FLAG}" >> "$GITHUB_OUTPUT"
+          echo "service=${{ matrix.service }} run=${FLAG}"
+
       - uses: actions/checkout@v4
+        if: steps.gate.outputs.run == 'true'
 
       - name: Configure AWS credentials (OIDC)
+        if: steps.gate.outputs.run == 'true'
         uses: aws-actions/configure-aws-credentials@v5
         with:
           role-to-assume: ${{ vars.AWS_CI_ROLE_ARN }}
@@ -177,29 +221,33 @@ jobs:
           audience: sts.amazonaws.com
 
       - name: ECR login
+        if: steps.gate.outputs.run == 'true'
         id: ecr
         uses: aws-actions/amazon-ecr-login@v2
 
       - uses: docker/setup-qemu-action@v3
+        if: steps.gate.outputs.run == 'true'
       - uses: docker/setup-buildx-action@v3
+        if: steps.gate.outputs.run == 'true'
 
       - name: Build image (SHA tag, linux/arm64)
+        if: steps.gate.outputs.run == 'true'
         id: build
-        working-directory: services/web
         run: |
           set -euo pipefail
-          IMAGE="${{ steps.ecr.outputs.registry }}/${{ env.ECR_REPO_NAME }}:${GITHUB_SHA}"
+          IMAGE="${{ steps.ecr.outputs.registry }}/${{ matrix.ecr_repo }}:${GITHUB_SHA}"
           docker buildx build \
             --platform linux/arm64 \
-            --file Dockerfile \
+            --file "${{ matrix.dockerfile }}" \
             --tag "${IMAGE}" \
             --label "org.opencontainers.image.revision=${GITHUB_SHA}" \
             --label "org.opencontainers.image.source=https://github.com/${{ github.repository }}" \
             --load \
-            .
+            "${{ matrix.build_context }}"
           echo "image=${IMAGE}" >> "$GITHUB_OUTPUT"
 
       - name: Trivy image scan (fail on fixable HIGH/CRITICAL)
+        if: steps.gate.outputs.run == 'true'
         env:
           TRIVY_VERSION: '0.56.2'
         run: |
@@ -216,23 +264,26 @@ jobs:
               "${{ steps.build.outputs.image }}"
 
       - name: SBOM (syft)
+        if: steps.gate.outputs.run == 'true'
         uses: anchore/sbom-action@v0
         with:
           image: ${{ steps.build.outputs.image }}
           format: spdx-json
-          output-file: sbom-web.spdx.json
+          output-file: sbom-${{ matrix.service }}.spdx.json
 
       - name: Upload SBOM
+        if: steps.gate.outputs.run == 'true'
         uses: actions/upload-artifact@v4
         with:
-          name: sbom-web-${{ github.sha }}
-          path: sbom-web.spdx.json
+          name: sbom-${{ matrix.service }}-${{ github.sha }}
+          path: sbom-${{ matrix.service }}.spdx.json
 
       - name: Push image
+        if: steps.gate.outputs.run == 'true'
         run: |
           set -euo pipefail
           if aws ecr describe-images \
-            --repository-name "${{ env.ECR_REPO_NAME }}" \
+            --repository-name "${{ matrix.ecr_repo }}" \
             --image-ids imageTag="${GITHUB_SHA}" \
             >/dev/null 2>&1; then
             echo "ECR tag ${GITHUB_SHA} already exists (immutable); reuse digest"
@@ -241,18 +292,21 @@ jobs:
           fi
 
       - name: Resolve digest + rolling-update ECS
+        if: steps.gate.outputs.run == 'true'
         run: |
           set -euo pipefail
           DIGEST=$(aws ecr describe-images \
-            --repository-name "${{ env.ECR_REPO_NAME }}" \
+            --repository-name "${{ matrix.ecr_repo }}" \
             --image-ids imageTag="${GITHUB_SHA}" \
             --query 'imageDetails[0].imageDigest' \
             --output text)
-          IMAGE_URI="${{ steps.ecr.outputs.registry }}/${{ env.ECR_REPO_NAME }}@${DIGEST}"
+          IMAGE_URI="${{ steps.ecr.outputs.registry }}/${{ matrix.ecr_repo }}@${DIGEST}"
           echo "Deploying ${IMAGE_URI}"
+          echo "digest=${DIGEST}" >> "$GITHUB_OUTPUT"
+          echo "image_uri=${IMAGE_URI}" >> "$GITHUB_OUTPUT"
 
           aws ecs describe-task-definition \
-            --task-definition "${{ env.ECS_TASK_FAMILY }}" \
+            --task-definition "${{ matrix.ecs_family }}" \
             --query taskDefinition > td-raw.json
 
           ADOT_CONFIG=$(aws ssm get-parameter \
@@ -307,7 +361,7 @@ jobs:
 
           aws ecs update-service \
             --cluster "${{ env.ECS_CLUSTER }}" \
-            --service "${{ env.ECS_SERVICE }}" \
+            --service "${{ matrix.ecs_service }}" \
             --task-definition "${NEW_ARN}" \
             --force-new-deployment \
             >/dev/null
@@ -315,47 +369,32 @@ jobs:
           echo "Waiting for ECS service stability..."
           aws ecs wait services-stable \
             --cluster "${{ env.ECS_CLUSTER }}" \
-            --services "${{ env.ECS_SERVICE }}"
+            --services "${{ matrix.ecs_service }}"
 
-      - name: Smoke /health and /version
+      - name: Smoke
+        if: steps.gate.outputs.run == 'true'
         run: |
           set -euo pipefail
           API_URL=$(aws apigatewayv2 get-apis \
             --query "Items[?Name=='devops-g10-api'].ApiEndpoint" \
             --output text)
-          if [ -z "${API_URL}" ] || [ "${API_URL}" = "None" ]; then
-            echo "Could not resolve API Gateway URL" >&2
-            exit 1
-          fi
-          echo "Smoking ${API_URL}/health"
-          dump_path() {
-            echo "---- target health ----"
-            TG=$(aws elbv2 describe-target-groups --names devops-g10-web-tg \
-              --query 'TargetGroups[0].TargetGroupArn' --output text)
-            aws elbv2 describe-target-health --target-group-arn "$TG" || true
-            echo "---- vpc link ----"
-            aws apigatewayv2 get-vpc-links \
-              --query "Items[?contains(Name, 'devops-g10')]" || true
-            echo "---- recent api gateway logs ----"
-            aws logs filter-log-events \
-              --log-group-name /devops-g10/api-gateway \
-              --start-time $(( $(date +%s) * 1000 - 600000 )) \
-              --limit 20 \
-              --query 'events[].message' --output text || true
-          }
-          if ! curl -sSf --retry 8 --retry-all-errors --retry-delay 5 \
-            "${API_URL}/health" | tee smoke-health.json; then
-            dump_path
-            exit 1
-          fi
-          echo
-          curl -sSf --retry 5 --retry-all-errors --retry-delay 3 \
-            "${API_URL}/ready" | tee smoke-ready.json
-          echo
-          curl -sSf --retry 5 --retry-all-errors --retry-delay 3 \
-            "${API_URL}/version" | tee smoke-version.json
-          echo
-          python3 - <<'PY'
+          TG=$(aws elbv2 describe-target-groups --names "${{ matrix.tg_name }}" \
+            --query 'TargetGroups[0].TargetGroupArn' --output text)
+          echo "target health for ${{ matrix.tg_name }}:"
+          aws elbv2 describe-target-health --target-group-arn "$TG"
+
+          case "${{ matrix.service }}" in
+            web)
+              curl -sSf --retry 8 --retry-all-errors --retry-delay 5 \
+                "${API_URL}/health" | tee smoke-health.json
+              echo
+              curl -sSf --retry 5 --retry-all-errors --retry-delay 3 \
+                "${API_URL}/ready" | tee smoke-ready.json
+              echo
+              curl -sSf --retry 5 --retry-all-errors --retry-delay 3 \
+                "${API_URL}/version" | tee smoke-version.json
+              echo
+              python3 - <<'PY'
           import json, os, sys
           health = json.load(open("smoke-health.json"))
           ready = json.load(open("smoke-ready.json"))
@@ -367,5 +406,140 @@ jobs:
               sys.exit(f"ready not ready: {ready}")
           if version.get("commit") != sha:
               sys.exit(f"version commit {version.get('commit')} != {sha}")
-          print("smoke ok", health, ready, version)
+          if version.get("service") != "web":
+              sys.exit(f"version service not web: {version}")
+          print("web smoke ok", health, ready, version)
           PY
+              ;;
+            pos)
+              # Unauthenticated POST must hit POS (400), not web 501 or ALB 404.
+              CODE=$(curl -sS -o /tmp/pos-body.json -w "%{http_code}" --retry 8 --retry-all-errors --retry-delay 3 \
+                -X POST "${API_URL}/sales" -H 'content-type: application/json' -d '{}')
+              echo "POST /sales -> ${CODE}"
+              cat /tmp/pos-body.json; echo
+              test "${CODE}" = "400"
+              DIGEST=$(aws ecs describe-task-definition --task-definition "${{ matrix.ecs_family }}" \
+                --query 'taskDefinition.containerDefinitions[?name==`app`].image' --output text)
+              echo "${DIGEST}" | grep -q '@sha256:'
+              echo "${DIGEST}" | grep -q "${GITHUB_SHA}" || echo "${DIGEST}" | grep -q 'sha256:'
+              echo "pos smoke ok (${DIGEST})"
+              ;;
+            payments)
+              CODE=$(curl -sS -o /tmp/pay-body.json -w "%{http_code}" --retry 8 --retry-all-errors --retry-delay 3 \
+                "${API_URL}/internal/v1/payments/00000000-0000-0000-0000-000000000001")
+              echo "GET /internal/v1/payments/:id -> ${CODE}"
+              cat /tmp/pay-body.json; echo
+              # 401 = Payments auth ran; 404 from web default would mean wrong TG.
+              test "${CODE}" = "401"
+              DIGEST=$(aws ecs describe-task-definition --task-definition "${{ matrix.ecs_family }}" \
+                --query 'taskDefinition.containerDefinitions[?name==`app`].image' --output text)
+              echo "${DIGEST}" | grep -q '@sha256:'
+              echo "payments smoke ok (${DIGEST})"
+              ;;
+          esac
+
+  db-migrate:
+    name: DB bootstrap + migrate
+    needs: [changes, plan, apply, deploy]
+    if: >-
+      always()
+      && !cancelled()
+      && (needs.plan.result == 'success' || needs.plan.result == 'skipped')
+      && (needs.apply.result == 'success' || needs.apply.result == 'skipped')
+      && needs.deploy.result == 'success'
+      && needs.changes.outputs.backend == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v5
+        with:
+          role-to-assume: ${{ vars.AWS_CI_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+          audience: sts.amazonaws.com
+
+      - name: Run DB bootstrap (schemas + roles)
+        run: |
+          set -euo pipefail
+          SUBNETS=$(aws ecs describe-services --cluster devops-g10 --services devops-g10-pos \
+            --query 'services[0].networkConfiguration.awsvpcConfiguration.subnets' --output text | tr '\t' ',')
+          SGS=$(aws ecs describe-services --cluster devops-g10 --services devops-g10-pos \
+            --query 'services[0].networkConfiguration.awsvpcConfiguration.securityGroups' --output text | tr '\t' ',')
+          TASK_ARN=$(aws ecs run-task \
+            --cluster devops-g10 \
+            --task-definition devops-g10-db-bootstrap \
+            --launch-type FARGATE \
+            --network-configuration "awsvpcConfiguration={subnets=[${SUBNETS}],securityGroups=[${SGS}],assignPublicIp=DISABLED}" \
+            --query 'tasks[0].taskArn' --output text)
+          echo "bootstrap task ${TASK_ARN}"
+          aws ecs wait tasks-stopped --cluster devops-g10 --tasks "${TASK_ARN}"
+          EXIT=$(aws ecs describe-tasks --cluster devops-g10 --tasks "${TASK_ARN}" \
+            --query 'tasks[0].containers[0].exitCode' --output text)
+          echo "bootstrap exit=${EXIT}"
+          test "${EXIT}" = "0"
+
+      - name: Migrate POS schema
+        if: needs.changes.outputs.pos == 'true' || needs.changes.outputs.infra == 'true' || github.event_name == 'workflow_dispatch'
+        run: |
+          set -euo pipefail
+          IMAGE=$(aws ecs describe-task-definition --task-definition devops-g10-pos \
+            --query 'taskDefinition.containerDefinitions[?name==`app`].image | [0]' --output text)
+          if echo "${IMAGE}" | grep -qi busybox; then
+            echo "POS still on busybox placeholder (${IMAGE}); skip migrate"
+            exit 0
+          fi
+          SUBNETS=$(aws ecs describe-services --cluster devops-g10 --services devops-g10-pos \
+            --query 'services[0].networkConfiguration.awsvpcConfiguration.subnets' --output text | tr '\t' ',')
+          SGS=$(aws ecs describe-services --cluster devops-g10 --services devops-g10-pos \
+            --query 'services[0].networkConfiguration.awsvpcConfiguration.securityGroups' --output text | tr '\t' ',')
+          OVERRIDES=$(jq -n '{
+            containerOverrides: [{
+              name: "app",
+              command: ["node", "bin/migrate.js", "up"]
+            }]
+          }')
+          TASK_ARN=$(aws ecs run-task \
+            --cluster devops-g10 \
+            --task-definition devops-g10-pos \
+            --launch-type FARGATE \
+            --network-configuration "awsvpcConfiguration={subnets=[${SUBNETS}],securityGroups=[${SGS}],assignPublicIp=DISABLED}" \
+            --overrides "${OVERRIDES}" \
+            --query 'tasks[0].taskArn' --output text)
+          echo "pos migrate ${TASK_ARN}"
+          aws ecs wait tasks-stopped --cluster devops-g10 --tasks "${TASK_ARN}"
+          EXIT=$(aws ecs describe-tasks --cluster devops-g10 --tasks "${TASK_ARN}" \
+            --query 'tasks[0].containers[?name==`app`].exitCode | [0]' --output text)
+          test "${EXIT}" = "0"
+
+      - name: Migrate Payments schema
+        if: needs.changes.outputs.payments == 'true' || needs.changes.outputs.infra == 'true' || github.event_name == 'workflow_dispatch'
+        run: |
+          set -euo pipefail
+          IMAGE=$(aws ecs describe-task-definition --task-definition devops-g10-payments \
+            --query 'taskDefinition.containerDefinitions[?name==`app`].image | [0]' --output text)
+          if echo "${IMAGE}" | grep -qi busybox; then
+            echo "Payments still on busybox placeholder (${IMAGE}); skip migrate"
+            exit 0
+          fi
+          SUBNETS=$(aws ecs describe-services --cluster devops-g10 --services devops-g10-payments \
+            --query 'services[0].networkConfiguration.awsvpcConfiguration.subnets' --output text | tr '\t' ',')
+          SGS=$(aws ecs describe-services --cluster devops-g10 --services devops-g10-payments \
+            --query 'services[0].networkConfiguration.awsvpcConfiguration.securityGroups' --output text | tr '\t' ',')
+          OVERRIDES=$(jq -n '{
+            containerOverrides: [{
+              name: "app",
+              command: ["node", "bin/migrate.js", "up"]
+            }]
+          }')
+          TASK_ARN=$(aws ecs run-task \
+            --cluster devops-g10 \
+            --task-definition devops-g10-payments \
+            --launch-type FARGATE \
+            --network-configuration "awsvpcConfiguration={subnets=[${SUBNETS}],securityGroups=[${SGS}],assignPublicIp=DISABLED}" \
+            --overrides "${OVERRIDES}" \
+            --query 'tasks[0].taskArn' --output text)
+          echo "payments migrate ${TASK_ARN}"
+          aws ecs wait tasks-stopped --cluster devops-g10 --tasks "${TASK_ARN}"
+          EXIT=$(aws ecs describe-tasks --cluster devops-g10 --tasks "${TASK_ARN}" \
+            --query 'tasks[0].containers[?name==`app`].exitCode | [0]' --output text)
+          test "${EXIT}" = "0"

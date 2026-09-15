@@ -167,7 +167,18 @@ function createApp(options = {}) {
     }
   });
 
-    app.post('/internal/v1/payments/:id/reconcile', requirePosService, async (req, res) => {
+  app.post('/internal/v1/pos-sync/sweep', requirePosService, async (req, res) => {
+    try {
+      const limit = Math.min(Number(req.body?.limit) || 100, 500);
+      const result = await paymentsService.sweepPosSync(database, pos, { limit });
+      req.log.info(result, 'pos_sync_sweep');
+      return res.status(200).json(result);
+    } catch (err) {
+      return sendError(req, res, err);
+    }
+  });
+
+  app.post('/internal/v1/payments/:id/reconcile', requirePosService, async (req, res) => {
     try {
       const result = await paymentsService.reconcilePayment(database, mpesa, pos, req.params.id);
       if (!result.payment) return res.status(404).json({ error: 'not_found' });
