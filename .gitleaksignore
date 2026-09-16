@@ -1,0 +1,3 @@
+# False positive: G2 happy-path evidence JSON field charge_idempotency_key
+# is the Idempotency-Key header we sent, not a credential.
+e590a301805b083718022c24c26685b33b9d55a8:evidence/payments-integrity/g2-happy-path-6aaa4fcddaba.json:generic-api-key:12
