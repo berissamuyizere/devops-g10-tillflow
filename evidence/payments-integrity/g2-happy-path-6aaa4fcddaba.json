@@ -1,0 +1,119 @@
+{
+  "captured_at": "2026-09-16T08:14:09.501Z",
+  "trace_id": "6aaa4fcddabad362fa853d6f1b752f62",
+  "xray_trace_id": "1-6aaa4fcd-dabad362fa853d6f1b752f62",
+  "traceparent": "00-6aaa4fcddabad362fa853d6f1b752f62-2dd9177ee8fcbcbf-01",
+  "pos_base_url": "https://f9nla14lfh.execute-api.eu-central-1.amazonaws.com",
+  "payments_base_url": "https://f9nla14lfh.execute-api.eu-central-1.amazonaws.com",
+  "mpesa_mode": "fake",
+  "sale_id": "4fb33f27-db56-4355-9e5b-8db5b13102c3",
+  "payment_id": "5a594b43-a4a9-4546-a3a2-245e4d600eed",
+  "sale_idempotency_key": "g2-sale-1de5a559",
+  "charge_idempotency_key": "g2-charge-995e6d19",
+  "mpesa_receipt": "R0172A0433",
+  "checks": [
+    {
+      "check": "sale created",
+      "ok": true,
+      "actual": 201,
+      "expected": 201
+    },
+    {
+      "check": "sale total_minor",
+      "ok": true,
+      "actual": 15000,
+      "expected": 15000
+    },
+    {
+      "check": "sale replay is 200",
+      "ok": true,
+      "actual": 200,
+      "expected": 200
+    },
+    {
+      "check": "sale replay same id",
+      "ok": true,
+      "actual": "4fb33f27-db56-4355-9e5b-8db5b13102c3",
+      "expected": "4fb33f27-db56-4355-9e5b-8db5b13102c3"
+    },
+    {
+      "check": "charge accepted",
+      "ok": true,
+      "actual": 201,
+      "expected": 201
+    },
+    {
+      "check": "payment pending",
+      "ok": true,
+      "actual": "pending",
+      "expected": "pending"
+    },
+    {
+      "check": "charged the POS amount",
+      "ok": true,
+      "actual": 15000,
+      "expected": 15000
+    },
+    {
+      "check": "charge replay is 200",
+      "ok": true,
+      "actual": 200,
+      "expected": 200
+    },
+    {
+      "check": "charge replay same id",
+      "ok": true,
+      "actual": "5a594b43-a4a9-4546-a3a2-245e4d600eed",
+      "expected": "5a594b43-a4a9-4546-a3a2-245e4d600eed"
+    },
+    {
+      "check": "charge replay flagged",
+      "ok": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "check": "callback applied",
+      "ok": true,
+      "actual": 200,
+      "expected": 200
+    },
+    {
+      "check": "payment paid",
+      "ok": true,
+      "actual": "paid",
+      "expected": "paid"
+    },
+    {
+      "check": "callback replay is 200",
+      "ok": true,
+      "actual": 200,
+      "expected": 200
+    },
+    {
+      "check": "callback replay is a no-op",
+      "ok": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "check": "sale is paid",
+      "ok": true,
+      "actual": "paid",
+      "expected": "paid"
+    },
+    {
+      "check": "payment is paid",
+      "ok": true,
+      "actual": "paid",
+      "expected": "paid"
+    },
+    {
+      "check": "POS sync recorded",
+      "ok": true,
+      "actual": true,
+      "expected": true
+    }
+  ],
+  "passed": true
+}

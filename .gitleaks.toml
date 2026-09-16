@@ -1,0 +1,16 @@
+title = "TillFlow"
+
+[extend]
+useDefault = true
+
+# G2 evidence JSON records client-generated Idempotency-Key headers
+# (g2-sale-… / g2-charge-…). The generic-api-key rule matches the
+# field name `*_key` plus a hex suffix. Those values are not credentials.
+[allowlist]
+description = "G2 evidence: idempotency keys and captured traces, not secrets"
+paths = [
+  '''(^|/)evidence/payments-integrity/g2-.*''',
+]
+regexes = [
+  '''g2-(sale|charge|timeout)[-0-9a-fA-F]+''',
+]
