@@ -1,0 +1,1 @@
+{"error":"unauthorized","hint":"X-Tenant-Id, X-User-Id, and X-Role are required"}

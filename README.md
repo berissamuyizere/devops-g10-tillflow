@@ -53,14 +53,17 @@ CODEOWNERS
 
 ## Bootstrap / deploy / destroy
 
-G1 is live in `eu-central-1`. Public smoke:
+G1 (web) and G2 (POS + Payments) are live in `eu-central-1`. Public smoke:
 
 `https://f9nla14lfh.execute-api.eu-central-1.amazonaws.com/health`
 
 - **PRs** → `develop`, then `develop` → `main`. Cross-reviewer reviews the area.
 - **Apply on `main`** waits on the GitHub Environment `production` (required reviewers) and applies the saved `plan.bin` — it does not re-plan.
+- **Release** builds `web`, `pos`, and `payments` (ARM64 native runner), rolls ECS, then runs DB bootstrap + migrate.
 - **Bootstrap** (state bucket + lock table) is one-time: `infra/bootstrap/`. See [`evidence/platform-delivery/README.md`](evidence/platform-delivery/README.md).
 - **Destroy** is out of band; do not `terraform destroy` the shared platform.
+
+G2 happy-path JSON: [`evidence/payments-integrity/`](evidence/payments-integrity/). Platform dumps (three ECS services, path-routing smoke, tag audit): [`evidence/platform-delivery/`](evidence/platform-delivery/).
 
 ## Group facts
 
