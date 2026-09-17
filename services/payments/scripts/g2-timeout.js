@@ -6,9 +6,9 @@ const { TEST_MSISDNS } = require('../../_shared/mpesa');
 
 const POS = (process.env.POS_BASE_URL || 'http://127.0.0.1:18081').replace(/\/+$/, '');
 const PAYMENTS = (process.env.PAYMENTS_BASE_URL || 'http://127.0.0.1:18082').replace(/\/+$/, '');
-const POS_TOKEN = process.env.POS_SERVICE_TOKEN || 'dev-pos-token';
-const TENANT_ID = process.env.TENANT_ID;
-const ATTENDANT_ID = process.env.ATTENDANT_ID;
+const POS_TOKEN = (process.env.POS_SERVICE_TOKEN || 'dev-pos-token').trim();
+const TENANT_ID = (process.env.TENANT_ID || '').trim();
+const ATTENDANT_ID = (process.env.ATTENDANT_ID || '').trim();
 const SETTLE_WAIT_MS = Number(process.env.SETTLE_WAIT_MS || 15000);
 const OUT_DIR =
   process.env.EVIDENCE_DIR || path.resolve(__dirname, '../../../evidence/payments-integrity');
