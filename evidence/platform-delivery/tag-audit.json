@@ -1,0 +1,3939 @@
+{
+    "ResourceTagMappingList": [
+        {
+            "ResourceARN": "arn:aws:codebuild:eu-central-1:240462142849:project/devops-g10-web-build",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "cicd"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:ec2:eu-central-1:240462142849:subnet/subnet-0071919afe6ebce85",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "network"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "Name",
+                    "Value": "devops-g10-vpc-public-eu-central-1b"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:ec2:eu-central-1:240462142849:subnet/subnet-09e9a7061b4a519d7",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "network"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                },
+                {
+                    "Key": "Name",
+                    "Value": "devops-g10-vpc-db-eu-central-1a"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:ec2:eu-central-1:240462142849:subnet/subnet-08702886f08e85353",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "network"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                },
+                {
+                    "Key": "Name",
+                    "Value": "devops-g10-vpc-db-eu-central-1b"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:ecr:eu-central-1:240462142849:repository/devops-g10/payments",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "payments"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-payments",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "payments"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:elasticloadbalancing:eu-central-1:240462142849:listener-rule/app/devops-g10-alb/fbc75d83f8f153af/7f52ae32ff10aed2/b19b13b288486e40",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "platform"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:elasticloadbalancing:eu-central-1:240462142849:listener-rule/app/devops-g10-alb/fbc75d83f8f153af/7f52ae32ff10aed2/fd9c76481e00136c",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "platform"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:elasticloadbalancing:eu-central-1:240462142849:loadbalancer/app/devops-g10-alb/fbc75d83f8f153af",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "alb"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:sqs:eu-central-1:240462142849:devops-g10-commission-close-dlq",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "role",
+                    "Value": "dlq"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "commission"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:ec2:eu-central-1:240462142849:network-interface/eni-06cb1a27492204b75",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "web"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "aws:ecs:serviceName",
+                    "Value": "devops-g10-web"
+                },
+                {
+                    "Key": "aws:ecs:clusterName",
+                    "Value": "devops-g10"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:ec2:eu-central-1:240462142849:network-interface/eni-056cdad799f42e77b",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "pos"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "aws:ecs:serviceName",
+                    "Value": "devops-g10-pos"
+                },
+                {
+                    "Key": "aws:ecs:clusterName",
+                    "Value": "devops-g10"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:ec2:eu-central-1:240462142849:security-group-rule/sgr-00367ca7a6943a0be",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "platform"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:elasticloadbalancing:eu-central-1:240462142849:targetgroup/devops-g10-web-tg/b9fa0d6c6a7f47e0",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "web"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:logs:eu-central-1:240462142849:log-group:/devops-g10/payments",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "payments"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:rds:eu-central-1:240462142849:snapshot:rds:devops-g10-pg-2026-09-12-02-06",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "rds"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:secretsmanager:eu-central-1:240462142849:secret:devops-g10/db/master-LOAkpy",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "rds"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:ec2:eu-central-1:240462142849:route-table/rtb-002e56bf3947f45e9",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "network"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "Name",
+                    "Value": "devops-g10-vpc-default"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:ec2:eu-central-1:240462142849:route-table/rtb-021a23ea27b741ebd",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "network"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "Name",
+                    "Value": "devops-g10-vpc-public"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:ec2:eu-central-1:240462142849:security-group/sg-0ece9add76cf20bba",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "rds"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "Name",
+                    "Value": "devops-g10-rds"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:ec2:eu-central-1:240462142849:security-group/sg-09f5f26c6b661d778",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "cache"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "Name",
+                    "Value": "devops-g10-cache"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:ec2:eu-central-1:240462142849:security-group-rule/sgr-0cccdd63bbd2c693b",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "platform"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:ec2:eu-central-1:240462142849:security-group-rule/sgr-05d8f38a64ee49a99",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "platform"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:ec2:eu-central-1:240462142849:vpc-endpoint/vpce-0898000b22171b1db",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "network"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                },
+                {
+                    "Key": "Name",
+                    "Value": "devops-g10-vpce-logs"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-web",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "web"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:ecs:eu-central-1:240462142849:task-definition/devops-g10-pos:1",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "pos"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:elasticache:eu-central-1:240462142849:snapshot:automatic.devops-g10-valkey-001-2026-09-14-03-22",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "cache"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:logs:eu-central-1:240462142849:log-group:/aws/vpc-flow-log/vpc-0608a01d03195ac0d",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "network"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:s3:::devops-g10-artifacts-240462142849",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "artifacts"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:secretsmanager:eu-central-1:240462142849:secret:devops-g10/cache/auth-LOAkpy",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "cache"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:ec2:eu-central-1:240462142849:security-group-rule/sgr-07f88466a6ed37640",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "platform"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:ec2:eu-central-1:240462142849:vpc-flow-log/fl-0edc06fe408c5c3d4",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "network"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:elasticache:eu-central-1:240462142849:snapshot:automatic.devops-g10-valkey-001-2026-09-16-03-22",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "cache"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:elasticache:eu-central-1:240462142849:subnetgroup:devops-g10-cache",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "cache"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:elasticloadbalancing:eu-central-1:240462142849:listener-rule/app/devops-g10-alb/fbc75d83f8f153af/7f52ae32ff10aed2/a60137530ae3200a",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "platform"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:logs:eu-central-1:240462142849:log-group:/devops-g10/web",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "web"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:rds:eu-central-1:240462142849:snapshot:rds:devops-g10-pg-2026-09-16-02-06",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "rds"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:sqs:eu-central-1:240462142849:devops-g10-payments-callbacks",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "role",
+                    "Value": "primary"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "payments"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:apigateway:eu-central-1::/apis/f9nla14lfh",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "api-gateway"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:ec2:eu-central-1:240462142849:network-interface/eni-0a19a3030d958672e",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "payments"
+                },
+                {
+                    "Key": "aws:ecs:serviceName",
+                    "Value": "devops-g10-payments"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "aws:ecs:clusterName",
+                    "Value": "devops-g10"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:ecr:eu-central-1:240462142849:repository/devops-g10/web",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "web"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-pos",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "pos"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:logs:eu-central-1:240462142849:log-group:/devops-g10/adot/web",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "role",
+                    "Value": "adot-sidecar"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "web"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:logs:eu-central-1:240462142849:log-group:/devops-g10/pos",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "pos"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:ec2:eu-central-1:240462142849:network-interface/eni-0d2dc13316f860951",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "payments"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "aws:ecs:serviceName",
+                    "Value": "devops-g10-payments"
+                },
+                {
+                    "Key": "aws:ecs:clusterName",
+                    "Value": "devops-g10"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:ec2:eu-central-1:240462142849:security-group/sg-0c0cc2e57426ea5c1",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "network"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "Name",
+                    "Value": "devops-g10-vpce"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:ec2:eu-central-1:240462142849:security-group/sg-0635ff8540248d2c5",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "alb"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                },
+                {
+                    "Key": "Name",
+                    "Value": "devops-g10-alb"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:ec2:eu-central-1:240462142849:security-group/sg-08be70a5a27e8ec81",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "api-gateway"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "Name",
+                    "Value": "devops-g10-vpclink"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:ec2:eu-central-1:240462142849:security-group-rule/sgr-02ee64794c7847452",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "platform"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:ecs:eu-central-1:240462142849:cluster/devops-g10",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "ecs"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:ecs:eu-central-1:240462142849:task-definition/devops-g10-db-bootstrap:1",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "role",
+                    "Value": "db-bootstrap"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "platform"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:elasticloadbalancing:eu-central-1:240462142849:targetgroup/devops-g10-pos-tg/65d6c970e3bd0f07",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "pos"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:events:eu-central-1:240462142849:rule/devops-g10-commission-daily-close",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "commission"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:logs:eu-central-1:240462142849:log-group:/devops-g10/api-gateway",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "api-gateway"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:ssm:eu-central-1:240462142849:parameter/devops-g10/adot/config",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "adot"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:apigateway:eu-central-1::/apis/f9nla14lfh/stages/$default",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "api-gateway"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:ec2:eu-central-1:240462142849:subnet/subnet-0dff0f1bc9e4c8ba1",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "network"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "Name",
+                    "Value": "devops-g10-vpc-private-eu-central-1b"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:ec2:eu-central-1:240462142849:subnet/subnet-034c31442d6c6c438",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "network"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "Name",
+                    "Value": "devops-g10-vpc-private-eu-central-1a"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:ec2:eu-central-1:240462142849:vpc-endpoint/vpce-0235d6cb813bd77f2",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "network"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                },
+                {
+                    "Key": "Name",
+                    "Value": "devops-g10-vpce-secrets"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:ecs:eu-central-1:240462142849:task/devops-g10/51beea749bbe4f2092aec5658646e63f",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "web"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "aws:ecs:serviceName",
+                    "Value": "devops-g10-web"
+                },
+                {
+                    "Key": "aws:ecs:clusterName",
+                    "Value": "devops-g10"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:elasticloadbalancing:eu-central-1:240462142849:listener-rule/app/devops-g10-alb/fbc75d83f8f153af/7f52ae32ff10aed2/916276c593aaee6a",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "platform"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:logs:eu-central-1:240462142849:log-group:/aws/codebuild/devops-g10-web-build",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "cicd"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:s3:::devops-g10-backups-240462142849",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "backups"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:secretsmanager:eu-central-1:240462142849:secret:devops-g10/daraja-s3gGMt",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "payments"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                },
+                {
+                    "Key": "populated-by",
+                    "Value": "arsema"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:sqs:eu-central-1:240462142849:devops-g10-commission-close",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "role",
+                    "Value": "primary"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "commission"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:ec2:eu-central-1:240462142849:natgateway/nat-05b1be440be9bfb67",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "network"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                },
+                {
+                    "Key": "Name",
+                    "Value": "devops-g10-vpc-eu-central-1a"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:ec2:eu-central-1:240462142849:security-group-rule/sgr-028a90bfc4cfeaa44",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "platform"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:elasticloadbalancing:eu-central-1:240462142849:listener-rule/app/devops-g10-alb/fbc75d83f8f153af/7f52ae32ff10aed2/fe89444a3a378eb9",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "platform"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:elasticloadbalancing:eu-central-1:240462142849:listener-rule/app/devops-g10-alb/fbc75d83f8f153af/7f52ae32ff10aed2/a0a958c28c8c966f",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "platform"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:rds:eu-central-1:240462142849:snapshot:rds:devops-g10-pg-2026-09-14-02-06",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "rds"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:ec2:eu-central-1:240462142849:vpc-endpoint/vpce-0267e5ebbfa4dc1a9",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "network"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                },
+                {
+                    "Key": "Name",
+                    "Value": "devops-g10-vpce-s3"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:ecs:eu-central-1:240462142849:task/devops-g10/c67ca0b34c4840a9bddbf1e5d4617327",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "web"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "aws:ecs:serviceName",
+                    "Value": "devops-g10-web"
+                },
+                {
+                    "Key": "aws:ecs:clusterName",
+                    "Value": "devops-g10"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:elasticache:eu-central-1:240462142849:replicationgroup:devops-g10-valkey",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "cache"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:logs:eu-central-1:240462142849:log-group:/devops-g10/db-migrate",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "role",
+                    "Value": "db-migrate"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "platform"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:rds:eu-central-1:240462142849:snapshot:rds:devops-g10-pg-2026-09-15-02-06",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "rds"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:wafv2:eu-central-1:240462142849:regional/webacl/devops-g10-waf/c3161d06-8c94-41f8-a55a-404a94326b01",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "waf"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:ec2:eu-central-1:240462142849:internet-gateway/igw-0dad1ea7bd38c8c28",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "network"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "Name",
+                    "Value": "devops-g10-vpc"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:ec2:eu-central-1:240462142849:security-group/sg-0b0624dcf45526dd4",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "network"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "Name",
+                    "Value": "devops-g10-vpc-default"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:ecr:eu-central-1:240462142849:repository/devops-g10/commission",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "commission"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:ecs:eu-central-1:240462142849:task/devops-g10/b2dc748dc6e64345ad1d81ca3b6f2bcb",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "pos"
+                },
+                {
+                    "Key": "aws:ecs:serviceName",
+                    "Value": "devops-g10-pos"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "aws:ecs:clusterName",
+                    "Value": "devops-g10"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:elasticache:eu-central-1:240462142849:cluster:devops-g10-valkey-001",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "cache"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:elasticache:eu-central-1:240462142849:snapshot:automatic.devops-g10-valkey-001-2026-09-15-03-21",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "cache"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:s3:::devops-g10-tfstate-240462142849",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "shared"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "platform-bootstrap"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:s3:::devops-g10-logs-240462142849",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "logs"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:apigateway:eu-central-1::/vpclinks/qd6h34",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "api-gateway"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:ec2:eu-central-1:240462142849:vpc-endpoint/vpce-02faf878e320b3560",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "network"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "Name",
+                    "Value": "devops-g10-vpce-ssm"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:ec2:eu-central-1:240462142849:vpc-endpoint/vpce-0dce38fa1988b858a",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "network"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "Name",
+                    "Value": "devops-g10-vpce-ecr-api"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:ecs:eu-central-1:240462142849:task/devops-g10/cb191116fe224d34a353d05deaed2b63",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "pos"
+                },
+                {
+                    "Key": "aws:ecs:serviceName",
+                    "Value": "devops-g10-pos"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "aws:ecs:clusterName",
+                    "Value": "devops-g10"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:elasticloadbalancing:eu-central-1:240462142849:listener-rule/app/devops-g10-alb/fbc75d83f8f153af/7f52ae32ff10aed2/7152c7a956d9d884",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "platform"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:ec2:eu-central-1:240462142849:elastic-ip/eipalloc-0d66e7c17124d5409",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "network"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "Name",
+                    "Value": "devops-g10-vpc-eu-central-1a"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:ec2:eu-central-1:240462142849:network-interface/eni-0e2fd6d16fad3d539",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "pos"
+                },
+                {
+                    "Key": "aws:ecs:serviceName",
+                    "Value": "devops-g10-pos"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "aws:ecs:clusterName",
+                    "Value": "devops-g10"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:ec2:eu-central-1:240462142849:route-table/rtb-020132f05decd0323",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "network"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "Name",
+                    "Value": "devops-g10-vpc-private"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:ec2:eu-central-1:240462142849:security-group/sg-05cc34784cf1ed3e2",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "ecs"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "Name",
+                    "Value": "devops-g10-ecs-tasks"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:ec2:eu-central-1:240462142849:security-group-rule/sgr-0009908447a16b5db",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "platform"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:ecs:eu-central-1:240462142849:task-definition/devops-g10-payments:1",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "payments"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:elasticache:eu-central-1:240462142849:snapshot:automatic.devops-g10-valkey-001-2026-09-17-03-22",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "cache"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:elasticloadbalancing:eu-central-1:240462142849:listener-rule/app/devops-g10-alb/fbc75d83f8f153af/7f52ae32ff10aed2/b4aac71effbcc449",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "platform"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:rds:eu-central-1:240462142849:db:devops-g10-pg",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "rds"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:elasticloadbalancing:eu-central-1:240462142849:listener/app/devops-g10-alb/fbc75d83f8f153af/7f52ae32ff10aed2",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "platform"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:elasticloadbalancing:eu-central-1:240462142849:targetgroup/devops-g10-payments-tg/8a1d77ca29cd30f2",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "payments"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:logs:eu-central-1:240462142849:log-group:/devops-g10/adot/payments",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "role",
+                    "Value": "adot-sidecar"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "payments"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:rds:eu-central-1:240462142849:pg:devops-g10-pg16",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "rds"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:rds:eu-central-1:240462142849:snapshot:rds:devops-g10-pg-2026-09-17-02-06",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "rds"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:secretsmanager:eu-central-1:240462142849:secret:devops-g10/service-tokens-UMhS7k",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "platform"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:dynamodb:eu-central-1:240462142849:table/devops-g10-tflock",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "shared"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "platform-bootstrap"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:ec2:eu-central-1:240462142849:vpc-endpoint/vpce-0e8c8fc920e215e12",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "network"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "Name",
+                    "Value": "devops-g10-vpce-ecr-dkr"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:ecr:eu-central-1:240462142849:repository/devops-g10/pos",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "pos"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:ecs:eu-central-1:240462142849:task/devops-g10/305f5c1251af41eaae7f42fe4813611a",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "payments"
+                },
+                {
+                    "Key": "aws:ecs:serviceName",
+                    "Value": "devops-g10-payments"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "aws:ecs:clusterName",
+                    "Value": "devops-g10"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:elasticloadbalancing:eu-central-1:240462142849:listener-rule/app/devops-g10-alb/fbc75d83f8f153af/7f52ae32ff10aed2/580d2badd07b003d",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "platform"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:elasticloadbalancing:eu-central-1:240462142849:listener-rule/app/devops-g10-alb/fbc75d83f8f153af/7f52ae32ff10aed2/2dde57ed24ba044c",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "platform"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:logs:eu-central-1:240462142849:log-group:/devops-g10/adot/pos",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "role",
+                    "Value": "adot-sidecar"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "pos"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:rds:eu-central-1:240462142849:snapshot:rds:devops-g10-pg-2026-09-11-21-33",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "rds"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:secretsmanager:eu-central-1:240462142849:secret:devops-g10/db/payments-CZFAxr",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "payments"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:ec2:eu-central-1:240462142849:network-acl/acl-097970eb3240064a6",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "network"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                },
+                {
+                    "Key": "Name",
+                    "Value": "devops-g10-vpc-default"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:ec2:eu-central-1:240462142849:security-group-rule/sgr-0fe7f2b57d9676326",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "platform"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:ec2:eu-central-1:240462142849:security-group-rule/sgr-02d6b5059eafd5eba",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "platform"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:secretsmanager:eu-central-1:240462142849:secret:devops-g10/db/pos-c5rCpu",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "pos"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:ec2:eu-central-1:240462142849:network-interface/eni-011355c79fc68bf4b",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "web"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "aws:ecs:serviceName",
+                    "Value": "devops-g10-web"
+                },
+                {
+                    "Key": "aws:ecs:clusterName",
+                    "Value": "devops-g10"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:ec2:eu-central-1:240462142849:subnet/subnet-02b8ec6b4d4aa0c69",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "network"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "Name",
+                    "Value": "devops-g10-vpc-public-eu-central-1a"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:ec2:eu-central-1:240462142849:vpc/vpc-0608a01d03195ac0d",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "network"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                },
+                {
+                    "Key": "Name",
+                    "Value": "devops-g10-vpc"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:ecs:eu-central-1:240462142849:task/devops-g10/7477e9df1b7840c4850d67f1b0946c19",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "payments"
+                },
+                {
+                    "Key": "aws:ecs:serviceName",
+                    "Value": "devops-g10-payments"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "aws:ecs:clusterName",
+                    "Value": "devops-g10"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:ecs:eu-central-1:240462142849:task-definition/devops-g10-web:1",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "web"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:logs:eu-central-1:240462142849:log-group:/devops-g10/adot/metrics",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "adot"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:rds:eu-central-1:240462142849:snapshot:rds:devops-g10-pg-2026-09-13-02-06",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "rds"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:rds:eu-central-1:240462142849:subgrp:devops-g10-vpc",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "network"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "Name",
+                    "Value": "devops-g10-vpc"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:secretsmanager:eu-central-1:240462142849:secret:devops-g10/slack-webhook-NR4QlQ",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "reliability"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                },
+                {
+                    "Key": "populated-by",
+                    "Value": "saloi"
+                }
+            ]
+        },
+        {
+            "ResourceARN": "arn:aws:sqs:eu-central-1:240462142849:devops-g10-payments-callbacks-dlq",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "yordanos"
+                },
+                {
+                    "Key": "environment",
+                    "Value": "prod"
+                },
+                {
+                    "Key": "role",
+                    "Value": "dlq"
+                },
+                {
+                    "Key": "managed-by",
+                    "Value": "terraform"
+                },
+                {
+                    "Key": "service",
+                    "Value": "payments"
+                },
+                {
+                    "Key": "capstone",
+                    "Value": "tillflow"
+                },
+                {
+                    "Key": "group",
+                    "Value": "g10"
+                }
+            ]
+        }
+    ]
+}

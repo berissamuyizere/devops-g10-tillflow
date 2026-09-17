@@ -81,7 +81,14 @@ already created the GitHub App connection in the console.
 API_URL=$(terraform output -raw api_gateway_url)
 curl -sSf "$API_URL/health"    # -> {"status":"ok","service":"web"}
 curl -sSf "$API_URL/version"   # -> commit + image digest
+# Path routing (G2): auth middleware on the right service, not web/ALB.
+curl -sS -o /dev/null -w '%{http_code}\n' "$API_URL/sales/00000000-0000-0000-0000-000000000001"
+# -> 401
+curl -sS -o /dev/null -w '%{http_code}\n' "$API_URL/internal/v1/payments/00000000-0000-0000-0000-000000000001"
+# -> 401
 ```
+
+Refresh live dumps: `./evidence/platform-delivery/collect.sh`.
 
 ## Tear-down
 

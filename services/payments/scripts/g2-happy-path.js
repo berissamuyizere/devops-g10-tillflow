@@ -6,15 +6,26 @@ const { createFakeMpesaClient, TEST_MSISDNS } = require('../../_shared/mpesa');
 
 const POS = (process.env.POS_BASE_URL || 'http://127.0.0.1:18081').replace(/\/+$/, '');
 const PAYMENTS = (process.env.PAYMENTS_BASE_URL || 'http://127.0.0.1:18082').replace(/\/+$/, '');
-const POS_TOKEN = process.env.POS_SERVICE_TOKEN || 'dev-pos-token';
-const CALLBACK_SECRET = process.env.DARAJA_CALLBACK_SECRET || 'dev-callback-secret';
-const TENANT_ID = process.env.TENANT_ID;
-const ATTENDANT_ID = process.env.ATTENDANT_ID;
+const POS_TOKEN = (process.env.POS_SERVICE_TOKEN || 'dev-pos-token').trim();
+const CALLBACK_SECRET = (process.env.DARAJA_CALLBACK_SECRET || 'dev-callback-secret').trim();
+const TENANT_ID = (process.env.TENANT_ID || '').trim();
+const ATTENDANT_ID = (process.env.ATTENDANT_ID || '').trim();
 const OUT_DIR =
   process.env.EVIDENCE_DIR || path.resolve(__dirname, '../../../evidence/payments-integrity');
 
 const steps = [];
 let failures = 0;
+
+function xrayCompatibleTraceId() {
+  const epochHex = Math.floor(Date.now() / 1000)
+    .toString(16)
+    .padStart(8, '0');
+  return epochHex + randomBytes(12).toString('hex');
+}
+
+function xrayTraceId(w3cTraceId) {
+  return `1-${w3cTraceId.slice(0, 8)}-${w3cTraceId.slice(8)}`;
+}
 
 function check(name, actual, expected) {
   const ok = JSON.stringify(actual) === JSON.stringify(expected);
@@ -31,7 +42,7 @@ async function main() {
     process.exit(2);
   }
 
-  const traceId = randomBytes(16).toString('hex');
+  const traceId = xrayCompatibleTraceId();
   const traceparent = `00-${traceId}-${randomBytes(8).toString('hex')}-01`;
   const saleKey = `g2-sale-${randomUUID().slice(0, 8)}`;
   const chargeKey = `g2-charge-${randomUUID().slice(0, 8)}`;
@@ -141,6 +152,7 @@ async function main() {
   const evidence = {
     captured_at: new Date().toISOString(),
     trace_id: traceId,
+    xray_trace_id: xrayTraceId(traceId),
     traceparent,
     pos_base_url: POS,
     payments_base_url: PAYMENTS,
@@ -160,7 +172,8 @@ async function main() {
 
   console.log(`\n${failures === 0 ? 'ALL CHECKS PASSED' : `${failures} CHECK(S) FAILED`}`);
   console.log(`evidence written to ${outFile}`);
-  console.log(`look this trace up in X-Ray / Grafana by trace_id ${traceId}\n`);
+  console.log(`X-Ray trace id: ${xrayTraceId(traceId)}`);
+  console.log(`W3C trace id  : ${traceId}\n`);
   process.exit(failures === 0 ? 0 : 1);
 }
 
