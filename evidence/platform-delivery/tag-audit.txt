@@ -1,0 +1,3 @@
+resources tagged capstone=tillflow: 127
+tag key coverage: {'owner': 127, 'environment': 127, 'managed-by': 127, 'service': 127, 'capstone': 127, 'group': 127, 'Name': 28, 'role': 9, 'aws:ecs:serviceName': 12, 'aws:ecs:clusterName': 12, 'populated-by': 2}
+all required tags present
