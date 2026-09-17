@@ -1,0 +1,158 @@
+{
+  "latest_present": false,
+  "images": {
+    "devops-g10/web": [
+      {
+        "tags": [
+          "0af7d0b754b7362b6ec45d2539fe580cf1647297"
+        ],
+        "digest": "sha256:a3bf30d62f99d94c02bfd1b2b3f9568e38ef0b21d7b03e41494e7d0b59e158ed",
+        "pushed": "2026-09-15T18:23:42.372000+03:00"
+      },
+      {
+        "tags": [
+          "0f884475cae013b6b23e630695cd1057d9c642d6"
+        ],
+        "digest": "sha256:5f09ee41af045b3e2c04948e11ab6dac9ec6b094859013058406b44a8295f838",
+        "pushed": "2026-09-13T19:55:55.675000+03:00"
+      },
+      {
+        "tags": [
+          "dd657a9e686dc1b32e4e33dac7a634e245e83244"
+        ],
+        "digest": "sha256:d71d09bab8d87a816049d98e40f75cbf9ce413becf904b6731c6428329638a7f",
+        "pushed": "2026-09-12T10:56:50.865000+03:00"
+      },
+      {
+        "tags": [
+          "a3d3b8173c77563dac0eb1a521f702ab160297b8"
+        ],
+        "digest": "sha256:e6fd026522d36f2e9e1ef480310f3c26479c7a33088476ce203337165c0c4733",
+        "pushed": "2026-09-15T15:18:34.408000+03:00"
+      },
+      {
+        "tags": [
+          "d18da86050a5f37bb55de5c13ef53eeb7775cfb8"
+        ],
+        "digest": "sha256:8cad133c4d4cc8877ed030ab7dcd359751ea542af558f259b8e30d4e4478cc93",
+        "pushed": "2026-09-15T14:49:50.583000+03:00"
+      },
+      {
+        "tags": [
+          "bb50aee6b42da32025851c32a7cae07586039032"
+        ],
+        "digest": "sha256:1a59767db5376b27a7227b87c3be17a69d77a88d9cce60c58b489f1d640f5b93",
+        "pushed": "2026-09-15T12:24:51.018000+03:00"
+      },
+      {
+        "tags": [
+          "4875f78e516e50af933f473ae9731e3a12a0f575"
+        ],
+        "digest": "sha256:6a8bb0ccee43ae56d4453f5d789053fc7a174d7c7aa9a18ab9cdb2d80f4f374d",
+        "pushed": "2026-09-13T14:08:24.304000+03:00"
+      },
+      {
+        "tags": [
+          "09634e52bbe5a704466d0a51cd0e847b1781b401"
+        ],
+        "digest": "sha256:7bcee39a0c90102f0e99c9353fd7bcfca02820f4b102b2c3e3c7c7c5a777ec64",
+        "pushed": "2026-09-12T10:29:14.569000+03:00"
+      }
+    ],
+    "devops-g10/pos": [
+      {
+        "tags": [
+          "076b5914c73a571a431763f1a1af5e88863e57b0"
+        ],
+        "digest": "sha256:678c8c1bb9b771d577db5356abc21a2cd316489903a8d9be0c2dabdc33147279",
+        "pushed": "2026-09-15T14:26:29.670000+03:00"
+      },
+      {
+        "tags": [
+          "0af7d0b754b7362b6ec45d2539fe580cf1647297"
+        ],
+        "digest": "sha256:43a0d8c7f3c78e574c275643c2571262644efd8bc89fcb74a06b8d820dd04650",
+        "pushed": "2026-09-15T18:23:40.493000+03:00"
+      },
+      {
+        "tags": [
+          "4a6ce5a7fa06442b5055f03ac221ce4b205d12b0"
+        ],
+        "digest": "sha256:4a55a214b5f3dccb5dc9750f81e3c40e61e6faa521e5fee722deb420ec5b8f0e",
+        "pushed": "2026-09-15T19:50:04.106000+03:00"
+      },
+      {
+        "tags": [
+          "16cdbb43ae0d1d41607939d0ebd191b91b7fc48c"
+        ],
+        "digest": "sha256:d5c99343b818e1392a4c8db414dead23a1681369747e0c6f4b2a4544c2200384",
+        "pushed": "2026-09-15T20:19:38.903000+03:00"
+      },
+      {
+        "tags": [
+          "d18da86050a5f37bb55de5c13ef53eeb7775cfb8"
+        ],
+        "digest": "sha256:d3d4a1cf1b9ab658d6e748d6081c016e2548899a5dc1d5e8fac2e3619294d5b8",
+        "pushed": "2026-09-15T14:50:13.432000+03:00"
+      },
+      {
+        "tags": [
+          "a3d3b8173c77563dac0eb1a521f702ab160297b8"
+        ],
+        "digest": "sha256:e24bebf0f89203e5826ce59e01c5ff1471376295b4fac5933a91068b7b74f66e",
+        "pushed": "2026-09-15T15:18:51.414000+03:00"
+      }
+    ],
+    "devops-g10/payments": [
+      {
+        "tags": [
+          "16cdbb43ae0d1d41607939d0ebd191b91b7fc48c"
+        ],
+        "digest": "sha256:33a346c753c2c30ff40fa99688bc4e8ab10c1daf33fafc125055c38f5c1ee29b",
+        "pushed": "2026-09-15T20:19:44.792000+03:00"
+      },
+      {
+        "tags": [
+          "d18da86050a5f37bb55de5c13ef53eeb7775cfb8"
+        ],
+        "digest": "sha256:8d92c89e66cd96e6dcae339585d57073cdde49bad0d2c9cb7551993e39f6bf5b",
+        "pushed": "2026-09-15T14:49:49.675000+03:00"
+      },
+      {
+        "tags": [
+          "4a6ce5a7fa06442b5055f03ac221ce4b205d12b0"
+        ],
+        "digest": "sha256:dd1e8a812d235258eb5c5b683ed290a103ce1dca33d123c5895e1d0d92b646b9",
+        "pushed": "2026-09-15T19:50:09.056000+03:00"
+      },
+      {
+        "tags": [
+          "a3d3b8173c77563dac0eb1a521f702ab160297b8"
+        ],
+        "digest": "sha256:0508f2822cd3b46d2e03db78f6ac2a10e90ecba0268f617678953be0765cbbd8",
+        "pushed": "2026-09-15T15:18:47.335000+03:00"
+      },
+      {
+        "tags": [
+          "bf3f55b8b8703551e26572387d17778c5a72cfa3"
+        ],
+        "digest": "sha256:66056c910672116cccc286330237c5a896becd17757296479391d57c842bc932",
+        "pushed": "2026-09-15T16:32:18.149000+03:00"
+      },
+      {
+        "tags": [
+          "076b5914c73a571a431763f1a1af5e88863e57b0"
+        ],
+        "digest": "sha256:b96accb06757b482e3c322cb487d5798765e6fc77c256959dc0344ca90392f82",
+        "pushed": "2026-09-15T14:26:39.962000+03:00"
+      },
+      {
+        "tags": [
+          "0af7d0b754b7362b6ec45d2539fe580cf1647297"
+        ],
+        "digest": "sha256:03a86442aee433dcc374efc45fbfb8153b95e742b9d956a7f3773477da719d96",
+        "pushed": "2026-09-15T18:23:36.080000+03:00"
+      }
+    ]
+  }
+}

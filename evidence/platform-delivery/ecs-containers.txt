@@ -1,2 +1,13 @@
-{'name': 'app', 'lastStatus': 'RUNNING', 'healthStatus': 'HEALTHY', 'image': '240462142849.dkr.ecr.eu-central-1.amazonaws.com/devops-g10/web@sha256:5f09ee41af045b3e2c04948e11ab6dac9ec6b094859013058406b44a8295f838'}
+# web
+{'name': 'app', 'lastStatus': 'RUNNING', 'healthStatus': 'HEALTHY', 'image': '240462142849.dkr.ecr.eu-central-1.amazonaws.com/devops-g10/web@sha256:a3bf30d62f99d94c02bfd1b2b3f9568e38ef0b21d7b03e41494e7d0b59e158ed'}
 {'name': 'adot', 'lastStatus': 'RUNNING', 'healthStatus': 'HEALTHY', 'image': 'public.ecr.aws/aws-observability/aws-otel-collector:v0.43.1'}
+
+# pos
+{'name': 'adot', 'lastStatus': 'RUNNING', 'healthStatus': 'HEALTHY', 'image': 'public.ecr.aws/aws-observability/aws-otel-collector:v0.43.1'}
+{'name': 'app', 'lastStatus': 'RUNNING', 'healthStatus': 'HEALTHY', 'image': '240462142849.dkr.ecr.eu-central-1.amazonaws.com/devops-g10/pos@sha256:d5c99343b818e1392a4c8db414dead23a1681369747e0c6f4b2a4544c2200384'}
+
+# payments
+{'name': 'app', 'lastStatus': 'RUNNING', 'healthStatus': 'HEALTHY', 'image': '240462142849.dkr.ecr.eu-central-1.amazonaws.com/devops-g10/payments@sha256:33a346c753c2c30ff40fa99688bc4e8ab10c1daf33fafc125055c38f5c1ee29b'}
+{'name': 'adot', 'lastStatus': 'RUNNING', 'healthStatus': 'HEALTHY', 'image': 'public.ecr.aws/aws-observability/aws-otel-collector:v0.43.1'}
+
+all services: app+adot RUNNING, app digest-pinned
