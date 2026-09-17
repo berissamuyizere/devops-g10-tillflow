@@ -6,10 +6,10 @@ const { createFakeMpesaClient, TEST_MSISDNS } = require('../../_shared/mpesa');
 
 const POS = (process.env.POS_BASE_URL || 'http://127.0.0.1:18081').replace(/\/+$/, '');
 const PAYMENTS = (process.env.PAYMENTS_BASE_URL || 'http://127.0.0.1:18082').replace(/\/+$/, '');
-const POS_TOKEN = process.env.POS_SERVICE_TOKEN || 'dev-pos-token';
-const CALLBACK_SECRET = process.env.DARAJA_CALLBACK_SECRET || 'dev-callback-secret';
-const TENANT_ID = process.env.TENANT_ID;
-const ATTENDANT_ID = process.env.ATTENDANT_ID;
+const POS_TOKEN = (process.env.POS_SERVICE_TOKEN || 'dev-pos-token').trim();
+const CALLBACK_SECRET = (process.env.DARAJA_CALLBACK_SECRET || 'dev-callback-secret').trim();
+const TENANT_ID = (process.env.TENANT_ID || '').trim();
+const ATTENDANT_ID = (process.env.ATTENDANT_ID || '').trim();
 const OUT_DIR =
   process.env.EVIDENCE_DIR || path.resolve(__dirname, '../../../evidence/payments-integrity');
 

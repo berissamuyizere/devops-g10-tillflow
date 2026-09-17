@@ -1,0 +1,77 @@
+{
+  "captured_at": "2026-09-17T10:34:57.228Z",
+  "invariant": "a Daraja timeout moves the payment to pending/unknown, never failed (ADR-002)",
+  "trace_id": "6aabc23fada2d7e1d6353e34d5f7af78",
+  "xray_trace_id": "1-6aabc23f-ada2d7e1d6353e34d5f7af78",
+  "traceparent": "00-6aabc23fada2d7e1d6353e34d5f7af78-a1e115d9eede6fa1-01",
+  "payer_msisdn": "254700000003",
+  "sale_id": "52586a6c-9e17-4a10-ab42-5c9bc8270da2",
+  "payment_id": "01985e8b-8e7d-4600-ab73-56b61b001f49",
+  "payment_status_immediately": "pending",
+  "payment_status_after_wait": "pending",
+  "sale_status_after_wait": "awaiting_payment",
+  "settle_wait_ms": 15000,
+  "checks": [
+    {
+      "check": "sale created",
+      "ok": true,
+      "actual": 201,
+      "expected": 201
+    },
+    {
+      "check": "charge accepted",
+      "ok": true,
+      "actual": 201,
+      "expected": 201
+    },
+    {
+      "check": "payment is pending, not failed",
+      "ok": true,
+      "actual": "pending",
+      "expected": "pending"
+    },
+    {
+      "check": "no failure_reason recorded",
+      "ok": true,
+      "actual": null,
+      "expected": null
+    },
+    {
+      "check": "correlation id survived the timeout",
+      "ok": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "check": "still pending after the wait",
+      "ok": true,
+      "actual": "pending",
+      "expected": "pending"
+    },
+    {
+      "check": "never became failed",
+      "ok": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "check": "never became timed_out without reconciliation",
+      "ok": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "check": "sale was not cancelled by the timeout",
+      "ok": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "check": "sale was not marked paid",
+      "ok": true,
+      "actual": false,
+      "expected": false
+    }
+  ],
+  "passed": true
+}
