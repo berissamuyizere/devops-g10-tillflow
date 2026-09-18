@@ -12,11 +12,12 @@ Runtime proof for the POS sale path and commission eligibility.
 After Release is green and `devops-g10-commission` is running:
 
 ```bash
-# From repo root — tokens from Secrets Manager (devops-g10/service-tokens, daraja)
+# From repo root — fetch tokens (do not paste "…" placeholders from docs)
 export API_URL=https://f9nla14lfh.execute-api.eu-central-1.amazonaws.com
-export PAYMENTS_SERVICE_TOKEN=…
-export POS_SERVICE_TOKEN=…
-export DARAJA_CALLBACK_SECRET=…
+TOKENS=$(aws secretsmanager get-secret-value --secret-id devops-g10/service-tokens --region eu-central-1 --query SecretString --output text)
+export PAYMENTS_SERVICE_TOKEN=$(echo "$TOKENS" | jq -r .payments_service_token)
+export POS_SERVICE_TOKEN=$(echo "$TOKENS" | jq -r .pos_service_token)
+export DARAJA_CALLBACK_SECRET=$(echo "$TOKENS" | jq -r .daraja_callback_secret)
 export TENANT_ID=11111111-1111-1111-1111-111111111111
 export ATTENDANT_ID=22222222-2222-2222-2222-222222222222
 

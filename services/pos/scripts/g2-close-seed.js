@@ -71,15 +71,41 @@ function assertPresent(name, value) {
   return ok;
 }
 
+/** HTTP headers must be ASCII — reject doc placeholders copied literally. */
+function assertAsciiToken(envName, value) {
+  if (!value) {
+    console.error(`${envName} is required.`);
+    process.exit(2);
+  }
+  for (let i = 0; i < value.length; i += 1) {
+    if (value.charCodeAt(i) > 255) {
+      console.error(
+        `${envName} contains a non-ASCII character (e.g. "…" from a doc placeholder).`
+      );
+      console.error('Fetch real values from Secrets Manager (see README G2 close section).');
+      process.exit(2);
+    }
+  }
+  if (
+    value.includes('paste') ||
+    value.startsWith('<') ||
+    value.length < 32
+  ) {
+    console.error(`${envName} looks like a placeholder, not a real secret (length ${value.length}).`);
+    console.error('In AWS Console → Secrets Manager → eu-central-1 → devops-g10/service-tokens');
+    console.error('Copy the actual JSON field value — expect ~48 alphanumeric characters.');
+    process.exit(2);
+  }
+}
+
 async function main() {
   if (!POS || !PAYMENTS) {
     console.error('API_URL or POS_BASE_URL is required.');
     process.exit(2);
   }
-  if (!PAYMENTS_TOKEN || !POS_TOKEN || !CALLBACK_SECRET) {
-    console.error('PAYMENTS_SERVICE_TOKEN, POS_SERVICE_TOKEN, and DARAJA_CALLBACK_SECRET are required.');
-    process.exit(2);
-  }
+  assertAsciiToken('PAYMENTS_SERVICE_TOKEN', PAYMENTS_TOKEN);
+  assertAsciiToken('POS_SERVICE_TOKEN', POS_TOKEN);
+  assertAsciiToken('DARAJA_CALLBACK_SECRET', CALLBACK_SECRET);
   if (!TENANT_ID || !ATTENDANT_ID) {
     console.error('TENANT_ID and ATTENDANT_ID are required (see evidence/product-pos/g2-seed.json).');
     process.exit(2);
@@ -146,7 +172,7 @@ async function main() {
     amountMinor: payment.amount_minor,
     msisdn: TEST_MSISDNS.SUCCESS,
     accountReference: sale.id,
-    transactionDesc: 'TillFlow close seed',
+    transactionDesc: 'TillFlow',
     callbackUrl: `${PAYMENTS}/payments/callback`,
   });
   const cbBody = mpesa.buildCallback(payment.checkout_request_id);
@@ -157,10 +183,18 @@ async function main() {
   const signed = mpesa.signBody(cbBody, Date.now());
   const cbRes = await fetch(`${PAYMENTS}/payments/callback`, {
     method: 'POST',
-    headers: signed.headers,
+    headers: {
+      'content-type': 'application/json',
+      ...signed.headers,
+    },
     body: signed.raw,
   });
   const cbJson = await cbRes.json();
+  if (cbRes.status !== 200) {
+    console.error(
+      `  callback error: ${JSON.stringify(cbJson)} (Payments verifies HMAC over the raw JSON body; content-type must be application/json)`
+    );
+  }
   check('callback applied', cbRes.status, 200);
   check('payment paid', cbJson.status, 'paid');
 
