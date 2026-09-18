@@ -19,11 +19,11 @@ and the Payments status contract in
 | POST | `/sales/:id/cancel` | owner/attendant | Cancel — **only while `created`** (409 once `awaiting_payment`) |
 | GET | `/internal/v1/sales/:id` | Payments | Charge inputs |
 | POST | `/internal/v1/sales/:id/awaiting-payment` | Payments | `created` → `awaiting_payment` |
-| POST | `/internal/v1/sales/:id/paid` | Payments | `awaiting_payment` → `paid` (replay no-op) |
+| POST | `/internal/v1/sales/:id/paid` | Payments | `awaiting_payment` → `paid` (same `payment_id` replay; different → 409) |
 | GET | `/internal/v1/commission/eligible` | Payments/Commission | Paid sales for an EAT business day only |
 
 Identity headers (scaffold until real auth): `X-Tenant-Id`, `X-User-Id`, `X-Role`.  
-Payments: `X-Payments-Token` (= `PAYMENTS_SERVICE_TOKEN`).
+Payments: `X-Payments-Token` (= `PAYMENTS_SERVICE_TOKEN`). The env is required — POS fail-closes (`500 misconfigured`) if it is unset. There is no in-process `dev-payments-token` default.
 
 ## Local run
 

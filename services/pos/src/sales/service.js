@@ -1,6 +1,5 @@
 const { hashSaleRequest } = require('../hash');
 const { STATUSES, ACTORS, assertTransition } = require('./state');
-const { filterEligibleSales } = require('../commission/eligibility');
 
 function mapSale(row, lines = []) {
   if (!row) return null;
@@ -14,6 +13,7 @@ function mapSale(row, lines = []) {
     total_minor: row.total_minor,
     created_at: row.created_at,
     paid_at: row.paid_at,
+    payment_id: row.payment_id ?? null,
     lines: lines.map((l) => ({
       id: l.id,
       description: l.description,
@@ -201,34 +201,81 @@ async function createSale(db, { tenantId, userId, role, idempotencyKey, body }) 
       return { sale: mapSale(row, existingLines), created: false };
     }
 
-    const inserted = await client.query(
-      `INSERT INTO pos.sales (
-         tenant_id, attendant_id, idempotency_key, status,
-         currency, total_minor, request_hash
-       ) VALUES ($1, $2, $3, $4, 'KES', $5, $6)
-       RETURNING *`,
-      [tenantId, userId, idempotencyKey, STATUSES.CREATED, total_minor, requestHash]
-    );
-    const sale = inserted.rows[0];
-
-    for (const line of lines) {
-      await client.query(
-        `INSERT INTO pos.sale_lines (
-           sale_id, description, quantity, unit_price_minor, line_total_minor
-         ) VALUES ($1, $2, $3, $4, $5)`,
-        [
-          sale.id,
-          line.description,
-          line.quantity,
-          line.unit_price_minor,
-          line.line_total_minor,
-        ]
+    try {
+      const inserted = await client.query(
+        `INSERT INTO pos.sales (
+           tenant_id, attendant_id, idempotency_key, status,
+           currency, total_minor, request_hash
+         ) VALUES ($1, $2, $3, $4, 'KES', $5, $6)
+         RETURNING *`,
+        [tenantId, userId, idempotencyKey, STATUSES.CREATED, total_minor, requestHash]
       );
-    }
+      const sale = inserted.rows[0];
 
-    const saleLines = await loadLines(client, sale.id);
-    return { sale: mapSale(sale, saleLines), created: true };
+      for (const line of lines) {
+        await client.query(
+          `INSERT INTO pos.sale_lines (
+             sale_id, description, quantity, unit_price_minor, line_total_minor
+           ) VALUES ($1, $2, $3, $4, $5)`,
+          [
+            sale.id,
+            line.description,
+            line.quantity,
+            line.unit_price_minor,
+            line.line_total_minor,
+          ]
+        );
+      }
+
+      const saleLines = await loadLines(client, sale.id);
+      return { sale: mapSale(sale, saleLines), created: true };
+    } catch (err) {
+      if (!isSaleIdempotencyCollision(err)) {
+        throw err;
+      }
+      const raced = new Error('sale idempotency collision');
+      raced.code = 'SALE_IDEMPOTENCY_COLLISION';
+      raced.tenantId = tenantId;
+      raced.idempotencyKey = idempotencyKey;
+      raced.requestHash = requestHash;
+      throw raced;
+    }
+  }).catch(async (err) => {
+    if (err.code !== 'SALE_IDEMPOTENCY_COLLISION') {
+      throw err;
+    }
+    return loadIdempotentSale(db, err.tenantId, err.idempotencyKey, err.requestHash);
   });
+}
+
+function isSaleIdempotencyCollision(err) {
+  return (
+    err &&
+    err.code === '23505' &&
+    (!err.constraint || err.constraint === 'sales_tenant_idempotency_unique')
+  );
+}
+
+async function loadIdempotentSale(db, tenantId, idempotencyKey, requestHash) {
+  const winner = await db.query(
+    `SELECT * FROM pos.sales WHERE tenant_id = $1 AND idempotency_key = $2`,
+    [tenantId, idempotencyKey]
+  );
+  if (winner.rowCount === 0) {
+    const err = new Error('idempotency collision but sale not found');
+    err.code = 'INTERNAL';
+    err.status = 500;
+    throw err;
+  }
+  const row = winner.rows[0];
+  if (row.request_hash !== requestHash) {
+    const err = new Error('idempotency key reused with different body');
+    err.code = 'IDEMPOTENCY_CONFLICT';
+    err.status = 409;
+    throw err;
+  }
+  const existingLines = await loadLines(db, row.id);
+  return { sale: mapSale(row, existingLines), created: false };
 }
 
 async function cancelSale(db, { tenantId, saleId, role }) {
@@ -286,7 +333,21 @@ async function markAwaitingPayment(db, saleId) {
   });
 }
 
-async function markPaid(db, saleId, paidAt = new Date()) {
+async function markPaid(db, saleId, { paymentId, paidAt } = {}) {
+  if (!paymentId || typeof paymentId !== 'string') {
+    const err = new Error('payment_id required');
+    err.code = 'VALIDATION';
+    err.status = 400;
+    throw err;
+  }
+  const paidAtDate = paidAt ? new Date(paidAt) : new Date();
+  if (Number.isNaN(paidAtDate.getTime())) {
+    const err = new Error('invalid paid_at');
+    err.code = 'VALIDATION';
+    err.status = 400;
+    throw err;
+  }
+
   return db.withTransaction(async (client) => {
     const result = await client.query(
       `SELECT * FROM pos.sales WHERE id = $1 FOR UPDATE`,
@@ -297,17 +358,32 @@ async function markPaid(db, saleId, paidAt = new Date()) {
     }
     const row = result.rows[0];
     if (row.status === STATUSES.PAID) {
-      // Replay: no-op — paid_at and totals unchanged.
+      if (row.payment_id && row.payment_id !== paymentId) {
+        const err = new Error('sale already paid by a different payment_id');
+        err.code = 'PAYMENT_ID_MISMATCH';
+        err.status = 409;
+        throw err;
+      }
+      // Replay: no-op — paid_at and totals unchanged. Stamp payment_id if
+      // a pre-migration row was paid without one.
+      if (!row.payment_id) {
+        const stamped = await client.query(
+          `UPDATE pos.sales SET payment_id = $1 WHERE id = $2 RETURNING *`,
+          [paymentId, saleId]
+        );
+        const lines = await loadLines(client, saleId);
+        return mapSale(stamped.rows[0], lines);
+      }
       const lines = await loadLines(client, saleId);
       return mapSale(row, lines);
     }
     assertTransition(row.status, STATUSES.PAID, ACTORS.PAYMENTS);
     const updated = await client.query(
       `UPDATE pos.sales
-       SET status = $1, paid_at = $2
-       WHERE id = $3
+       SET status = $1, paid_at = $2, payment_id = $3
+       WHERE id = $4
        RETURNING *`,
-      [STATUSES.PAID, paidAt, saleId]
+      [STATUSES.PAID, paidAtDate, paymentId, saleId]
     );
     const lines = await loadLines(client, saleId);
     return mapSale(updated.rows[0], lines);
@@ -316,12 +392,14 @@ async function markPaid(db, saleId, paidAt = new Date()) {
 
 async function listEligibleForCommission(db, { tenantId, businessDayEAT }) {
   const result = await db.query(
-    `SELECT id, tenant_id, attendant_id, status, total_minor, paid_at, currency
+    `SELECT id, tenant_id, attendant_id, status, total_minor, paid_at, currency, payment_id
      FROM pos.sales
-     WHERE tenant_id = $1`,
-    [tenantId]
+     WHERE tenant_id = $1
+       AND status = 'paid'
+       AND (paid_at AT TIME ZONE 'Africa/Nairobi')::date = $2::date`,
+    [tenantId, businessDayEAT]
   );
-  return filterEligibleSales(result.rows, businessDayEAT).map((row) => ({
+  return result.rows.map((row) => ({
     id: row.id,
     tenant_id: row.tenant_id,
     attendant_id: row.attendant_id,
@@ -329,6 +407,7 @@ async function listEligibleForCommission(db, { tenantId, businessDayEAT }) {
     total_minor: row.total_minor,
     paid_at: row.paid_at,
     currency: row.currency,
+    payment_id: row.payment_id ?? null,
   }));
 }
 

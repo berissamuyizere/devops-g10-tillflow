@@ -6,6 +6,9 @@ services:
       POSTGRES_USER: pos
       POSTGRES_PASSWORD: pos
       POSTGRES_DB: tillflow_pos
+      # POS fail-closes Payments routes if this is unset (no silent default).
+      # CI sets the same value in .github/workflows/pr.yml; tests set it in helpers.js.
+      PAYMENTS_SERVICE_TOKEN: dev-payments-token
     ports:
       - "5433:5432"
     healthcheck:
