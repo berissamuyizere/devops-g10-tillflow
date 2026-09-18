@@ -169,7 +169,7 @@ jobs:
       - uses: actions/setup-node@v4
         if: steps.run.outputs.go == 'true'
         with:
-          node-version: '20.17'
+          node-version: '24'
           cache: 'npm'
           cache-dependency-path: services/${{ matrix.service }}/package-lock.json
 
