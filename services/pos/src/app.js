@@ -175,11 +175,15 @@ function createApp(options = {}) {
 
   app.post('/internal/v1/sales/:id/paid', requirePaymentsService, async (req, res) => {
     try {
+      const paymentId = req.body?.payment_id;
       const paidAt = req.body?.paid_at ? new Date(req.body.paid_at) : new Date();
+      if (!paymentId || typeof paymentId !== 'string') {
+        return res.status(400).json({ error: 'VALIDATION', hint: 'payment_id required' });
+      }
       if (Number.isNaN(paidAt.getTime())) {
         return res.status(400).json({ error: 'invalid_paid_at' });
       }
-      const sale = await sales.markPaid(database, req.params.id, paidAt);
+      const sale = await sales.markPaid(database, req.params.id, { paymentId, paidAt });
       if (!sale) {
         return res.status(404).json({ error: 'not_found' });
       }

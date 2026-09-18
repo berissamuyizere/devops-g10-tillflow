@@ -77,4 +77,29 @@ describe('POST /sales idempotency', () => {
     assert.equal(second.status, 409);
     assert.equal(second.body.error, 'IDEMPOTENCY_CONFLICT');
   });
+
+  it('two parallel POST /sales with the same key → one row, 201+200, never 500', async () => {
+    const headers = {
+      ...attendantHeaders(fixtures.tenantA, fixtures.attendantA),
+      'idempotency-key': 'sale-key-race',
+    };
+    const body = saleBody();
+
+    const [first, second] = await Promise.all([
+      request(app).post('/sales').set(headers).send(body),
+      request(app).post('/sales').set(headers).send(body),
+    ]);
+
+    const statuses = [first.status, second.status].sort();
+    assert.equal(first.status >= 500, false, `first was ${first.status} ${JSON.stringify(first.body)}`);
+    assert.equal(second.status >= 500, false, `second was ${second.status} ${JSON.stringify(second.body)}`);
+    assert.deepEqual(statuses, [200, 201]);
+    assert.equal(first.body.id, second.body.id);
+
+    const count = await db.query(
+      `SELECT count(*)::int AS n FROM pos.sales WHERE tenant_id = $1 AND idempotency_key = $2`,
+      [fixtures.tenantA, 'sale-key-race']
+    );
+    assert.equal(count.rows[0].n, 1);
+  });
 });

@@ -34,7 +34,7 @@ Payments calls POS with:
 X-Payments-Token: <shared secret>
 ```
 
-Value comes from env `PAYMENTS_SERVICE_TOKEN` (later: Secrets Manager). Local default for tests: `dev-payments-token`.
+Value comes from env `PAYMENTS_SERVICE_TOKEN` (Secrets Manager in ECS; `dev-payments-token` only when that env is set in tests/CI/compose). If the env is unset, POS **fail-closes** (`500 misconfigured`) — there is no in-process default.
 
 POS never accepts sale status changes from attendants for `awaiting_payment` or `paid`.
 
@@ -93,7 +93,7 @@ Content-Type: application/json
 { "payment_id": "uuid" }
 ```
 
-`payment_id` is optional metadata for tracing; POS does not persist it in G2 scaffold (Payments owns payment rows).
+`payment_id` is optional on this call (Payments owns payment rows). POS persists `payment_id` on `POST .../paid`.
 
 | Current status | Result |
 |---|---|
@@ -112,10 +112,13 @@ Content-Type: application/json
 { "payment_id": "uuid", "paid_at": "2026-09-10T12:01:00.000Z" }
 ```
 
+`payment_id` is **required**. POS stores it on the sale.
+
 | Current status | Result |
 |---|---|
-| `awaiting_payment` | → `paid`, set `paid_at` once, **200** |
-| `paid` | **200** no-op (same `paid_at`, totals unchanged) |
+| `awaiting_payment` | → `paid`, set `paid_at` and `payment_id` once, **200** |
+| `paid` + same `payment_id` | **200** no-op (same `paid_at`, totals, `payment_id`) |
+| `paid` + different `payment_id` | **409** `PAYMENT_ID_MISMATCH` |
 | `created` / `cancelled` | **409** `ILLEGAL_TRANSITION` |
 
 **Timeout is not a decline.** Do not call cancel or paid on timeout; leave sale in `awaiting_payment` until reconcile.
