@@ -1,13 +1,8 @@
 const { hashPayoutRequest } = require('../hash');
+const { LEDGER_STATUSES, evaluate, statusForB2cResultCode } = require('./state');
+const { MpesaTimeoutError, MpesaRejectedError } = require('../../../_shared/mpesa');
 
 const UNIQUE_VIOLATION = '23505';
-
-const LEDGER_STATUSES = Object.freeze({
-  PENDING: 'pending',
-  DISBURSING: 'disbursing',
-  DISBURSED: 'disbursed',
-  FAILED: 'failed',
-});
 
 function mapLedger(row) {
   if (!row) return null;
@@ -26,7 +21,11 @@ function mapLedger(row) {
     conversation_id: row.conversation_id,
     failure_reason: row.failure_reason,
     created_at: row.created_at,
+    accepted_at: row.accepted_at,
     disbursed_at: row.disbursed_at,
+    b2c_result_code: row.b2c_result_code,
+    b2c_transaction_id: row.b2c_transaction_id,
+    b2c_sync_error: row.b2c_sync_error,
   };
 }
 
@@ -186,22 +185,38 @@ async function recordPayout(db, request) {
   });
 }
 
+async function lockLedger(client, ledgerId) {
+  const res = await client.query(
+    `SELECT * FROM payments.payout_ledger WHERE id = $1 FOR UPDATE`,
+    [ledgerId]
+  );
+  return res.rowCount ? res.rows[0] : null;
+}
+
+async function applyLedgerTransition(client, row, target, patch = {}) {
+  const decision = evaluate(row.status, target);
+  if (decision.action === 'noop') {
+    return { ledger: mapLedger(row), changed: false, reason: decision.reason };
+  }
+  const columns = { status: target, ...patch };
+  const keys = Object.keys(columns);
+  const assignments = keys.map((k, i) => `${k} = $${i + 1}`).join(', ');
+  const values = keys.map((k) => columns[k]);
+  const updated = await client.query(
+    `UPDATE payments.payout_ledger SET ${assignments} WHERE id = $${keys.length + 1} RETURNING *`,
+    [...values, row.id]
+  );
+  return { ledger: mapLedger(updated.rows[0]), changed: true };
+}
+
 async function disburse(db, mpesa, ledgerId, { shortcode } = {}) {
   const claimed = await db.withTransaction(async (client) => {
-    const res = await client.query(
-      `SELECT * FROM payments.payout_ledger WHERE id = $1 FOR UPDATE`,
-      [ledgerId]
-    );
-    if (res.rowCount === 0) return null;
-    const row = res.rows[0];
+    const row = await lockLedger(client, ledgerId);
+    if (!row) return null;
     if (row.status !== LEDGER_STATUSES.PENDING) {
       return { row, claimed: false };
     }
-    const updated = await client.query(
-      `UPDATE payments.payout_ledger SET status = $1 WHERE id = $2 RETURNING *`,
-      [LEDGER_STATUSES.DISBURSING, ledgerId]
-    );
-    return { row: updated.rows[0], claimed: true };
+    return { ...(await applyLedgerTransition(client, row, LEDGER_STATUSES.DISBURSING)), claimed: true };
   });
 
   if (!claimed) return { ledger: null, disbursed: false, reason: 'not_found' };
@@ -213,39 +228,151 @@ async function disburse(db, mpesa, ledgerId, { shortcode } = {}) {
     };
   }
 
-  const row = claimed.row;
+  const row = claimed.ledger;
+  const period = row.period;
+
   try {
     const result = await mpesa.b2c({
       shortcode: shortcode || process.env.MPESA_B2C_SHORTCODE || '600000',
       amountMinor: row.amount_minor,
       msisdn: row.msisdn,
-      remarks: `TillFlow commission ${row.period instanceof Date ? toDateString(row.period) : row.period}`,
+      remarks: `TillFlow commission ${period}`,
       originatorConversationId: row.originator_conversation_id,
     });
 
-    const done = await db.query(
+    const accepted = await db.query(
       `UPDATE payments.payout_ledger
-       SET status = $1, conversation_id = $2, disbursed_at = now()
-       WHERE id = $3
+       SET conversation_id = $1, accepted_at = now(), b2c_sync_error = NULL
+       WHERE id = $2
        RETURNING *`,
-      [LEDGER_STATUSES.DISBURSED, result.conversationId, ledgerId]
+      [result.conversationId, ledgerId]
     );
-    return { ledger: mapLedger(done.rows[0]), disbursed: true, reason: 'disbursed' };
-  } catch (err) {
-    const reverted = await db.query(
-      `UPDATE payments.payout_ledger
-       SET status = $1, failure_reason = $2
-       WHERE id = $3
-       RETURNING *`,
-      [LEDGER_STATUSES.PENDING, String(err.message || err), ledgerId]
-    );
+
     return {
-      ledger: mapLedger(reverted.rows[0]),
+      ledger: mapLedger(accepted.rows[0]),
       disbursed: false,
-      reason: 'b2c_failed',
+      accepted: true,
+      reason: 'accepted_awaiting_result',
+    };
+  } catch (err) {
+    if (err instanceof MpesaRejectedError) {
+      const failed = await db.withTransaction(async (client) => {
+        const current = await lockLedger(client, ledgerId);
+        if (!current) return null;
+        return applyLedgerTransition(client, current, LEDGER_STATUSES.FAILED, {
+          failure_reason: `b2c_rejected: ${err.message}`,
+        });
+      });
+      return {
+        ledger: failed?.ledger || null,
+        disbursed: false,
+        accepted: false,
+        reason: 'b2c_rejected',
+        error: err,
+      };
+    }
+
+    const unknown = await db.query(
+      `UPDATE payments.payout_ledger
+       SET b2c_sync_error = $1,
+           conversation_id = COALESCE(conversation_id, $2)
+       WHERE id = $3
+       RETURNING *`,
+      [
+        `b2c_unknown: ${err.code || 'ERROR'}: ${err.message}`,
+        err.conversationId || null,
+        ledgerId,
+      ]
+    );
+
+    return {
+      ledger: mapLedger(unknown.rows[0]),
+      disbursed: false,
+      accepted: false,
+      reason: err instanceof MpesaTimeoutError ? 'b2c_timeout_unknown' : 'b2c_unknown',
       error: err,
     };
   }
+}
+
+async function applyB2cResult(db, { originatorConversationId, resultCode, transactionId, resultDesc }) {
+  const target = statusForB2cResultCode(resultCode);
+  if (!target) {
+    return { ledger: null, changed: false, reason: 'not_terminal' };
+  }
+
+  return db.withTransaction(async (client) => {
+    const res = await client.query(
+      `SELECT * FROM payments.payout_ledger
+       WHERE originator_conversation_id = $1
+       FOR UPDATE`,
+      [originatorConversationId]
+    );
+    if (res.rowCount === 0) {
+      return { ledger: null, changed: false, reason: 'not_found' };
+    }
+    const row = res.rows[0];
+
+    const patch =
+      target === LEDGER_STATUSES.DISBURSED
+        ? {
+            b2c_result_code: Number(resultCode),
+            b2c_transaction_id: transactionId || null,
+            b2c_sync_error: null,
+            disbursed_at: new Date(),
+          }
+        : {
+            b2c_result_code: Number(resultCode),
+            failure_reason: resultDesc || `b2c result ${resultCode}`,
+            b2c_sync_error: null,
+          };
+
+    const applied = await applyLedgerTransition(client, row, target, patch);
+    return { ...applied, reason: applied.changed ? `settled_${target}` : applied.reason };
+  });
+}
+
+async function reconcilePayout(db, mpesa, ledgerId) {
+  const current = await getLedgerEntry(db, ledgerId);
+  if (!current) return { ledger: null, changed: false, reason: 'not_found' };
+  if (current.status !== LEDGER_STATUSES.DISBURSING) {
+    return { ledger: current, changed: false, reason: 'not_disbursing' };
+  }
+
+  let query;
+  try {
+    query = await mpesa.b2cQuery({
+      originatorConversationId: current.originator_conversation_id,
+    });
+  } catch (err) {
+    if (err instanceof MpesaRejectedError) {
+      return { ledger: current, changed: false, reason: 'unknown_to_daraja' };
+    }
+    throw err;
+  }
+
+  const target = statusForB2cResultCode(query.resultCode);
+  if (!target) {
+    return { ledger: current, changed: false, reason: 'still_processing' };
+  }
+
+  return applyB2cResult(db, {
+    originatorConversationId: current.originator_conversation_id,
+    resultCode: query.resultCode,
+    transactionId: query.transactionId,
+    resultDesc: query.resultDesc,
+  });
+}
+
+async function findStuckDisbursing(db, limit = 100) {
+  const res = await db.query(
+    `SELECT * FROM payments.payout_ledger
+     WHERE status = 'disbursing'
+     ORDER BY updated_at ASC
+     LIMIT $1`,
+    [limit]
+  );
+  return res.rows.map(mapLedger);
 }
 
 async function getLedgerEntry(db, ledgerId) {
@@ -264,6 +391,11 @@ async function findByAgentPeriod(db, agentId, period) {
 module.exports = {
   recordPayout,
   disburse,
+  applyB2cResult,
+  reconcilePayout,
+  findStuckDisbursing,
+  applyLedgerTransition,
+  lockLedger,
   getLedgerEntry,
   findByAgentPeriod,
   commissionFor,

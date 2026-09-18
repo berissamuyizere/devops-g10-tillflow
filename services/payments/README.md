@@ -46,6 +46,8 @@ See [`src/payments/state.js`](src/payments/state.js).
 | `POST` | `/internal/v1/pos-sync/sweep` | scheduler / runbook | `X-Pos-Token` |
 | `POST` | `/payments/callback` | Daraja | HMAC signature |
 | `POST` | `/internal/v1/payouts` | Commission | `X-Commission-Token` |
+| `POST` | `/internal/v1/payouts/:id/reconcile` | scheduler / runbook | `X-Commission-Token` |
+| `POST` | `/payments/b2c/callback` | Daraja | HMAC signature |
 | `GET` | `/internal/v1/payouts/:id` | Commission | `X-Commission-Token` |
 | `GET` | `/health` `/ready` `/version` | ALB / ops | none |
 
@@ -79,6 +81,9 @@ The replay guarantees are constraints, not conventions:
 | `callback_log_hash_unique` (partial, applied rows) | applying the same callback twice |
 | `payout_ledger_agent_period_unique` | a second payout for one agent-period |
 | `payout_ledger_sales_sale_unique` | one sale backing two payouts |
+| `payout_callback_log_ledger_unique` | applying two result callbacks to one payout |
+| `payout_ledger_b2c_transaction_unique` | one Daraja transaction settling two payouts |
+| `callback_log_payment_applied_unique` | two applied STK callbacks on one payment |
 
 If every line of application logic were deleted, the database would still
 refuse to charge twice or pay twice.
@@ -122,6 +127,8 @@ POS uses 5433 and Payments uses 5434, so both can run side by side.
 | `test/callback-auth.test.js` | HMAC signing, verification, canonicalisation (no DB) |
 | `test/mpesa-fake.test.js` | the fake adapter's determinism (no DB) |
 | `test/pos-wiring.test.js` | POS sync recording, conflicts, outages, the sweeper |
+| `test/invariants-b2c.test.js` | B2C acceptance vs disbursement, timeout, result callback |
+| `test/atomic-callback.test.js` | a crash mid-callback still settles on redelivery |
 | `test/contract-pos-live.contract.js` | **the real POS service**, over real HTTP |
 | `test/trace-propagation.contract.js` | one trace id across both services, two real processes |
 
@@ -170,6 +177,32 @@ non-2xx so Daraja retries rather than believing we handled it.
 whose `awaiting-payment` call never landed. It only repeats calls the contract
 defines as idempotent, so it is safe to run at any time and a second run is a
 no-op. Query `pos_sync_error IS NOT NULL` to see what is currently out of sync.
+
+## Payout state machine
+
+```
+pending ──► disbursing ──► disbursed     (result callback said 0)
+   │            │
+   │            └──► failed              (result callback said anything else)
+   └──► failed                           (Daraja refused the command outright)
+```
+
+Two rules mirror the payment side, for the same reason.
+
+**Acceptance is not disbursement.** Daraja's `responseCode: "0"` on a B2C call
+means the command was queued, not that money moved. The ledger stays
+`disbursing` until the asynchronous result callback arrives. Marking
+`disbursed` on acceptance would record a failed payout as paid.
+
+**A B2C timeout is not a decline, and must never return to `pending`.** If the
+call times out, the command may have been executed. The row stays `disbursing`
+with `b2c_sync_error` set. `pending` is the state the daily close picks up, so
+returning a timed-out payout there is exactly how an agent gets paid twice.
+Only a synchronous refusal — where Daraja answered and we know nothing ran —
+moves the row to `failed`.
+
+Stuck `disbursing` rows are settled by `POST /internal/v1/payouts/:id/reconcile`,
+which queries Daraja and never re-sends.
 
 ## Contract test
 

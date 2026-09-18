@@ -18,6 +18,29 @@ const TEST_MSISDNS = Object.freeze({
   NO_CALLBACK: '254700000004',
 });
 
+const B2C_OUTCOMES = Object.freeze({
+  ACCEPTED: 'accepted',
+  TIMEOUT: 'timeout',
+  REJECTED: 'rejected',
+});
+
+const B2C_RESULT_CODES = Object.freeze({
+  SUCCESS: 0,
+  INSUFFICIENT_BALANCE: 2001,
+  INVALID_RECIPIENT: 2006,
+});
+
+function b2cOutcomeFor(msisdn) {
+  switch (String(msisdn).slice(-1)) {
+    case '3':
+      return B2C_OUTCOMES.TIMEOUT;
+    case '1':
+      return B2C_OUTCOMES.REJECTED;
+    default:
+      return B2C_OUTCOMES.ACCEPTED;
+  }
+}
+
 function outcomeFor(msisdn) {
   switch (String(msisdn).slice(-1)) {
     case '1':
@@ -156,6 +179,8 @@ function createFakeMpesaClient(options = {}) {
     return signature.verify(rawBody, header, callbackSecret, { now });
   }
 
+  const b2cInflight = new Map();
+
   async function b2c(req) {
     validateMsisdn(req.msisdn);
     validateAmount(req.amountMinor);
@@ -165,12 +190,99 @@ function createFakeMpesaClient(options = {}) {
       });
     }
 
+    const outcome = b2cOutcomeFor(req.msisdn);
+    const conversationId = derivedId('AG', req.originatorConversationId);
+
+    b2cInflight.set(req.originatorConversationId, {
+      outcome,
+      req,
+      conversationId,
+      acceptedAt: now(),
+    });
+
+    if (outcome === B2C_OUTCOMES.TIMEOUT) {
+      throw new MpesaTimeoutError('daraja did not respond to b2c', {
+        originatorConversationId: req.originatorConversationId,
+        conversationId,
+      });
+    }
+
+    if (outcome === B2C_OUTCOMES.REJECTED) {
+      throw new MpesaRejectedError('insufficient balance on the shortcode', {
+        originatorConversationId: req.originatorConversationId,
+        responseCode: '1',
+      });
+    }
+
     return {
-      conversationId: derivedId('AG', req.originatorConversationId),
+      conversationId,
       originatorConversationId: req.originatorConversationId,
       responseCode: '0',
       responseDescription: 'Accept the service request successfully.',
     };
+  }
+
+  async function b2cQuery(req) {
+    const entry = b2cInflight.get(req.originatorConversationId);
+    if (!entry) {
+      throw new MpesaRejectedError('unknown originatorConversationId', {
+        originatorConversationId: req.originatorConversationId,
+      });
+    }
+    const settled = entry.outcome !== B2C_OUTCOMES.TIMEOUT || entry.settled === true;
+    if (!settled) {
+      return {
+        originatorConversationId: req.originatorConversationId,
+        conversationId: entry.conversationId,
+        resultCode: RESULT_CODES.STILL_PROCESSING,
+        resultDesc: 'The transaction is being processed',
+        transactionId: null,
+      };
+    }
+    const failed = entry.outcome === B2C_OUTCOMES.REJECTED;
+    return {
+      originatorConversationId: req.originatorConversationId,
+      conversationId: entry.conversationId,
+      resultCode: failed ? B2C_RESULT_CODES.INSUFFICIENT_BALANCE : B2C_RESULT_CODES.SUCCESS,
+      resultDesc: failed ? 'Insufficient balance' : 'The service request is processed successfully.',
+      transactionId: failed ? null : derivedId('TX', req.originatorConversationId).toUpperCase(),
+    };
+  }
+
+  function buildB2cResultCallback(originatorConversationId, overrides = {}) {
+    const entry = b2cInflight.get(originatorConversationId);
+    if (!entry) return null;
+    const failed = overrides.fail === true || entry.outcome === B2C_OUTCOMES.REJECTED;
+    const resultCode =
+      overrides.resultCode ?? (failed ? B2C_RESULT_CODES.INSUFFICIENT_BALANCE : 0);
+    const transactionId =
+      overrides.transactionId ?? derivedId('TX', originatorConversationId).toUpperCase();
+
+    return {
+      Result: {
+        ResultType: 0,
+        ResultCode: resultCode,
+        ResultDesc: overrides.resultDesc ?? (failed ? 'Insufficient balance' : 'The service request is processed successfully.'),
+        OriginatorConversationID: overrides.originatorConversationId ?? originatorConversationId,
+        ConversationID: entry.conversationId,
+        TransactionID: resultCode === 0 ? transactionId : null,
+        ResultParameters:
+          resultCode === 0
+            ? {
+                ResultParameter: [
+                  { Key: 'TransactionAmount', Value: entry.req.amountMinor / 100 },
+                  { Key: 'TransactionReceipt', Value: transactionId },
+                  { Key: 'ReceiverPartyPublicName', Value: entry.req.msisdn },
+                ],
+              }
+            : undefined,
+      },
+    };
+  }
+
+  function settleB2c(originatorConversationId) {
+    const entry = b2cInflight.get(originatorConversationId);
+    if (entry) entry.settled = true;
   }
 
     function buildCallback(checkoutRequestId, overrides = {}) {
@@ -229,6 +341,7 @@ function createFakeMpesaClient(options = {}) {
 
   function reset() {
     inflight.clear();
+    b2cInflight.clear();
   }
 
   return {
@@ -236,10 +349,13 @@ function createFakeMpesaClient(options = {}) {
     stkQuery,
     verifyCallback,
     b2c,
+    b2cQuery,
 
     buildCallback,
+    buildB2cResultCallback,
     signBody,
     settle,
+    settleB2c,
     reset,
     mode: 'fake',
   };
@@ -248,6 +364,9 @@ function createFakeMpesaClient(options = {}) {
 module.exports = {
   createFakeMpesaClient,
   outcomeFor,
+  b2cOutcomeFor,
   OUTCOMES,
+  B2C_OUTCOMES,
+  B2C_RESULT_CODES,
   TEST_MSISDNS,
 };

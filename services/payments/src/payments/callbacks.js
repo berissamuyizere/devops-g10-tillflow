@@ -52,27 +52,32 @@ function parseEnvelope(body) {
   };
 }
 
+async function insertLog(client, entry) {
+  const res = await client.query(
+    `INSERT INTO payments.callback_log (
+       payment_id, checkout_request_id, callback_hash, signature_valid,
+       signature_reason, outcome, result_code, notes, raw_body
+     ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+     RETURNING id`,
+    [
+      entry.paymentId || null,
+      entry.checkoutRequestId || null,
+      entry.callbackHash,
+      entry.signatureValid,
+      entry.signatureReason || null,
+      entry.outcome,
+      entry.resultCode ?? null,
+      entry.notes || null,
+      entry.rawBody,
+    ]
+  );
+  return res.rows[0].id;
+}
+
 async function writeLog(db, entry) {
   try {
-    const res = await db.query(
-      `INSERT INTO payments.callback_log (
-         payment_id, checkout_request_id, callback_hash, signature_valid,
-         signature_reason, outcome, result_code, notes, raw_body
-       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-       RETURNING id`,
-      [
-        entry.paymentId || null,
-        entry.checkoutRequestId || null,
-        entry.callbackHash,
-        entry.signatureValid,
-        entry.signatureReason || null,
-        entry.outcome,
-        entry.resultCode ?? null,
-        entry.notes || null,
-        entry.rawBody,
-      ]
-    );
-    return { logged: true, id: res.rows[0].id, duplicate: false };
+    await db.withTransaction((client) => insertLog(client, entry));
+    return { logged: true, duplicate: false };
   } catch (err) {
     if (err.code === UNIQUE_VIOLATION) {
       return { logged: false, duplicate: true };
@@ -80,6 +85,7 @@ async function writeLog(db, entry) {
     throw err;
   }
 }
+
 
 async function handleCallback(
   db,
@@ -158,42 +164,126 @@ async function handleCallback(
     };
   }
 
-  const logged = await writeLog(db, {
-    paymentId: payment.id,
-    checkoutRequestId: envelope.checkoutRequestId,
-    callbackHash,
-    signatureValid: true,
-    outcome: OUTCOMES.APPLIED,
-    resultCode: envelope.resultCode,
-    rawBody: parsedBody,
-  });
+  const settled = await db
+    .withTransaction(async (client) => {
+      const row = await paymentsService.lockPayment(client, payment.id);
+      if (!row) {
+        return { outcome: OUTCOMES.REJECTED_UNKNOWN_PAYMENT, body: { error: 'unknown_payment' } };
+      }
 
-  if (logged.duplicate) {
+      const writeRow = async (outcome, notes) => {
+        try {
+          return await insertLog(client, {
+            paymentId: row.id,
+            checkoutRequestId: envelope.checkoutRequestId,
+            callbackHash,
+            signatureValid: true,
+            outcome,
+            resultCode: envelope.resultCode,
+            notes,
+            rawBody: parsedBody,
+          });
+        } catch (err) {
+          if (err.code === UNIQUE_VIOLATION) {
+            const dup = new Error('duplicate applied callback');
+            dup.code = 'DUPLICATE_APPLIED';
+            dup.status = row.status;
+            throw dup;
+          }
+          throw err;
+        }
+      };
+
+      if (envelope.resultCode === 0 && envelope.amountMinor !== row.amount_minor) {
+        await writeRow(
+          OUTCOMES.REJECTED_AMOUNT_MISMATCH,
+          `callback ${envelope.amountMinor} != sale ${row.amount_minor}`
+        );
+        return {
+          outcome: OUTCOMES.REJECTED_AMOUNT_MISMATCH,
+          body: { error: 'amount_mismatch' },
+          payment: paymentsService.mapPayment(row),
+        };
+      }
+
+      const target = statusForResultCode(envelope.resultCode, { fromReconciliation: false });
+
+      if (!target) {
+        await writeRow(
+          OUTCOMES.REPLAY_NOOP,
+          `result_code ${envelope.resultCode} is not terminal`
+        );
+        return {
+          outcome: OUTCOMES.REPLAY_NOOP,
+          body: { status: row.status, applied: false },
+          payment: paymentsService.mapPayment(row),
+        };
+      }
+
+      let decision;
+      try {
+        decision = evaluate(row.status, target);
+      } catch (err) {
+        if (err.code !== 'ILLEGAL_TRANSITION') throw err;
+        await writeRow(OUTCOMES.REJECTED_ILLEGAL_TRANSITION, err.message);
+        return {
+          outcome: OUTCOMES.REJECTED_ILLEGAL_TRANSITION,
+          body: { error: 'illegal_transition', from: row.status, to: target },
+          payment: paymentsService.mapPayment(row),
+        };
+      }
+
+      if (decision.action === 'noop') {
+        await writeRow(OUTCOMES.REPLAY_NOOP, decision.reason);
+        return {
+          outcome: OUTCOMES.REPLAY_NOOP,
+          body: { status: row.status, applied: false, replay: true },
+          payment: paymentsService.mapPayment(row),
+        };
+      }
+
+      const patch =
+        target === STATUSES.CONFIRMED
+          ? {
+              mpesa_receipt: envelope.mpesaReceipt,
+              result_code: envelope.resultCode,
+              confirmed_at: new Date(now()),
+            }
+          : {
+              result_code: envelope.resultCode,
+              failure_reason: envelope.resultDesc,
+            };
+
+      const applied = await paymentsService.applyTransition(client, row, target, patch);
+      await writeRow(OUTCOMES.APPLIED, null);
+
+      return {
+        outcome: OUTCOMES.APPLIED,
+        body: { status: applied.payment.status, applied: true },
+        payment: applied.payment,
+      };
+    })
+    .catch((err) => {
+      if (err.code === 'DUPLICATE_APPLIED') {
+        return {
+          outcome: OUTCOMES.REPLAY_NOOP,
+          body: { status: err.status, replay: true },
+          payment,
+        };
+      }
+      throw err;
+    });
+
+  if (settled.outcome === OUTCOMES.REPLAY_NOOP) {
     logger?.info(
       { payment_id: payment.id, checkout_request_id: envelope.checkoutRequestId },
       'callback_replay_noop'
     );
-    return {
-      status: HTTP_STATUS[OUTCOMES.REPLAY_NOOP],
-      ...log(OUTCOMES.REPLAY_NOOP),
-      body: { status: payment.status, replay: true },
-      payment,
-    };
   }
-
-  const finalise = async (outcome, notes) => {
-    await db.query(`UPDATE payments.callback_log SET outcome = $1, notes = $2 WHERE id = $3`, [
-      outcome,
-      notes || null,
-      logged.id,
-    ]);
-  };
-
-  if (envelope.resultCode === 0 && envelope.amountMinor !== payment.amount_minor) {
-    await finalise(
-      OUTCOMES.REJECTED_AMOUNT_MISMATCH,
-      `callback ${envelope.amountMinor} != sale ${payment.amount_minor}`
-    );
+  if (settled.outcome === OUTCOMES.REJECTED_ILLEGAL_TRANSITION) {
+    logger?.warn({ payment_id: payment.id }, 'callback_illegal_transition');
+  }
+  if (settled.outcome === OUTCOMES.REJECTED_AMOUNT_MISMATCH) {
     logger?.error(
       {
         payment_id: payment.id,
@@ -202,93 +292,19 @@ async function handleCallback(
       },
       'callback_amount_mismatch'
     );
-    return {
-      status: HTTP_STATUS[OUTCOMES.REJECTED_AMOUNT_MISMATCH],
-      ...log(OUTCOMES.REJECTED_AMOUNT_MISMATCH),
-      body: { error: 'amount_mismatch' },
-      payment,
-    };
   }
 
-  const target = statusForResultCode(envelope.resultCode, { fromReconciliation: false });
-
-  if (!target) {
-    await finalise(OUTCOMES.REPLAY_NOOP, `result_code ${envelope.resultCode} is not terminal`);
+  if (settled.outcome === OUTCOMES.APPLIED && settled.payment?.status === STATUSES.CONFIRMED) {
+    const done = await paymentsService.settleConfirmedPayment(db, pos, settled.payment.id, new Date(now()));
     return {
       status: 200,
-      ...log(OUTCOMES.REPLAY_NOOP),
-      body: { status: payment.status, applied: false },
-      payment,
+      outcome: OUTCOMES.APPLIED,
+      body: { status: done.payment?.status || STATUSES.CONFIRMED, applied: true },
+      payment: done.payment,
     };
   }
 
-  try {
-    evaluate(payment.status, target);
-  } catch (err) {
-    if (err.code !== 'ILLEGAL_TRANSITION') throw err;
-    await finalise(OUTCOMES.REJECTED_ILLEGAL_TRANSITION, err.message);
-    logger?.warn(
-      { payment_id: payment.id, from: payment.status, to: target },
-      'callback_illegal_transition'
-    );
-    return {
-      status: HTTP_STATUS[OUTCOMES.REJECTED_ILLEGAL_TRANSITION],
-      ...log(OUTCOMES.REJECTED_ILLEGAL_TRANSITION),
-      body: { error: 'illegal_transition', from: payment.status, to: target },
-      payment,
-    };
-  }
-
-  const applied = await db.withTransaction(async (client) => {
-    const row = await paymentsService.lockPayment(client, payment.id);
-    if (!row) return { payment: null, changed: false };
-
-    if (target === STATUSES.CONFIRMED) {
-      return paymentsService.applyTransition(client, row, STATUSES.CONFIRMED, {
-        mpesa_receipt: envelope.mpesaReceipt,
-        result_code: envelope.resultCode,
-        confirmed_at: new Date(now()),
-      });
-    }
-    return paymentsService.applyTransition(client, row, STATUSES.FAILED, {
-      result_code: envelope.resultCode,
-      failure_reason: envelope.resultDesc,
-    });
-  });
-
-  if (!applied.changed) {
-    await finalise(OUTCOMES.REPLAY_NOOP, applied.reason || 'reaffirm');
-    return {
-      status: 200,
-      ...log(OUTCOMES.REPLAY_NOOP),
-      body: { status: applied.payment?.status, applied: false },
-      payment: applied.payment,
-    };
-  }
-
-  await finalise(OUTCOMES.APPLIED, null);
-
-  if (applied.payment.status === STATUSES.CONFIRMED) {
-    const settled = await paymentsService.settleConfirmedPayment(
-      db,
-      pos,
-      applied.payment.id,
-      new Date(now())
-    );
-    return {
-      status: 200,
-      ...log(OUTCOMES.APPLIED),
-      body: { status: settled.payment?.status || STATUSES.CONFIRMED, applied: true },
-      payment: settled.payment,
-    };
-  }
-
-  return {
-    status: 200,
-    ...log(OUTCOMES.APPLIED),
-    body: { status: applied.payment.status, applied: true },
-    payment: applied.payment,
-  };
+  return { status: HTTP_STATUS[settled.outcome], ...settled };
 }
 
 module.exports = { handleCallback, parseEnvelope, OUTCOMES, HTTP_STATUS };
