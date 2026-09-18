@@ -68,6 +68,26 @@ connections (set `"ssl": false` or `DB_SSL=false` to opt out).
 The one-off migrate job runs the same resolver: `node bin/migrate.js up`
 with `DB_SECRET_ID` set (schema + role bootstrap per ADR-003 is Platform's).
 
+## G2 close — seed paid sales + prove eligible (Berissa)
+
+After Release is green (`develop` → `main`), seed paid sales for today's
+Africa/Nairobi business day and capture commission eligibility evidence:
+
+```bash
+export API_URL=https://f9nla14lfh.execute-api.eu-central-1.amazonaws.com
+export PAYMENTS_SERVICE_TOKEN=…   # from devops-g10/service-tokens
+export POS_SERVICE_TOKEN=…
+export DARAJA_CALLBACK_SECRET=…   # from devops-g10/daraja
+export TENANT_ID=11111111-1111-1111-1111-111111111111
+export ATTENDANT_ID=22222222-2222-2222-2222-222222222222
+
+npm run g2:close-seed
+```
+
+Creates one **paid** sale (fake STK) + one **unpaid** control sale, calls
+`GET /internal/v1/commission/eligible`, and writes
+`evidence/product-pos/g2-close-eligible-<YYYY-MM-DD>.json`.
+
 ## Invariants covered in CI
 
 1. Same `Idempotency-Key` + same body → one sale row  

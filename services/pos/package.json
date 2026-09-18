@@ -9,7 +9,8 @@
     "migrate": "node bin/migrate.js up",
     "migrate:down": "node bin/migrate.js down",
     "test": "node --test --test-concurrency=1 test/*.test.js",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "g2:close-seed": "node scripts/g2-close-seed.js"
   },
   "engines": {
     "node": ">=20.17.0"
