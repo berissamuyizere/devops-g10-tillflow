@@ -185,10 +185,15 @@ fails, the row returns to `pending` and a later run retries under the **same**
 - Treat a `409` as retryable. Every `409` here means "this is already handled
   or genuinely disagrees" — retrying will not change it.
 
+## Close trigger
+
+EventBridge rule `devops-g10-commission-daily-close` fires
+`cron(45 20 * * ? *)` (23:45 EAT) and enqueues SQS
+`devops-g10-commission-close`. The Commission ECS worker long-polls that
+queue. There is no public ALB for Commission.
+
 ## Open questions before this leaves stub status
 
-- **Who triggers the close.** EventBridge schedule vs. Commission's own cron.
-  Owner: Yordanos + Arsema at G2.
 - **Partial-period corrections.** Currently impossible by construction (one
   payout per agent per period, forever). If the business needs adjustments, they
   should be a *new* compensating ledger entry type, never an edit to an existing

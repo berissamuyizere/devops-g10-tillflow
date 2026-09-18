@@ -9,7 +9,7 @@ OUT="$ROOT/evidence/platform-delivery"
 PREFIX=devops-g10
 REGION="${AWS_REGION:-eu-central-1}"
 API_URL="${API_URL:-https://f9nla14lfh.execute-api.eu-central-1.amazonaws.com}"
-SERVICES=(web pos payments)
+SERVICES=(web pos payments commission)
 
 mkdir -p "$OUT"
 
@@ -104,22 +104,30 @@ cp "$OUT/ecs-web-task-detail.json" "$OUT/ecs-task-detail.json"
 python3 - <<PY > "$OUT/ecs-containers.txt"
 import json, sys
 ok = True
-for svc in ("web", "pos", "payments"):
+for svc in ("web", "pos", "payments", "commission"):
     data = json.load(open(f"$OUT/ecs-{svc}-task-detail.json"))
     tasks = data.get("tasks") or []
     print(f"# {svc}")
     if not tasks:
         print({"error": "no RUNNING tasks"})
-        ok = False
+        if svc != "commission":
+            ok = False
         continue
     for c in tasks[0]["containers"]:
         row = {k: c.get(k) for k in ("name", "lastStatus", "healthStatus", "image")}
         print(row)
         if c.get("name") in ("app", "adot") and c.get("lastStatus") != "RUNNING":
             ok = False
-        if c.get("name") == "app" and "@sha256:" not in (c.get("image") or ""):
+        image = c.get("image") or ""
+        if c.get("name") == "app":
+            digest_ok = "@sha256:" in image
+            placeholder_ok = svc == "commission" and "busybox" in image
+            if not digest_ok and not placeholder_ok:
+                ok = False
+                print({"error": "app image is not digest-pinned"})
+        if svc == "commission" and "daraja" in image.lower():
             ok = False
-            print({"error": "app image is not digest-pinned"})
+            print({"error": "commission image must not mention daraja"})
     print()
 if not ok:
     sys.exit("ecs dump failed golden-path checks (RUNNING + digest)")
@@ -129,17 +137,23 @@ PY
 echo "== ecr tags (no latest) =="
 python3 - <<PY > "$OUT/ecr-tags.json"
 import json, subprocess, sys
-repos = ["devops-g10/web", "devops-g10/pos", "devops-g10/payments"]
+repos = ["devops-g10/web", "devops-g10/pos", "devops-g10/payments", "devops-g10/commission"]
 out = {}
 latest = []
 for repo in repos:
-    raw = subprocess.check_output([
-        "aws", "ecr", "describe-images",
-        "--repository-name", repo,
-        "--region", "$REGION",
-        "--query", "imageDetails[].{tags:imageTags,digest:imageDigest,pushed:imagePushedAt}",
-        "--output", "json",
-    ], text=True)
+    try:
+        raw = subprocess.check_output([
+            "aws", "ecr", "describe-images",
+            "--repository-name", repo,
+            "--region", "$REGION",
+            "--query", "imageDetails[].{tags:imageTags,digest:imageDigest,pushed:imagePushedAt}",
+            "--output", "json",
+        ], text=True, stderr=subprocess.STDOUT)
+    except subprocess.CalledProcessError as err:
+        if repo.endswith("/commission"):
+            out[repo] = {"skipped": True, "reason": str(err.output or err)[-400:]}
+            continue
+        raise
     images = json.loads(raw)
     out[repo] = images
     for img in images:

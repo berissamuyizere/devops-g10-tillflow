@@ -4,7 +4,7 @@ name: Release
 #   1. path-detect
 #   2. terraform plan (saved artifact) when infra changed
 #   3. terraform apply of THAT plan behind environment `production`
-#   4. build / scan / push / ECS roll for web | pos | payments
+#   4. build / scan / push / ECS roll for web | pos | payments | commission
 #   5. DB bootstrap + migrate when pos/payments images change
 #
 # Not in this workflow (one-time / out-of-band):
@@ -40,6 +40,7 @@ jobs:
       web: ${{ steps.out.outputs.web }}
       pos: ${{ steps.out.outputs.pos }}
       payments: ${{ steps.out.outputs.payments }}
+      commission: ${{ steps.out.outputs.commission }}
       backend: ${{ steps.out.outputs.backend }}
     steps:
       - uses: actions/checkout@v4
@@ -62,6 +63,10 @@ jobs:
               - 'services/payments/**'
               - 'services/_shared/**'
               - '.github/workflows/release.yml'
+            commission:
+              - 'services/commission/**'
+              - 'services/_shared/**'
+              - '.github/workflows/release.yml'
       - id: out
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
@@ -69,12 +74,14 @@ jobs:
             echo "web=true" >> "$GITHUB_OUTPUT"
             echo "pos=true" >> "$GITHUB_OUTPUT"
             echo "payments=true" >> "$GITHUB_OUTPUT"
+            echo "commission=true" >> "$GITHUB_OUTPUT"
             echo "backend=true" >> "$GITHUB_OUTPUT"
           else
             echo "infra=${{ steps.filter.outputs.infra }}" >> "$GITHUB_OUTPUT"
             echo "web=${{ steps.filter.outputs.web }}" >> "$GITHUB_OUTPUT"
             echo "pos=${{ steps.filter.outputs.pos }}" >> "$GITHUB_OUTPUT"
             echo "payments=${{ steps.filter.outputs.payments }}" >> "$GITHUB_OUTPUT"
+            echo "commission=${{ steps.filter.outputs.commission }}" >> "$GITHUB_OUTPUT"
             if [ "${{ steps.filter.outputs.pos }}" = "true" ] || [ "${{ steps.filter.outputs.payments }}" = "true" ] || [ "${{ steps.filter.outputs.infra }}" = "true" ]; then
               echo "backend=true" >> "$GITHUB_OUTPUT"
             else
@@ -202,6 +209,13 @@ jobs:
             tg_name: devops-g10-payments-tg
             build_context: .
             dockerfile: services/payments/Dockerfile
+          - service: commission
+            ecr_repo: devops-g10/commission
+            ecs_service: devops-g10-commission
+            ecs_family: devops-g10-commission
+            tg_name: ""
+            build_context: services/commission
+            dockerfile: services/commission/Dockerfile
     steps:
       - name: Should this service run?
         id: gate
@@ -210,6 +224,7 @@ jobs:
             web) FLAG="${{ needs.changes.outputs.web }}" ;;
             pos) FLAG="${{ needs.changes.outputs.pos }}" ;;
             payments) FLAG="${{ needs.changes.outputs.payments }}" ;;
+            commission) FLAG="${{ needs.changes.outputs.commission }}" ;;
           esac
           echo "run=${FLAG}" >> "$GITHUB_OUTPUT"
           echo "service=${{ matrix.service }} run=${FLAG}"
@@ -383,10 +398,12 @@ jobs:
           API_URL=$(aws apigatewayv2 get-apis \
             --query "Items[?Name=='devops-g10-api'].ApiEndpoint" \
             --output text)
-          TG=$(aws elbv2 describe-target-groups --names "${{ matrix.tg_name }}" \
-            --query 'TargetGroups[0].TargetGroupArn' --output text)
-          echo "target health for ${{ matrix.tg_name }}:"
-          aws elbv2 describe-target-health --target-group-arn "$TG"
+          if [ -n "${{ matrix.tg_name }}" ]; then
+            TG=$(aws elbv2 describe-target-groups --names "${{ matrix.tg_name }}" \
+              --query 'TargetGroups[0].TargetGroupArn' --output text)
+            echo "target health for ${{ matrix.tg_name }}:"
+            aws elbv2 describe-target-health --target-group-arn "$TG"
+          fi
 
           case "${{ matrix.service }}" in
             web)
@@ -442,6 +459,20 @@ jobs:
                 --query 'taskDefinition.containerDefinitions[?name==`app`].image' --output text)
               echo "${DIGEST}" | grep -q '@sha256:'
               echo "payments smoke ok (${DIGEST})"
+              ;;
+            commission)
+              DIGEST=$(aws ecs describe-task-definition --task-definition "${{ matrix.ecs_family }}" \
+                --query 'taskDefinition.containerDefinitions[?name==`app`].image' --output text)
+              echo "${DIGEST}" | grep -q '@sha256:'
+              TASK=$(aws ecs list-tasks --cluster devops-g10 --service-name devops-g10-commission \
+                --desired-status RUNNING --query 'taskArns[0]' --output text)
+              test -n "${TASK}"
+              HEALTH=$(aws ecs describe-tasks --cluster devops-g10 --tasks "${TASK}" \
+                --query 'tasks[0].containers[?name==`app`].healthStatus | [0]' --output text)
+              echo "commission app health=${HEALTH} image=${DIGEST}"
+              test "${HEALTH}" = "HEALTHY"
+              echo "${DIGEST}" | grep -qi daraja && exit 1 || true
+              echo "commission smoke ok (no ALB, SQS worker)"
               ;;
           esac
 

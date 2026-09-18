@@ -69,6 +69,8 @@ describe('commission eligibility — unpaid sales excluded', () => {
     assert.equal(eligible.status, 200);
     assert.equal(eligible.body.sales.length, 1);
     assert.equal(eligible.body.sales[0].id, paying.body.id);
+    assert.equal(eligible.body.sales[0].payout_msisdn, '254700000001');
+    assert.equal(eligible.body.sales[0].commission_bps, 500);
     assert.ok(!eligible.body.sales.some((s) => s.id === unpaid.body.id));
   });
 

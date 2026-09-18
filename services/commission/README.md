@@ -1,0 +1,23 @@
+# services/commission
+
+TillFlow Commission **close worker**. Dual review: Berissa (eligibility) +
+Arsema (payouts). Platform wiring: Yordanos.
+
+**Commission never calls Daraja.** It long-polls SQS
+`devops-g10-commission-close` (EventBridge 23:45 EAT), asks POS who is
+eligible, and asks Payments to disburse via `POST /internal/v1/payouts`.
+
+No public ALB. Probes are local (`/health` on :8080) for ECS.
+
+## Env
+
+| Var | Notes |
+|---|---|
+| `SQS_QUEUE_URL` | Close queue. Unset = HTTP-only (tests). |
+| `POS_BASE_URL` | Internal ALB |
+| `PAYMENTS_BASE_URL` | Internal ALB |
+| `PAYMENTS_SERVICE_TOKEN` | POS `GET /internal/v1/commission/eligible` |
+| `COMMISSION_SERVICE_TOKEN` | Payments `X-Commission-Token` |
+| `COMMISSION_TENANT_IDS` | Comma-separated tenant UUIDs |
+
+No `DARAJA_*`. B2C timeout / result callback live in Payments.
