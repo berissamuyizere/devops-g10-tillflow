@@ -1,5 +1,5 @@
 # ECS Fargate cluster + golden-path services.
-# web: G1. pos + payments: G2 (see ecs_backend.tf). Commission: later.
+# web: G1. pos + payments: G2 (see ecs_backend.tf). Commission worker: ecs_commission.tf.
 
 resource "aws_ecs_cluster" "app" {
   name = var.name_prefix

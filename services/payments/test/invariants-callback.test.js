@@ -57,7 +57,12 @@ describe('callback invariants', () => {
 
     assert.equal(await countRows('callback_log', "WHERE outcome = 'applied'"), 1);
 
-    assert.equal(await countRows('callback_log'), 1);
+    assert.equal(
+      await countRows('callback_log'),
+      3,
+      'every delivery is recorded; only one of them is applied'
+    );
+    assert.equal(await countRows('callback_log', "WHERE outcome = 'replay_noop'"), 2);
 
     assert.equal(pos.sales.get(sale.id).status, 'paid');
   });

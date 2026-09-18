@@ -1,5 +1,13 @@
 const interfaceSpec = require('./interface');
-const { createFakeMpesaClient, OUTCOMES, TEST_MSISDNS, outcomeFor } = require('./fake');
+const {
+  createFakeMpesaClient,
+  OUTCOMES,
+  B2C_OUTCOMES,
+  B2C_RESULT_CODES,
+  TEST_MSISDNS,
+  outcomeFor,
+  b2cOutcomeFor,
+} = require('./fake');
 const signature = require('./signature');
 
 const MODES = Object.freeze({ FAKE: 'fake', DARAJA: 'daraja' });
@@ -26,8 +34,11 @@ module.exports = {
   createFakeMpesaClient,
   MODES,
   OUTCOMES,
+  B2C_OUTCOMES,
+  B2C_RESULT_CODES,
   TEST_MSISDNS,
   outcomeFor,
+  b2cOutcomeFor,
   signature,
   ...interfaceSpec,
 };

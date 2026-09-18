@@ -76,7 +76,11 @@ describe('payout invariants', () => {
       .send(body);
 
     assert.equal(first.status, 201);
-    assert.equal(first.body.status, 'disbursed');
+    assert.equal(
+      first.body.status,
+      'disbursing',
+      'responseCode 0 means accepted, not disbursed'
+    );
 
     assert.equal(first.body.gross_sales_minor, 30000);
     assert.equal(first.body.amount_minor, 1500);

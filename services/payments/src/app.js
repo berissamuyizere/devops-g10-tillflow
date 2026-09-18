@@ -10,6 +10,7 @@ const { createPosClient } = require('./pos/client');
 const paymentsService = require('./payments/service');
 const payoutsService = require('./payouts/service');
 const callbacks = require('./payments/callbacks');
+const payoutCallbacks = require('./payouts/callbacks');
 
 function createApp(options = {}) {
   const database = options.db || db;
@@ -228,13 +229,38 @@ function createApp(options = {}) {
       req.log.info(
         {
           ledger_id: recorded.ledger.id,
-          disbursed: disbursed.disbursed,
+          accepted: disbursed.accepted === true,
           reason: disbursed.reason,
         },
-        'payout_disbursed'
+        'payout_b2c_sent'
       );
 
       return res.status(201).json({ ...disbursed.ledger, disburse_reason: disbursed.reason });
+    } catch (err) {
+      return sendError(req, res, err);
+    }
+  });
+
+  app.post('/payments/b2c/callback', async (req, res) => {
+    try {
+      const result = await payoutCallbacks.handleB2cResultCallback(database, {
+        rawBody: req.rawBody ?? JSON.stringify(req.body ?? {}),
+        headers: req.headers,
+        secret: CALLBACK_SECRET,
+        now,
+        logger: req.log,
+      });
+      return res.status(result.status).json(result.body);
+    } catch (err) {
+      return sendError(req, res, err);
+    }
+  });
+
+  app.post('/internal/v1/payouts/:id/reconcile', requireCommissionService, async (req, res) => {
+    try {
+      const result = await payoutsService.reconcilePayout(database, mpesa, req.params.id);
+      if (!result.ledger) return res.status(404).json({ error: 'not_found' });
+      return res.status(200).json({ ...result.ledger, reconcile_reason: result.reason });
     } catch (err) {
       return sendError(req, res, err);
     }
