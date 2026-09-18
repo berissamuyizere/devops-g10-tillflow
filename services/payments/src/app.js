@@ -266,6 +266,24 @@ function createApp(options = {}) {
     }
   });
 
+  app.get('/internal/v1/payouts/by-agent-period', requireCommissionService, async (req, res) => {
+    try {
+      const agentId = req.query.agent_id;
+      const period = req.query.period;
+      if (!agentId || !/^\d{4}-\d{2}-\d{2}$/.test(String(period || ''))) {
+        return res.status(400).json({
+          error: 'VALIDATION',
+          hint: 'agent_id and period (YYYY-MM-DD) are required',
+        });
+      }
+      const ledger = await payoutsService.findByAgentPeriod(database, agentId, String(period));
+      if (!ledger) return res.status(404).json({ error: 'not_found' });
+      return res.status(200).json(ledger);
+    } catch (err) {
+      return sendError(req, res, err);
+    }
+  });
+
   app.get('/internal/v1/payouts/:id', requireCommissionService, async (req, res) => {
     try {
       const ledger = await payoutsService.getLedgerEntry(database, req.params.id);
