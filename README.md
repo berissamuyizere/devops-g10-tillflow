@@ -59,11 +59,11 @@ G1 (web) and G2 (POS + Payments) are live in `eu-central-1`. Public smoke:
 
 - **PRs** → `develop`, then `develop` → `main`. Cross-reviewer reviews the area.
 - **Apply on `main`** waits on the GitHub Environment `production` (required reviewers) and applies the saved `plan.bin` — it does not re-plan.
-- **Release** builds `web`, `pos`, and `payments` (ARM64 native runner), rolls ECS, then runs DB bootstrap + migrate.
+- **Release** builds `web`, `pos`, `payments`, and `commission` (ARM64 native runner), rolls ECS, then runs DB bootstrap + migrate for POS/Payments.
 - **Bootstrap** (state bucket + lock table) is one-time: `infra/bootstrap/`. See [`evidence/platform-delivery/README.md`](evidence/platform-delivery/README.md).
 - **Destroy** is out of band; do not `terraform destroy` the shared platform.
 
-G2 happy-path JSON: [`evidence/payments-integrity/`](evidence/payments-integrity/). Platform dumps (three ECS services, path-routing smoke, tag audit): [`evidence/platform-delivery/`](evidence/platform-delivery/).
+G2 happy-path JSON: [`evidence/payments-integrity/`](evidence/payments-integrity/). Platform dumps (ECS including the Commission SQS worker, path-routing smoke, tag audit): [`evidence/platform-delivery/`](evidence/platform-delivery/).
 
 ## Group facts
 

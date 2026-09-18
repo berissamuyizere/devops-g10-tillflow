@@ -4,12 +4,12 @@ DRI: Yordanos.
 
 ## What G2 adds (live)
 
-G1 (web on ECS) stays. G2 is the same golden path for **POS** and **Payments**:
+G1 (web on ECS) stays. G2 is the same golden path for **POS**, **Payments**, and the **Commission close worker**:
 
-- ECS services `devops-g10-pos` and `devops-g10-payments` (app + ADOT, digest tag, no `latest`).
-- ALB path rules (`/sales`, `/internal/v1/…`, `/payments/callback`) in front of those services.
-- `release.yml` matrix build/scan/push/roll + one-off `db-bootstrap` then `node bin/migrate.js up`.
-- Public smoke: unauthenticated `GET /sales/:id` and `GET /internal/v1/payments/:id` both return **401** (auth ran on the right service, not web 501 / ALB 404).
+- ECS services `devops-g10-pos` and `devops-g10-payments` (app + ADOT, digest tag, no `latest`) behind ALB path rules.
+- ECS service `devops-g10-commission`: SQS consumer, **no ALB**. EventBridge 23:45 EAT → `devops-g10-commission-close`. Image must not mention Daraja.
+- `release.yml` matrix build/scan/push/roll + one-off `db-bootstrap` then `node bin/migrate.js up` for POS/Payments.
+- Public smoke: unauthenticated `GET /sales/:id` and `GET /internal/v1/payments/:id` both return **401**. Commission smoke is ECS `HEALTHY` + digest.
 
 Sale → pay → callback JSON lives under `evidence/payments-integrity/` (Arsema) and the POS seed under `evidence/product-pos/` (Berissa). This folder is the **platform** proof those runs stood on.
 
@@ -19,9 +19,9 @@ Current-tree G2 files (replace on every clean collect):
 |---|---|
 | `smoke-health.json` / `smoke-ready.json` / `smoke-version.json` | Web catch-all through API Gateway. |
 | `smoke-pos.json` / `smoke-payments.json` / `smoke-summary.json` | Path routing: POS and Payments 401s. |
-| `ecs-{web,pos,payments}-tasks.json` / `ecs-{web,pos,payments}-task-detail.json` | One RUNNING task per service. |
-| `ecs-containers.txt` | All three: `app` + `adot` RUNNING; app image is `@sha256`. |
-| `ecr-tags.json` | No `latest` tag on web/pos/payments repos. |
+| `ecs-{web,pos,payments,commission}-tasks.json` / `ecs-{web,pos,payments,commission}-task-detail.json` | One RUNNING task per service. |
+| `ecs-containers.txt` | All four: `app` + `adot` RUNNING; app image is `@sha256` (busybox placeholder allowed until first commission digest swap). |
+| `ecr-tags.json` | No `latest` tag on web/pos/payments/commission repos. |
 | `tag-audit.json` / `tag-audit.txt` | `capstone=tillflow` + the six required tags. |
 | `outputs.json` | Live ALB DNS + API Gateway URL. |
 
@@ -195,7 +195,7 @@ directory:
 - `plan.txt`, `apply.txt`, `outputs.json`
 - `tag-audit.json`, `tag-audit.txt`
 - `ecs-tasks.json`, `ecs-task-detail.json`, `ecs-containers.txt` (G1 aliases of the web dump)
-- `ecs-{web,pos,payments}-tasks.json`, `ecs-{web,pos,payments}-task-detail.json`
+- `ecs-{web,pos,payments,commission}-tasks.json`, `ecs-{web,pos,payments,commission}-task-detail.json`
 - `smoke-health.json`, `smoke-ready.json`, `smoke-version.json`
 - `smoke-pos.json`, `smoke-payments.json`, `smoke-summary.json`
 - `ecr-tags.json`

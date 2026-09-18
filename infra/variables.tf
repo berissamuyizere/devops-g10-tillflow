@@ -68,6 +68,12 @@ variable "payments_image_digest" {
   default     = null
 }
 
+variable "commission_image_digest" {
+  description = "Full ECR image reference for Commission including digest. Null = busybox /health placeholder."
+  type        = string
+  default     = null
+}
+
 variable "adot_collector_image" {
   description = "Pinned ADOT collector image (never `latest`)."
   type        = string

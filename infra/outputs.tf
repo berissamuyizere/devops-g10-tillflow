@@ -68,10 +68,16 @@ output "secrets" {
 
 output "ecs_services" {
   value = {
-    web      = aws_ecs_service.web.name
-    pos      = aws_ecs_service.pos.name
-    payments = aws_ecs_service.payments.name
+    web        = aws_ecs_service.web.name
+    pos        = aws_ecs_service.pos.name
+    payments   = aws_ecs_service.payments.name
+    commission = aws_ecs_service.commission.name
   }
+}
+
+output "commission_close_queue_url" {
+  description = "SQS queue the Commission worker long-polls. No public ingress."
+  value       = aws_sqs_queue.commission_close.url
 }
 
 output "db_bootstrap_task_family" {

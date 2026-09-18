@@ -28,14 +28,14 @@
         │       │
         ▼       ▼
    ┌────────┐ ┌──────────┐     ┌─────────────┐
-   │  POS   │ │ Payments │     │ Commission  │  EventBridge daily schedule
-   │  API   │ │   API    │◄────│   worker    │  (no public ingress)
-   └───┬────┘ └────┬─────┘     └──────┬──────┘
-       │           │                  │
-       │           │ STK / B2C        │ B2C request only via Payments API
-       │           ▼                  │  (never Daraja directly)
-       │     ┌──────────┐             │
-       │     │  Daraja  │◄────────────┘
+   │  POS   │ │ Payments │     │ Commission  │  EventBridge 23:45 EAT
+   │  API   │ │   API    │◄────│   worker    │  → SQS (no public ALB)
+   └───┬────┘ └────┬─────┘     └─────────────┘
+       │           │
+       │           │ STK / B2C only
+       │           ▼
+       │     ┌──────────┐
+       │     │  Daraja  │
        │     │ sandbox  │
        │     └──────────┘
        │
@@ -76,11 +76,11 @@ Decisions locked in [tenant/sale ADR](adr-001-tenant-sale-data-model.md) and [id
 
 ## Flow 2 — Daily close → commission → B2C
 
-1. EventBridge triggers Commission after EAT business day close.
-2. Commission loads sales with `status=paid` and `paid_at` in that day only.
-3. For each attendant, compute commission from frozen `commission_bps`, write **one** payout-ledger row keyed idempotently (agent + period).
-4. Commission calls **Payments API** for B2C to `payout_msisdn`. Replay of daily close finds the ledger row and does not create a second payout.
-5. Payments owns the B2C call and its own payout/payment state. Commission never holds Daraja credentials.
+1. EventBridge `devops-g10-commission-daily-close` (`cron(45 20 * * ? *)` = 23:45 EAT) enqueues SQS `devops-g10-commission-close`.
+2. The Commission ECS worker (no ALB) long-polls that queue, then `GET`s POS `/internal/v1/commission/eligible` for `status=paid` sales on that Africa/Nairobi business day.
+3. For each attendant it `POST`s Payments `/internal/v1/payouts` with `X-Commission-Token` and `Idempotency-Key: <agent_id>:<period>`. Payments writes **one** payout-ledger row keyed by agent + period.
+4. Replay of daily close is a `200` with `replay: true` (no second B2C). A `409` is not retryable.
+5. Payments owns the B2C call and its result/timeout callbacks. Commission never holds Daraja credentials.
 
 ## Observability path
 

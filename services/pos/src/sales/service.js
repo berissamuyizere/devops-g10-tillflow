@@ -392,11 +392,13 @@ async function markPaid(db, saleId, { paymentId, paidAt } = {}) {
 
 async function listEligibleForCommission(db, { tenantId, businessDayEAT }) {
   const result = await db.query(
-    `SELECT id, tenant_id, attendant_id, status, total_minor, paid_at, currency, payment_id
-     FROM pos.sales
-     WHERE tenant_id = $1
-       AND status = 'paid'
-       AND (paid_at AT TIME ZONE 'Africa/Nairobi')::date = $2::date`,
+    `SELECT s.id, s.tenant_id, s.attendant_id, s.status, s.total_minor, s.paid_at, s.currency, s.payment_id,
+            a.payout_msisdn, a.commission_bps
+     FROM pos.sales s
+     JOIN pos.attendants a ON a.id = s.attendant_id AND a.tenant_id = s.tenant_id
+     WHERE s.tenant_id = $1
+       AND s.status = 'paid'
+       AND (s.paid_at AT TIME ZONE 'Africa/Nairobi')::date = $2::date`,
     [tenantId, businessDayEAT]
   );
   return result.rows.map((row) => ({
@@ -408,6 +410,8 @@ async function listEligibleForCommission(db, { tenantId, businessDayEAT }) {
     paid_at: row.paid_at,
     currency: row.currency,
     payment_id: row.payment_id ?? null,
+    payout_msisdn: row.payout_msisdn,
+    commission_bps: row.commission_bps,
   }));
 }
 

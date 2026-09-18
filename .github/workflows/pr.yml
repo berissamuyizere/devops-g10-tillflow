@@ -138,7 +138,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        service: [web, pos, payments]
+        service: [web, pos, payments, commission]
     defaults:
       run:
         working-directory: services/${{ matrix.service }}
@@ -176,10 +176,14 @@ jobs:
       - name: Install
         if: steps.run.outputs.go == 'true'
         run: |
+          PEER_FLAGS=""
+          if [ "${{ matrix.service }}" = "commission" ]; then
+            PEER_FLAGS="--legacy-peer-deps"
+          fi
           if [ -f package-lock.json ]; then
-            npm ci --no-audit --no-fund --no-progress
+            npm ci --no-audit --no-fund --no-progress $PEER_FLAGS
           else
-            npm install --no-audit --no-fund --no-progress
+            npm install --no-audit --no-fund --no-progress $PEER_FLAGS
           fi
 
       - name: Start Postgres (pos)
