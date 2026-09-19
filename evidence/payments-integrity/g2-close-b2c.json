@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-09-19T08:25:43.569Z",
+  "captured_at": "2026-09-19T09:44:23.758Z",
   "invariants": [
     "daily close creates one payout ledger row per agent per period",
     "daraja acceptance (responseCode 0) is not disbursement",
@@ -7,21 +7,23 @@
     "a replayed close creates no second ledger row and no second B2C",
     "a B2C timeout stays disbursing, never pending, never disbursed"
   ],
-  "trace_id": "6aae46f2a5157a0790907ef621e5b4a8",
-  "xray_trace_id": "1-6aae46f2-a5157a0790907ef621e5b4a8",
-  "traceparent": "00-6aae46f2a5157a0790907ef621e5b4a8-70ba02038d2b4349-01",
+  "trace_id": "6aae595ffbb2bb616810c9ebf118107b",
+  "xray_trace_id": "1-6aae595f-fbb2bb616810c9ebf118107b",
+  "traceparent": "00-6aae595ffbb2bb616810c9ebf118107b-151d8f0ac1ce4dc1-01",
   "pos_base_url": "https://f9nla14lfh.execute-api.eu-central-1.amazonaws.com",
   "payments_base_url": "https://f9nla14lfh.execute-api.eu-central-1.amazonaws.com",
   "mpesa_mode": "fake",
-  "triggered_via": "sqs_manual",
-  "sqs_message_id": null,
+  "triggered_via": "sqs",
+  "sqs_message_id": "cca24f84-e169-4f24-9415-a38e4947a887",
+  "run_started_at": "2026-09-19T09:43:59.280Z",
+  "ledger_created_at": "2026-09-19T09:44:03.467Z",
   "period": "2026-09-19",
-  "sale_id": "770917fd-b225-4abc-86ab-e976c435728f",
-  "payment_id": "d8024b6c-396c-4a90-98ba-07bd25167473",
-  "ledger_id": "f1713add-c5ae-4f4c-a2e9-05c2eb223a84",
-  "originator_conversation_id": "tillflow-33333333-3333-3333-3333-333333333333-2026-09-19",
-  "b2c_transaction_id": "TX-600145654DD6",
-  "timeout_ledger_id": "28ab7910-7ce3-4193-9b7d-b6d4bca7fd4f",
+  "sale_id": "a7ba68ed-b4d4-48db-b901-0080df65b538",
+  "payment_id": "8c60ec93-0283-4547-bbe7-a9a295191ac6",
+  "ledger_id": "8dfa680a-0d93-4411-9278-0d79c32a1d54",
+  "originator_conversation_id": "tillflow-44444444-4444-4444-4444-444444444444-2026-09-19",
+  "b2c_transaction_id": "TX-97A85F171A0E",
+  "timeout_ledger_id": "bcedf3e0-caee-40ca-bbcf-be970b015e9a",
   "checks": [
     {
       "check": "sale created",
@@ -48,6 +50,12 @@
       "expected": true
     },
     {
+      "check": "the payout was created by this run, not a previous one",
+      "ok": true,
+      "actual": true,
+      "expected": true
+    },
+    {
       "check": "status is disbursing, not disbursed",
       "ok": true,
       "actual": "disbursing",
@@ -62,8 +70,8 @@
     {
       "check": "replayed close returns the same payout",
       "ok": true,
-      "actual": "f1713add-c5ae-4f4c-a2e9-05c2eb223a84",
-      "expected": "f1713add-c5ae-4f4c-a2e9-05c2eb223a84"
+      "actual": "8dfa680a-0d93-4411-9278-0d79c32a1d54",
+      "expected": "8dfa680a-0d93-4411-9278-0d79c32a1d54"
     },
     {
       "check": "still disbursing after the replayed close",
@@ -104,8 +112,8 @@
     {
       "check": "disbursed_at did not move",
       "ok": true,
-      "actual": "2026-09-19T08:25:41.439Z",
-      "expected": "2026-09-19T08:25:41.439Z"
+      "actual": "2026-09-19T09:44:21.602Z",
+      "expected": "2026-09-19T09:44:21.602Z"
     },
     {
       "check": "timeout payout is disbursing",
@@ -128,8 +136,8 @@
     {
       "check": "replayed timeout close returns the same payout",
       "ok": true,
-      "actual": "28ab7910-7ce3-4193-9b7d-b6d4bca7fd4f",
-      "expected": "28ab7910-7ce3-4193-9b7d-b6d4bca7fd4f"
+      "actual": "bcedf3e0-caee-40ca-bbcf-be970b015e9a",
+      "expected": "bcedf3e0-caee-40ca-bbcf-be970b015e9a"
     },
     {
       "check": "replayed timeout close is flagged a replay",

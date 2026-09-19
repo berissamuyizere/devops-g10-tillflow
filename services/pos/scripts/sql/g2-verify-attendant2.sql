@@ -1,4 +1,4 @@
--- Read back attendant 3333… after seed (stdout marker parsed by g2-seed-attendant2.sh).
+-- Read back the seeded attendant (stdout marker parsed by g2-seed-attendant2.sh).
 \pset tuples_only on
 \pset format unaligned
 \echo '__SEED_EVIDENCE__'
@@ -12,18 +12,18 @@ SELECT json_build_object(
       'default_commission_bps', t.default_commission_bps
     )
     FROM pos.tenants t
-    WHERE t.id = '11111111-1111-1111-1111-111111111111'
+    WHERE t.id = :'tenant_id'
   ),
   'user', (
     SELECT json_build_object('id', u.id, 'email', u.email)
     FROM pos.users u
-    WHERE u.id = '33333333-3333-3333-3333-333333333333'
+    WHERE u.id = :'attendant_id'
   ),
   'membership', (
     SELECT json_build_object('tenant_id', m.tenant_id, 'user_id', m.user_id, 'role', m.role)
     FROM pos.memberships m
-    WHERE m.tenant_id = '11111111-1111-1111-1111-111111111111'
-      AND m.user_id = '33333333-3333-3333-3333-333333333333'
+    WHERE m.tenant_id = :'tenant_id'
+      AND m.user_id = :'attendant_id'
   ),
   'attendant', (
     SELECT json_build_object(
@@ -35,7 +35,7 @@ SELECT json_build_object(
       'status', a.status
     )
     FROM pos.attendants a
-    WHERE a.id = '33333333-3333-3333-3333-333333333333'
+    WHERE a.id = :'attendant_id'
   )
 )::text;
 \echo '__SEED_EVIDENCE_END__'

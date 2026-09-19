@@ -131,6 +131,8 @@ The close job runs once per EAT evening (EventBridge, moving to **01:00 EAT** af
 
 This ensures attendants who complete a sale late in the evening still appear in the next close. POS eligibility (`GET /internal/v1/commission/eligible?business_day=…`) is unchanged — Commission passes the prior day as `business_day`.
 
+**Evidence / manual close:** the SQS message (or in-process `runDailyClose`) may include `business_day: "YYYY-MM-DD"` to close a specific EAT day (e.g. today's paid sales during a G2 proof). Scheduled production jobs omit this field and always use the previous day.
+
 ## Alternatives considered
 
 - **One combined sale+payment table** — rejected. Brief splits POS and Payments; a timeout-is-not-a-decline state would leak Daraja into the sale row.
