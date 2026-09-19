@@ -63,6 +63,41 @@ describe('commission SQS poller', () => {
     assert.equal(deleted, true);
   });
 
+  it('passes business_day from the SQS payload to the close', async () => {
+    let eligibleUrl = null;
+    const poller = startPoller({
+      queueUrl: 'https://sqs.example/close',
+      region: 'eu-central-1',
+      posBaseUrl: 'http://pos.example',
+      paymentsBaseUrl: 'http://pay.example',
+      paymentsToken: 'pay-token',
+      commissionToken: 'comm-token',
+      tenantIds: ['t1'],
+      logger: silentLogger(),
+      retryDelayMs: 20,
+      fetchImpl: async (url) => {
+        if (String(url).includes('/commission/eligible')) {
+          eligibleUrl = url;
+          return { ok: true, status: 200, json: async () => ({ sales: [] }) };
+        }
+        throw new Error(`unexpected url ${url}`);
+      },
+      sqsClient: fakeSqs({
+        bodies: [
+          JSON.stringify({
+            type: 'commission.daily-close',
+            scheduled_at: '2026-09-19T20:45:00.000Z',
+            business_day: '2026-09-19',
+          }),
+        ],
+      }),
+    });
+    await new Promise((r) => setTimeout(r, 50));
+    await poller.stop();
+    assert.ok(eligibleUrl);
+    assert.ok(String(eligibleUrl).includes('business_day=2026-09-19'));
+  });
+
   it('does not delete when payouts fail (retry via visibility timeout)', async () => {
     let deleted = false;
     let receives = 0;

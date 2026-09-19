@@ -22,6 +22,17 @@ function closePeriodFor(value) {
   return eatDate(anchor);
 }
 
+const BUSINESS_DAY_RE = /^\d{4}-\d{2}-\d{2}$/;
+
+/** Production default is previous EAT day; evidence/manual close may pass businessDay explicitly. */
+function resolveClosePeriod({ scheduledAt, businessDay } = {}) {
+  const override = String(businessDay ?? '').trim();
+  if (override && BUSINESS_DAY_RE.test(override)) {
+    return override;
+  }
+  return closePeriodFor(scheduledAt);
+}
+
 function parseTenantIds(raw) {
   return String(raw || '')
     .split(',')
@@ -104,12 +115,13 @@ async function runDailyClose({
   commissionToken,
   tenantIds,
   scheduledAt,
+  businessDay,
   logger = console,
 } = {}) {
   if (!paymentsToken || !commissionToken) {
     throw new Error('PAYMENTS_SERVICE_TOKEN and COMMISSION_SERVICE_TOKEN are required');
   }
-  const period = closePeriodFor(scheduledAt);
+  const period = resolveClosePeriod({ scheduledAt, businessDay });
   const tenants = Array.isArray(tenantIds) ? tenantIds : parseTenantIds(tenantIds);
   if (tenants.length === 0) {
     throw new Error('COMMISSION_TENANT_IDS is empty');
@@ -145,6 +157,7 @@ async function runDailyClose({
 module.exports = {
   eatDate,
   closePeriodFor,
+  resolveClosePeriod,
   parseTenantIds,
   groupByAgent,
   runDailyClose,
