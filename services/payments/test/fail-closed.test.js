@@ -96,9 +96,16 @@ describe('service tokens fail closed', () => {
   });
 
   it('callbacks fail closed when no signing secret is configured', async () => {
-    const { app: noSecret, mpesa, pos: pos2 } = createTestApp({
-      appOptions: { callbackSecret: null },
-    });
+    const savedSecret = process.env.DARAJA_CALLBACK_SECRET;
+    delete process.env.DARAJA_CALLBACK_SECRET;
+    let built;
+    try {
+      built = createTestApp({ appOptions: { callbackSecret: null } });
+    } finally {
+      if (savedSecret === undefined) delete process.env.DARAJA_CALLBACK_SECRET;
+      else process.env.DARAJA_CALLBACK_SECRET = savedSecret;
+    }
+    const { app: noSecret, mpesa, pos: pos2 } = built;
     const { payment } = await startCharge(noSecret, pos2, { key: 'nosecret' });
     const body = mpesa.buildCallback(payment.checkout_request_id);
 
