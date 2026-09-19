@@ -9,9 +9,10 @@ Golden path every backend service extends. Owned by Yordanos (Platform).
   Downstream services `FROM` a tagged build of this base image.
 - `otel-bootstrap.js` — Node autoinstrumentation. Requires it before any
   application code so incoming HTTP + outgoing pg/redis calls get spans.
-- `alerts/slack-notify.sh` — small helper the runbook uses. Pulls the
-  webhook from Secrets Manager and posts a formatted alert. Owned in
-  practice by Saloi; lives here so every service has the same helper.
+- `alerts/slack-notify.sh` — posts the Slack alert contract from
+  [`docs/runbook.md`](../../docs/runbook.md). Pulls the webhook from
+  Secrets Manager. Owned in practice by Saloi; lives here so Lambda
+  and every service emit the same fields.
 
 ## Rules
 

@@ -2,7 +2,7 @@
 
 Targets may change only before final benchmarking, with a written rationale.
 
-These SLIs, targets, and 28-day error budgets will be wired into Grafana panels at G3.
+These SLIs, targets, and 28-day error budgets will be wired into Grafana panels at G3 ([ADR-005](adrs/ADR-005-observability.md)). Pager mapping: [alerts.md](alerts.md). First safe action: [runbook.md](runbook.md).
 
 Invalid requests and genuine business declines are excludable. Dependency outages during a real user journey are **not** excludable.
 

@@ -27,7 +27,7 @@ Web → API Gateway → VPC Link → ALB → POS / Payments / Commission on ECS 
 
 See [`docs/architecture.md`](docs/architecture.md) for the diagram, service boundaries, sale→pay→callback, and daily-close→B2C flows.
 
-## Key docs (G0)
+## Key docs
 
 | Doc | Purpose |
 |---|---|
@@ -35,9 +35,14 @@ See [`docs/architecture.md`](docs/architecture.md) for the diagram, service boun
 | [docs/architecture.md](docs/architecture.md) | System diagram and flows |
 | [docs/threat-model.md](docs/threat-model.md) | STRIDE + payment abuse cases |
 | [docs/slo-error-budgets.md](docs/slo-error-budgets.md) | Draft SLIs / budgets |
+| [docs/runbook.md](docs/runbook.md) | On-call, Slack contract, first safe action per alert |
+| [docs/alerts.md](docs/alerts.md) | Alarm table (SLI, threshold, runbook anchor) |
+| [docs/game-day.md](docs/game-day.md) | G4 drills: STK timeout, callback replay, cache, worker, bad release, RDS restore |
 | [docs/adrs/ADR-001-region-and-naming.md](docs/adrs/ADR-001-region-and-naming.md) | Region `eu-central-1`, prefix `devops-g10-` |
 | [docs/adr-001-tenant-sale-data-model.md](docs/adr-001-tenant-sale-data-model.md) | Tenant / sale model |
 | [docs/adrs/ADR-002-idempotency-and-replay-safety.md](docs/adrs/ADR-002-idempotency-and-replay-safety.md) | Idempotency and replay |
+| [docs/adrs/ADR-005-observability.md](docs/adrs/ADR-005-observability.md) | Amazon Managed Grafana, not self-hosted |
+| [docs/platform-asks-g2.md](docs/platform-asks-g2.md) | Reliability → Yordanos: probe, Grafana, Slack stub |
 | [docs/naming.md](docs/naming.md) | Resource naming examples |
 
 ## Repo layout
