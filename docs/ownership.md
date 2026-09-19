@@ -20,6 +20,7 @@ area's PRs.
 | `docs/threat-model.md` | Arsema |
 | `docs/slo-error-budgets.md` | Saloi |
 | Tenant / sale data model ADR | Berissa |
+| Commission close worker (`services/commission/`) | Berissa |
 | ADR-001 region + naming | Yordanos |
 | ADR-002 idempotency + replay | Arsema |
 | ADR-003 platform data services | Yordanos |

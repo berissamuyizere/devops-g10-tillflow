@@ -29,8 +29,8 @@
 /docs/runbook.md                            @akezasaloi
 /evidence/reliability-operations/           @akezasaloi
 
-# Commission worker: platform owns the ECS/SQS actor; money path dual-reviews
-/services/commission/                       @yordanoshagos @arsemagebremichael @berissamuyizere
+# Commission close worker — Berissa (eligibility + EAT business-day close logic)
+/services/commission/                       @berissamuyizere
 /services/_shared/mpesa/                    @arsemagebremichael @yordanoshagos
 
 # Cross-cutting docs — all four should review

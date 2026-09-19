@@ -1,10 +1,17 @@
 const { describe, it } = require('node:test');
 const assert = require('node:assert/strict');
-const { eatDate, groupByAgent, runDailyClose } = require('../src/close');
+const { eatDate, closePeriodFor, groupByAgent, runDailyClose } = require('../src/close');
 
 describe('commission close', () => {
   it('formats the EAT business day', () => {
     assert.equal(eatDate('2026-09-18T20:45:00.000Z'), '2026-09-18');
+  });
+
+  it('closes the previous EAT day so sales after 23:45 still earn commission', () => {
+    // Job at 23:45 EAT on 19 Sep pays out 18 Sep (includes sales paid 23:45–midnight on 18).
+    assert.equal(closePeriodFor('2026-09-19T20:45:00.000Z'), '2026-09-18');
+    // Job at 01:00 EAT on 20 Sep pays out 19 Sep (full prior calendar day).
+    assert.equal(closePeriodFor('2026-09-19T22:00:00.000Z'), '2026-09-19');
   });
 
   it('groups eligible sales by attendant', () => {
@@ -66,15 +73,17 @@ describe('commission close', () => {
       scheduledAt: '2026-09-18T20:45:00.000Z',
     });
 
-    assert.equal(out.period, '2026-09-18');
+    assert.equal(out.period, '2026-09-17');
     assert.equal(out.payouts.length, 1);
     assert.equal(out.payouts[0].replay, true);
     assert.equal(calls.length, 2);
+    const eligibleCall = calls[0];
+    assert.ok(String(eligibleCall.url).includes('business_day=2026-09-17'));
     const payoutCall = calls[1];
     assert.equal(payoutCall.init.headers['x-commission-token'], 'comm-token');
     assert.equal(
       payoutCall.init.headers['idempotency-key'],
-      '22222222-2222-2222-2222-222222222222:2026-09-18'
+      '22222222-2222-2222-2222-222222222222:2026-09-17'
     );
     assert.ok(!JSON.stringify(calls).toLowerCase().includes('daraja'));
   });
