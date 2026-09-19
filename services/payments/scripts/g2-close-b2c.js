@@ -39,10 +39,14 @@ function xrayTraceId() {
   return Math.floor(Date.now() / 1000).toString(16).padStart(8, '0') + randomBytes(12).toString('hex');
 }
 
-async function sendCloseMessage(scheduledAt) {
+async function sendCloseMessage(scheduledAt, businessDay) {
   const { SQSClient, SendMessageCommand } = require('@aws-sdk/client-sqs');
   const client = new SQSClient({ region: AWS_REGION });
-  const body = JSON.stringify({ type: 'commission.daily-close', scheduled_at: scheduledAt });
+  const body = JSON.stringify({
+    type: 'commission.daily-close',
+    scheduled_at: scheduledAt,
+    business_day: businessDay,
+  });
   const out = await client.send(
     new SendMessageCommand({ QueueUrl: SQS_QUEUE_URL, MessageBody: body })
   );
@@ -171,6 +175,7 @@ async function main() {
     const payload = JSON.stringify({
       type: 'commission.daily-close',
       scheduled_at: new Date().toISOString(),
+      business_day: period,
     });
     console.log('2. trigger the daily close from the SQS console');
     console.log('   Queue: devops-g10-commission-close -> Send and receive messages');
@@ -186,7 +191,7 @@ async function main() {
     );
   } else if (SQS_QUEUE_URL) {
     console.log('2. trigger the daily close via SQS (deployed worker consumes it)');
-    messageId = await sendCloseMessage(new Date().toISOString());
+    messageId = await sendCloseMessage(new Date().toISOString(), period);
     console.log(`   sent commission.daily-close message ${messageId}`);
     ledger = await waitForPayout(commissionHeaders, ATTENDANT_ID, period, runStartedAt);
     check('the deployed worker created the payout', Boolean(ledger.id), true);
@@ -204,6 +209,7 @@ async function main() {
       commissionToken: COMMISSION_TOKEN,
       tenantIds: [TENANT_ID],
       scheduledAt: new Date().toISOString(),
+      businessDay: period,
       logger: { info: () => {}, warn: () => {}, error: () => {} },
     });
     const payout = (close.payouts || []).find(
@@ -232,7 +238,7 @@ async function main() {
     const replayed = await lookupPayout(commissionHeaders, ATTENDANT_ID, period);
     check('replayed close returns the same payout', replayed?.id, ledgerId);
   } else if (SQS_QUEUE_URL) {
-    await sendCloseMessage(new Date().toISOString());
+    await sendCloseMessage(new Date().toISOString(), period);
     await new Promise((r) => setTimeout(r, CLOSE_POLL_MS * 3));
     const replayed = await lookupPayout(commissionHeaders, ATTENDANT_ID, period);
     check('replayed close returns the same payout', replayed?.id, ledgerId);
@@ -244,6 +250,7 @@ async function main() {
       commissionToken: COMMISSION_TOKEN,
       tenantIds: [TENANT_ID],
       scheduledAt: new Date().toISOString(),
+      businessDay: period,
       logger: { info: () => {}, warn: () => {}, error: () => {} },
     });
     const replayPayout = (closeAgain.payouts || []).find(
@@ -396,6 +403,7 @@ async function main() {
 
   console.log(`\n${failures === 0 ? 'ALL CHECKS PASSED' : `${failures} CHECK(S) FAILED`}`);
   console.log(`evidence written to ${outFile}`);
+  console.log('EVIDENCE_JSON ' + JSON.stringify(evidence));
   console.log(`X-Ray trace id: 1-${traceId.slice(0, 8)}-${traceId.slice(8)}\n`);
   process.exit(failures === 0 ? 0 : 1);
 }
