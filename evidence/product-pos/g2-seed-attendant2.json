@@ -1,0 +1,24 @@
+{
+  "captured_at": "2026-09-19T06:43:43.000Z",
+  "method": "ecs run-task devops-g10-db-bootstrap with psql as RDS master (container override)",
+  "task_arn": "arn:aws:ecs:eu-central-1:240462142849:task/devops-g10/f7dd65fdcfe8423dbfaaf6fc6d4fbd95",
+  "exit_code": 0,
+  "tenant": {
+    "id": "11111111-1111-1111-1111-111111111111",
+    "name": "Demo Café"
+  },
+  "user": {
+    "id": "33333333-3333-3333-3333-333333333333",
+    "email": "demo2@tillflow.dev"
+  },
+  "attendant": {
+    "id": "33333333-3333-3333-3333-333333333333",
+    "tenant_id": "11111111-1111-1111-1111-111111111111",
+    "display_name": "Demo Attendant 2",
+    "payout_msisdn": "254700000000",
+    "commission_bps": 500,
+    "status": "active",
+    "role": "attendant"
+  },
+  "notes": "For Arsema G2 close: use ATTENDANT_ID=33333333-3333-3333-3333-333333333333 in g2-close-seed.js. Do not delete 2222… ledger for 2026-09-18."
+}
