@@ -6,6 +6,7 @@ Runtime proof for the POS sale path and commission eligibility.
 |---|---|
 | `g2-seed.json` | Demo tenant + attendant **2222…** seeded on live RDS |
 | `g2-seed-attendant2.json` | Second demo attendant **3333…** (rows read back from RDS after seed) |
+| `g2-seed-44444444.json` | Third demo attendant **4444…**, used for the SQS-triggered close evidence |
 | `g2-close-eligible-YYYY-MM-DD.json` | Paid sales for an EAT business day appear in `GET /internal/v1/commission/eligible` with `payout_msisdn` and `commission_bps`; unpaid sales excluded |
 
 ## Reproduce close eligibility (G2)
@@ -51,3 +52,24 @@ npm run g2:close-seed
 ```
 
 Do **not** delete existing payout ledger rows for 2222….
+
+## Seeding further attendants
+
+The runner is parameterised, so a fresh agent-period can be created without
+editing SQL. **3333…** was already spent on a disbursed payout for 2026-09-19,
+so the SQS-triggered close evidence used **4444…**:
+
+```bash
+export ATTENDANT_ID=44444444-4444-4444-4444-444444444444
+export ATTENDANT_EMAIL=demo3@tillflow.dev
+export ATTENDANT_NAME="Demo Attendant 3"
+cd services/pos && npm run g2:seed-attendant2
+```
+
+Evidence lands in `g2-seed-<first-uuid-block>.json`, so re-seeding one
+attendant never overwrites another's proof. Inserts are `ON CONFLICT DO
+NOTHING`, so re-running is safe.
+
+A payout ledger row is unique per `agent_id + period`, so **each live close
+proof needs an attendant that has no payout for that EAT day** — either a new
+attendant or the next business day.
