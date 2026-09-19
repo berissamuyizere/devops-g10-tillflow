@@ -120,6 +120,33 @@ async function main() {
   const period = eatDate(new Date());
 
   const commissionHeaders = trace({ 'x-commission-token': COMMISSION_TOKEN });
+
+  const preflight = await fetch(
+    `${PAYMENTS}/internal/v1/payouts/by-agent-period?agent_id=${ATTENDANT_ID}&period=${period}`,
+    { headers: commissionHeaders }
+  );
+  if (preflight.status === 200) {
+    const existing = await preflight.json();
+    if (existing.status === 'disbursed' || existing.status === 'failed') {
+      console.error(`\nagent ${ATTENDANT_ID} already has a ${existing.status} payout for ${period}.`);
+      console.error('payout_ledger is unique per (agent_id, period), so a close for this');
+      console.error('agent-period returns the existing row and the run cannot prove');
+      console.error('"disbursing before the result callback".\n');
+      console.error('Options:');
+      console.error('  - run on the next Africa/Nairobi business day, or');
+      console.error('  - set ATTENDANT_ID to a different seeded attendant in this tenant.\n');
+      console.error(`existing ledger: ${existing.id} (${existing.status})`);
+      process.exit(2);
+    }
+    console.log(`  note: resuming an existing ${existing.status} payout ${existing.id}`);
+  } else if (preflight.status !== 404) {
+    console.error(
+      `\npreflight lookup returned ${preflight.status}. If this is 500, the deployed Payments`
+    );
+    console.error('does not have GET /internal/v1/payouts/by-agent-period yet.\n');
+    process.exit(2);
+  }
+
   const manual = CLOSE_TRIGGER === 'manual';
   const triggeredVia = manual ? 'sqs_manual' : SQS_QUEUE_URL ? 'sqs' : 'in_process';
   let ledger;
@@ -154,9 +181,12 @@ async function main() {
       scheduledAt: new Date().toISOString(),
       logger: { info: () => {}, warn: () => {}, error: () => {} },
     });
-    const payout = (close.payouts || []).find((p) => p.ledger && p.ledger.id);
+    const payout = (close.payouts || []).find(
+      (p) => p.ledger && p.ledger.id && p.ledger.agent_id === ATTENDANT_ID
+    );
     if (!payout) {
-      console.error('close produced no payout — is there a paid sale for today (EAT)?');
+      console.error(`close produced no payout for agent ${ATTENDANT_ID}.`);
+      console.error('is there a paid sale for this attendant today (EAT)?');
       console.error(JSON.stringify(close, null, 2));
       process.exit(2);
     }
@@ -191,7 +221,9 @@ async function main() {
       scheduledAt: new Date().toISOString(),
       logger: { info: () => {}, warn: () => {}, error: () => {} },
     });
-    const replayPayout = (closeAgain.payouts || []).find((p) => p.ledger && p.ledger.id);
+    const replayPayout = (closeAgain.payouts || []).find(
+      (p) => p.ledger && p.ledger.id && p.ledger.agent_id === ATTENDANT_ID
+    );
     check('replayed close returns the same payout', replayPayout?.ledger?.id, ledgerId);
   }
 
