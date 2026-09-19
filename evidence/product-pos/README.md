@@ -4,7 +4,8 @@ Runtime proof for the POS sale path and commission eligibility.
 
 | File | What it proves |
 |---|---|
-| `g2-seed.json` | Demo tenant + attendant seeded on live RDS (fixed UUIDs) |
+| `g2-seed.json` | Demo tenant + attendant **2222…** seeded on live RDS |
+| `g2-seed-attendant2.json` | Second demo attendant **3333…** for Arsema's live close (no collision with 2222… / 2026-09-18 ledger) |
 | `g2-close-eligible-YYYY-MM-DD.json` | Paid sales for today's EAT business day appear in `GET /internal/v1/commission/eligible` with `payout_msisdn` and `commission_bps`; unpaid sales excluded |
 
 ## Reproduce close eligibility (G2)
@@ -25,3 +26,24 @@ node services/pos/scripts/g2-close-seed.js
 ```
 
 Writes `g2-close-eligible-<today-EAT>.json` in this folder.
+
+## Seed second demo attendant (for Arsema close)
+
+Agent **2222…** is already closed for **2026-09-18** (ledger in merged evidence).
+Arsema needs attendant **3333…** so her live ECS close does not collide on
+`(agent_id, EAT period)`.
+
+```bash
+# SSO profile g10 (AkiraChix 240462142849) — browser login alone is not enough
+aws sso login --profile g10
+export AWS_PROFILE=g10
+cd services/pos && npm run g2:seed-attendant2
+```
+
+Writes `g2-seed-attendant2.json`. Then tell Arsema to run `g2-close-seed` with:
+
+```bash
+export ATTENDANT_ID=33333333-3333-3333-3333-333333333333
+```
+
+Do **not** delete the existing 2026-09-18 ledger row for 2222….
