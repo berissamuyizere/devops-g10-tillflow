@@ -1,6 +1,12 @@
 const { describe, it } = require('node:test');
 const assert = require('node:assert/strict');
-const { eatDate, closePeriodFor, groupByAgent, runDailyClose } = require('../src/close');
+const {
+  eatDate,
+  closePeriodFor,
+  resolveClosePeriod,
+  groupByAgent,
+  runDailyClose,
+} = require('../src/close');
 
 describe('commission close', () => {
   it('formats the EAT business day', () => {
@@ -33,6 +39,32 @@ describe('commission close', () => {
     ]);
     assert.equal(groups.length, 1);
     assert.deepEqual(groups[0].sales, ['s1', 's2']);
+  });
+
+  it('uses businessDay override when provided (evidence / manual close)', async () => {
+    const calls = [];
+    const fetchImpl = async (url) => {
+      calls.push({ url });
+      if (String(url).includes('/commission/eligible')) {
+        return { ok: true, status: 200, json: async () => ({ sales: [] }) };
+      }
+      return { ok: true, status: 201, json: async () => ({ id: 'ledger-1', status: 'disbursing' }) };
+    };
+
+    const out = await runDailyClose({
+      fetchImpl,
+      posBaseUrl: 'http://pos.example',
+      paymentsBaseUrl: 'http://pay.example',
+      paymentsToken: 'pay-token',
+      commissionToken: 'comm-token',
+      tenantIds: ['t1'],
+      scheduledAt: '2026-09-19T20:45:00.000Z',
+      businessDay: '2026-09-19',
+    });
+
+    assert.equal(resolveClosePeriod({ scheduledAt: '2026-09-19T20:45:00.000Z' }), '2026-09-18');
+    assert.equal(out.period, '2026-09-19');
+    assert.ok(String(calls[0].url).includes('business_day=2026-09-19'));
   });
 
   it('calls Payments once per agent and treats 200 as replay', async () => {
