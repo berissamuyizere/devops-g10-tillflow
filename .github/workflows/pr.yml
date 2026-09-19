@@ -231,6 +231,9 @@ jobs:
             && 'postgres://payments:payments@127.0.0.1:5434/tillflow_payments'
             || 'postgres://pos:pos@127.0.0.1:5433/tillflow_pos' }}
           PAYMENTS_SERVICE_TOKEN: dev-payments-token
+          POS_SERVICE_TOKEN: dev-pos-token
+          COMMISSION_SERVICE_TOKEN: dev-commission-token
+          DARAJA_CALLBACK_SECRET: dev-callback-secret
           MPESA_MODE: fake
         run: npm test --if-present
 
@@ -240,6 +243,9 @@ jobs:
           DATABASE_URL: postgres://payments:payments@127.0.0.1:5434/tillflow_payments
           POS_DATABASE_URL: postgres://pos:pos@127.0.0.1:5433/tillflow_pos
           PAYMENTS_SERVICE_TOKEN: dev-payments-token
+          POS_SERVICE_TOKEN: dev-pos-token
+          COMMISSION_SERVICE_TOKEN: dev-commission-token
+          DARAJA_CALLBACK_SECRET: dev-callback-secret
           MPESA_MODE: fake
         run: npm run test:contract
 

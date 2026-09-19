@@ -23,7 +23,7 @@ function createApp(options = {}) {
   const ENVIRONMENT = options.environment || process.env.DEPLOYMENT_ENVIRONMENT || 'prod';
   const STARTED_AT = options.startedAt || new Date().toISOString();
   const CALLBACK_SECRET =
-    options.callbackSecret || process.env.DARAJA_CALLBACK_SECRET || 'dev-callback-secret';
+    options.callbackSecret || (process.env.DARAJA_CALLBACK_SECRET || '').trim() || null;
   const CALLBACK_URL =
     options.callbackUrl || process.env.DARAJA_CALLBACK_URL || 'https://localhost/payments/callback';
 
@@ -190,6 +190,10 @@ function createApp(options = {}) {
   });
 
   app.post('/payments/callback', async (req, res) => {
+    if (!CALLBACK_SECRET) {
+      req.log.error({ env: 'DARAJA_CALLBACK_SECRET' }, 'callback_secret_not_configured');
+      return res.status(500).json({ error: 'misconfigured', hint: 'DARAJA_CALLBACK_SECRET is not set' });
+    }
     try {
       const result = await callbacks.handleCallback(database, pos, {
         rawBody: req.rawBody ?? JSON.stringify(req.body ?? {}),
@@ -218,6 +222,25 @@ function createApp(options = {}) {
       });
 
       if (!recorded.created) {
+        if (recorded.ledger.status === payoutsService.LEDGER_STATUSES.PENDING) {
+          const resumed = await payoutsService.disburse(database, mpesa, recorded.ledger.id);
+          req.log.warn(
+            {
+              ledger_id: recorded.ledger.id,
+              agent_id: body.agent_id,
+              period: body.period,
+              reason: resumed.reason,
+            },
+            'payout_resumed_from_pending'
+          );
+          return res.status(200).json({
+            ...resumed.ledger,
+            replay: true,
+            resumed: true,
+            disburse_reason: resumed.reason,
+          });
+        }
+
         req.log.info(
           { ledger_id: recorded.ledger.id, agent_id: body.agent_id, period: body.period },
           'payout_replay_noop'
@@ -242,6 +265,10 @@ function createApp(options = {}) {
   });
 
   app.post('/payments/b2c/callback', async (req, res) => {
+    if (!CALLBACK_SECRET) {
+      req.log.error({ env: 'DARAJA_CALLBACK_SECRET' }, 'callback_secret_not_configured');
+      return res.status(500).json({ error: 'misconfigured', hint: 'DARAJA_CALLBACK_SECRET is not set' });
+    }
     try {
       const result = await payoutCallbacks.handleB2cResultCallback(database, {
         rawBody: req.rawBody ?? JSON.stringify(req.body ?? {}),
