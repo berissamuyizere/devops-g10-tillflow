@@ -1,11 +1,12 @@
 # services/commission
 
-TillFlow Commission **close worker**. Dual review: Berissa (eligibility) +
-Arsema (payouts). Platform wiring: Yordanos.
+TillFlow Commission **close worker** (DRI: Berissa — see `CODEOWNERS`).
+Platform wiring (ECS/SQS/EventBridge): Yordanos.
 
 **Commission never calls Daraja.** It long-polls SQS
-`devops-g10-commission-close` (EventBridge 23:45 EAT), asks POS who is
-eligible, and asks Payments to disburse via `POST /internal/v1/payouts`.
+`devops-g10-commission-close` (EventBridge 23:45 EAT → **01:00 EAT** after
+platform resubmission), asks POS who is eligible for the **previous EAT
+business day**, and asks Payments to disburse via `POST /internal/v1/payouts`.
 
 No public ALB. Probes are local (`/health` on :8080) for ECS.
 
@@ -21,3 +22,20 @@ No public ALB. Probes are local (`/health` on :8080) for ECS.
 | `COMMISSION_TENANT_IDS` | Comma-separated tenant UUIDs |
 
 No `DARAJA_*`. B2C timeout / result callback live in Payments.
+
+SQS message shape (production):
+
+```json
+{ "type": "commission.daily-close", "scheduled_at": "2026-09-19T20:45:00.000Z" }
+```
+
+Optional `business_day` (`YYYY-MM-DD`, EAT) for evidence/manual close — closes
+that day instead of the default previous day:
+
+```json
+{
+  "type": "commission.daily-close",
+  "scheduled_at": "2026-09-19T20:45:00.000Z",
+  "business_day": "2026-09-19"
+}
+```

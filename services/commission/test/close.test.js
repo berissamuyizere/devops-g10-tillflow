@@ -1,10 +1,23 @@
 const { describe, it } = require('node:test');
 const assert = require('node:assert/strict');
-const { eatDate, groupByAgent, runDailyClose } = require('../src/close');
+const {
+  eatDate,
+  closePeriodFor,
+  resolveClosePeriod,
+  groupByAgent,
+  runDailyClose,
+} = require('../src/close');
 
 describe('commission close', () => {
   it('formats the EAT business day', () => {
     assert.equal(eatDate('2026-09-18T20:45:00.000Z'), '2026-09-18');
+  });
+
+  it('closes the previous EAT day so sales after 23:45 still earn commission', () => {
+    // Job at 23:45 EAT on 19 Sep pays out 18 Sep (includes sales paid 23:45–midnight on 18).
+    assert.equal(closePeriodFor('2026-09-19T20:45:00.000Z'), '2026-09-18');
+    // Job at 01:00 EAT on 20 Sep pays out 19 Sep (full prior calendar day).
+    assert.equal(closePeriodFor('2026-09-19T22:00:00.000Z'), '2026-09-19');
   });
 
   it('groups eligible sales by attendant', () => {
@@ -26,6 +39,32 @@ describe('commission close', () => {
     ]);
     assert.equal(groups.length, 1);
     assert.deepEqual(groups[0].sales, ['s1', 's2']);
+  });
+
+  it('uses businessDay override when provided (evidence / manual close)', async () => {
+    const calls = [];
+    const fetchImpl = async (url) => {
+      calls.push({ url });
+      if (String(url).includes('/commission/eligible')) {
+        return { ok: true, status: 200, json: async () => ({ sales: [] }) };
+      }
+      return { ok: true, status: 201, json: async () => ({ id: 'ledger-1', status: 'disbursing' }) };
+    };
+
+    const out = await runDailyClose({
+      fetchImpl,
+      posBaseUrl: 'http://pos.example',
+      paymentsBaseUrl: 'http://pay.example',
+      paymentsToken: 'pay-token',
+      commissionToken: 'comm-token',
+      tenantIds: ['t1'],
+      scheduledAt: '2026-09-19T20:45:00.000Z',
+      businessDay: '2026-09-19',
+    });
+
+    assert.equal(resolveClosePeriod({ scheduledAt: '2026-09-19T20:45:00.000Z' }), '2026-09-18');
+    assert.equal(out.period, '2026-09-19');
+    assert.ok(String(calls[0].url).includes('business_day=2026-09-19'));
   });
 
   it('calls Payments once per agent and treats 200 as replay', async () => {
@@ -66,15 +105,17 @@ describe('commission close', () => {
       scheduledAt: '2026-09-18T20:45:00.000Z',
     });
 
-    assert.equal(out.period, '2026-09-18');
+    assert.equal(out.period, '2026-09-17');
     assert.equal(out.payouts.length, 1);
     assert.equal(out.payouts[0].replay, true);
     assert.equal(calls.length, 2);
+    const eligibleCall = calls[0];
+    assert.ok(String(eligibleCall.url).includes('business_day=2026-09-17'));
     const payoutCall = calls[1];
     assert.equal(payoutCall.init.headers['x-commission-token'], 'comm-token');
     assert.equal(
       payoutCall.init.headers['idempotency-key'],
-      '22222222-2222-2222-2222-222222222222:2026-09-18'
+      '22222222-2222-2222-2222-222222222222:2026-09-17'
     );
     assert.ok(!JSON.stringify(calls).toLowerCase().includes('daraja'));
   });

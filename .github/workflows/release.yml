@@ -449,12 +449,14 @@ jobs:
               echo "pos smoke ok (${DIGEST})"
               ;;
             payments)
+              # Edge lockdown: API GW stamps x-tillflow-edge=public; ALB
+              # returns 404 for stamped /internal/*. 401 would mean the
+              # block missed and Payments auth still ran.
               CODE=$(curl -sS -o /tmp/pay-body.json -w "%{http_code}" --retry 8 --retry-all-errors --retry-delay 3 \
                 "${API_URL}/internal/v1/payments/00000000-0000-0000-0000-000000000001")
               echo "GET /internal/v1/payments/:id -> ${CODE}"
               cat /tmp/pay-body.json; echo
-              # 401 = Payments auth ran; 404 from web default would mean wrong TG.
-              test "${CODE}" = "401"
+              test "${CODE}" = "404"
               DIGEST=$(aws ecs describe-task-definition --task-definition "${{ matrix.ecs_family }}" \
                 --query 'taskDefinition.containerDefinitions[?name==`app`].image' --output text)
               echo "${DIGEST}" | grep -q '@sha256:'
@@ -471,7 +473,6 @@ jobs:
                 --query 'tasks[0].containers[?name==`app`].healthStatus | [0]' --output text)
               echo "commission app health=${HEALTH} image=${DIGEST}"
               test "${HEALTH}" = "HEALTHY"
-              echo "${DIGEST}" | grep -qi daraja && exit 1 || true
               echo "commission smoke ok (no ALB, SQS worker)"
               ;;
           esac

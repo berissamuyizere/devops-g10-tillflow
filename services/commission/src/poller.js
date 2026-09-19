@@ -50,6 +50,7 @@ function startPoller({
             commissionToken,
             tenantIds,
             scheduledAt: payload.scheduled_at,
+            businessDay: payload.business_day,
             logger,
           });
           await client.send(
