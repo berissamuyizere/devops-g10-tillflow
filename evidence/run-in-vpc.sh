@@ -73,7 +73,6 @@ echo "internal ALB ${INTERNAL}" >&2
 OVERRIDES=$(jq -n \
   --arg script "${SCRIPT}" \
   --arg internal "${INTERNAL}" \
-  --args -- "$@" \
   '
   def kv: split("=") | {name: .[0], value: (.[1:] | join("="))};
   ($ARGS.positional | map(kv)) as $user
@@ -86,14 +85,9 @@ OVERRIDES=$(jq -n \
     ]
     | map(select(.name as $n | ($names | index($n)) | not))
     | . + $user
-  | {
-      containerOverrides: [{
-        name: "app",
-        command: ["node", $script],
-        environment: .
-      }]
-    }
-  ')
+  | {containerOverrides: [{name: "app", command: ["node", $script], environment: .}]}
+  ' \
+  --args "$@")
 
 echo "run-task ${FAMILY} node ${SCRIPT}" >&2
 TASK_ARN=$(aws ecs run-task \
