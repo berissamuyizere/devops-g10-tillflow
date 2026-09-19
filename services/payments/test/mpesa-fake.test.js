@@ -142,7 +142,7 @@ describe('client selection', () => {
   it('refuses to build a real client instead of silently reaching Safaricom', () => {
     assert.throws(
       () => createMpesaClient({ mode: 'daraja' }),
-      (err) => err.code === 'MPESA_MODE_UNAVAILABLE'
+      (err) => err.code === 'MPESA_CONFIG_INVALID'
     );
     assert.throws(
       () => createMpesaClient({ mode: 'nonsense' }),
