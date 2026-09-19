@@ -1,0 +1,142 @@
+{
+  "captured_at": "2026-09-19T08:25:43.569Z",
+  "invariants": [
+    "daily close creates one payout ledger row per agent per period",
+    "daraja acceptance (responseCode 0) is not disbursement",
+    "only the B2C result callback sets disbursed",
+    "a replayed close creates no second ledger row and no second B2C",
+    "a B2C timeout stays disbursing, never pending, never disbursed"
+  ],
+  "trace_id": "6aae46f2a5157a0790907ef621e5b4a8",
+  "xray_trace_id": "1-6aae46f2-a5157a0790907ef621e5b4a8",
+  "traceparent": "00-6aae46f2a5157a0790907ef621e5b4a8-70ba02038d2b4349-01",
+  "pos_base_url": "https://f9nla14lfh.execute-api.eu-central-1.amazonaws.com",
+  "payments_base_url": "https://f9nla14lfh.execute-api.eu-central-1.amazonaws.com",
+  "mpesa_mode": "fake",
+  "triggered_via": "sqs_manual",
+  "sqs_message_id": null,
+  "period": "2026-09-19",
+  "sale_id": "770917fd-b225-4abc-86ab-e976c435728f",
+  "payment_id": "d8024b6c-396c-4a90-98ba-07bd25167473",
+  "ledger_id": "f1713add-c5ae-4f4c-a2e9-05c2eb223a84",
+  "originator_conversation_id": "tillflow-33333333-3333-3333-3333-333333333333-2026-09-19",
+  "b2c_transaction_id": "TX-600145654DD6",
+  "timeout_ledger_id": "28ab7910-7ce3-4193-9b7d-b6d4bca7fd4f",
+  "checks": [
+    {
+      "check": "sale created",
+      "ok": true,
+      "actual": 201,
+      "expected": 201
+    },
+    {
+      "check": "charge accepted",
+      "ok": true,
+      "actual": 201,
+      "expected": 201
+    },
+    {
+      "check": "sale is paid",
+      "ok": true,
+      "actual": "paid",
+      "expected": "paid"
+    },
+    {
+      "check": "the deployed worker created the payout",
+      "ok": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "check": "status is disbursing, not disbursed",
+      "ok": true,
+      "actual": "disbursing",
+      "expected": "disbursing"
+    },
+    {
+      "check": "nothing disbursed before the result callback",
+      "ok": true,
+      "actual": null,
+      "expected": null
+    },
+    {
+      "check": "replayed close returns the same payout",
+      "ok": true,
+      "actual": "f1713add-c5ae-4f4c-a2e9-05c2eb223a84",
+      "expected": "f1713add-c5ae-4f4c-a2e9-05c2eb223a84"
+    },
+    {
+      "check": "still disbursing after the replayed close",
+      "ok": true,
+      "actual": "disbursing",
+      "expected": "disbursing"
+    },
+    {
+      "check": "result callback accepted",
+      "ok": true,
+      "actual": 200,
+      "expected": 200
+    },
+    {
+      "check": "payout disbursed only after the result callback",
+      "ok": true,
+      "actual": "disbursed",
+      "expected": "disbursed"
+    },
+    {
+      "check": "disbursed_at is set",
+      "ok": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "check": "b2c transaction recorded",
+      "ok": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "check": "replayed result callback is a no-op",
+      "ok": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "check": "disbursed_at did not move",
+      "ok": true,
+      "actual": "2026-09-19T08:25:41.439Z",
+      "expected": "2026-09-19T08:25:41.439Z"
+    },
+    {
+      "check": "timeout payout is disbursing",
+      "ok": true,
+      "actual": "disbursing",
+      "expected": "disbursing"
+    },
+    {
+      "check": "timeout payout is never pending",
+      "ok": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "check": "timeout payout is never disbursed",
+      "ok": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "check": "replayed timeout close returns the same payout",
+      "ok": true,
+      "actual": "28ab7910-7ce3-4193-9b7d-b6d4bca7fd4f",
+      "expected": "28ab7910-7ce3-4193-9b7d-b6d4bca7fd4f"
+    },
+    {
+      "check": "replayed timeout close is flagged a replay",
+      "ok": true,
+      "actual": true,
+      "expected": true
+    }
+  ],
+  "passed": true
+}

@@ -12,7 +12,8 @@
     "lint": "eslint .",
     "test:contract": "node --test --test-concurrency=1 test/*.contract.js",
     "evidence:g2": "node scripts/g2-happy-path.js",
-    "evidence:timeout": "node scripts/g2-timeout.js"
+    "evidence:timeout": "node scripts/g2-timeout.js",
+    "evidence:close": "node scripts/g2-close-b2c.js"
   },
   "engines": {
     "node": ">=20.17.0"
@@ -32,6 +33,7 @@
     "pino-http": "^10.3.0"
   },
   "devDependencies": {
+    "@aws-sdk/client-sqs": "^3.700.0",
     "eslint": "^9.15.0",
     "supertest": "^7.0.0"
   },
