@@ -14,6 +14,14 @@ function eatDate(value) {
   }).format(d);
 }
 
+/** EAT business day the close pays out — always the calendar day before the job runs. */
+function closePeriodFor(value) {
+  const eatToday = eatDate(value);
+  const anchor = new Date(`${eatToday}T12:00:00+03:00`);
+  anchor.setDate(anchor.getDate() - 1);
+  return eatDate(anchor);
+}
+
 function parseTenantIds(raw) {
   return String(raw || '')
     .split(',')
@@ -101,7 +109,7 @@ async function runDailyClose({
   if (!paymentsToken || !commissionToken) {
     throw new Error('PAYMENTS_SERVICE_TOKEN and COMMISSION_SERVICE_TOKEN are required');
   }
-  const period = eatDate(scheduledAt);
+  const period = closePeriodFor(scheduledAt);
   const tenants = Array.isArray(tenantIds) ? tenantIds : parseTenantIds(tenantIds);
   if (tenants.length === 0) {
     throw new Error('COMMISSION_TENANT_IDS is empty');
@@ -136,6 +144,7 @@ async function runDailyClose({
 
 module.exports = {
   eatDate,
+  closePeriodFor,
   parseTenantIds,
   groupByAgent,
   runDailyClose,

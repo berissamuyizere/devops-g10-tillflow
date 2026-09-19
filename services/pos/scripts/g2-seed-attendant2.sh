@@ -11,14 +11,16 @@ POS_SERVICE="${POS_ECS_SERVICE:-devops-g10-pos}"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/../../.." && pwd)"
 SQL_FILE="${SCRIPT_DIR}/sql/g2-seed-attendant2.sql"
+VERIFY_SQL_FILE="${SCRIPT_DIR}/sql/g2-verify-attendant2.sql"
 EVIDENCE_FILE="${EVIDENCE_FILE:-${REPO_ROOT}/evidence/product-pos/g2-seed-attendant2.json}"
 
-if [ ! -f "${SQL_FILE}" ]; then
-  echo "missing ${SQL_FILE}" >&2
+if [ ! -f "${SQL_FILE}" ] || [ ! -f "${VERIFY_SQL_FILE}" ]; then
+  echo "missing seed or verify SQL under ${SCRIPT_DIR}/sql/" >&2
   exit 2
 fi
 
 SQL_BODY="$(cat "${SQL_FILE}")"
+VERIFY_BODY="$(cat "${VERIFY_SQL_FILE}")"
 
 PSQL_SCRIPT="$(cat <<EOS
 set -euo pipefail
@@ -29,6 +31,10 @@ psql -h "\$MASTER_HOST" -p "\$MASTER_PORT" -U "\$MASTER_USER" -d "\$MASTER_DB" \
 ${SQL_BODY}
 SQL
 echo "g2 seed attendant2 ok"
+psql -h "\$MASTER_HOST" -p "\$MASTER_PORT" -U "\$MASTER_USER" -d "\$MASTER_DB" \\
+  -v ON_ERROR_STOP=1 <<'VERIFY'
+${VERIFY_BODY}
+VERIFY
 EOS
 )"
 
@@ -62,12 +68,25 @@ EXIT="$(aws ecs describe-tasks --cluster "${CLUSTER}" --tasks "${TASK_ARN}" --re
   --query 'tasks[0].containers[0].exitCode' --output text)"
 
 echo "--- CloudWatch (last 30m) ---"
-aws logs tail "/devops-g10/db-migrate" --since 30m --region "${REGION}" \
-  --log-stream-name-prefix "bootstrap/bootstrap/${TASK_ID}" 2>&1 || true
+LOGS="$(aws logs tail "/devops-g10/db-migrate" --since 30m --region "${REGION}" \
+  --log-stream-name-prefix "bootstrap/bootstrap/${TASK_ID}" 2>&1 || true)"
+echo "${LOGS}"
 
 echo "exit=${EXIT}"
 if [ "${EXIT}" != "0" ]; then
   echo "seed failed" >&2
+  exit 1
+fi
+
+DB_EVIDENCE="$(echo "${LOGS}" | awk '/__SEED_EVIDENCE__/{getline; print; exit}')"
+if [ -z "${DB_EVIDENCE}" ]; then
+  echo "could not parse __SEED_EVIDENCE__ from CloudWatch logs" >&2
+  exit 1
+fi
+
+if ! echo "${DB_EVIDENCE}" | jq -e '.attendant.id and .user.id and .membership.role' >/dev/null 2>&1; then
+  echo "verify query returned incomplete rows:" >&2
+  echo "${DB_EVIDENCE}" >&2
   exit 1
 fi
 
@@ -78,29 +97,17 @@ jq -n \
   --arg method "ecs run-task ${TASK_DEF} with psql as RDS master (container override)" \
   --arg task_arn "${TASK_ARN}" \
   --argjson exit_code "${EXIT}" \
+  --argjson db "${DB_EVIDENCE}" \
   '{
     captured_at: $captured_at,
     method: $method,
     task_arn: $task_arn,
     exit_code: $exit_code,
-    tenant: {
-      id: "11111111-1111-1111-1111-111111111111",
-      name: "Demo Café"
-    },
-    user: {
-      id: "33333333-3333-3333-3333-333333333333",
-      email: "demo2@tillflow.dev"
-    },
-    attendant: {
-      id: "33333333-3333-3333-3333-333333333333",
-      tenant_id: "11111111-1111-1111-1111-111111111111",
-      display_name: "Demo Attendant 2",
-      payout_msisdn: "254700000000",
-      commission_bps: 500,
-      status: "active",
-      role: "attendant"
-    },
-    notes: "For Arsema G2 close: use ATTENDANT_ID=33333333-3333-3333-3333-333333333333 in g2-close-seed.js. Do not delete 2222… ledger for 2026-09-18."
+    tenant: $db.tenant,
+    user: $db.user,
+    membership: $db.membership,
+    attendant: ($db.attendant + { role: $db.membership.role }),
+    notes: "For Arsema G2 close: use ATTENDANT_ID=33333333-3333-3333-3333-333333333333 in g2-close-seed.js. Do not delete existing ledger rows for 2222…."
   }' > "${EVIDENCE_FILE}"
 
 echo "evidence written to ${EVIDENCE_FILE}"
