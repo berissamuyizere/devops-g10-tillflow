@@ -10,8 +10,11 @@
 #
 # Example:
 #   evidence/run-in-vpc.sh payments scripts/g2-close-b2c.js \
-#     TENANT_ID=... ATTENDANT_ID=... CLOSE_TRIGGER=sqs \
-#     PAYMENTS_BASE_URL=http://internal-alb
+#     TENANT_ID=... ATTENDANT_ID=... CLOSE_TRIGGER=manual CLOSE_WAIT_MS=600000
+# The Payments task cannot SendMessage to devops-g10-commission-close, so the
+# close message is sent from a laptop (or the SQS console). The script waits
+# for the worker. POS_BASE_URL, PAYMENTS_BASE_URL, and API_URL default to the
+# internal ALB; KEY=VALUE still overrides.
 set -euo pipefail
 
 PREFIX="${PREFIX:-devops-g10}"
@@ -56,20 +59,41 @@ if [ -z "${SUBNETS}" ] || [ "${SUBNETS}" = "None" ] || [ -z "${SGS}" ] || [ "${S
   exit 1
 fi
 
+ALB_DNS=$(aws elbv2 describe-load-balancers --names "${PREFIX}-alb" --region "${REGION}" \
+  --query 'LoadBalancers[0].DNSName' --output text)
+if [ -z "${ALB_DNS}" ] || [ "${ALB_DNS}" = "None" ]; then
+  echo "could not read DNS name for ${PREFIX}-alb" >&2
+  exit 1
+fi
+INTERNAL="http://${ALB_DNS}"
+echo "internal ALB ${INTERNAL}" >&2
+
 # readonlyRootFilesystem: write evidence JSON to the task's /tmp volume.
+# Inject the in-VPC ALB unless the caller already set that key.
 OVERRIDES=$(jq -n \
   --arg script "${SCRIPT}" \
+  --arg internal "${INTERNAL}" \
   --args -- "$@" \
-  '{
-    containerOverrides: [{
-      name: "app",
-      command: ["node", $script],
-      environment: (
-        [{"name":"EVIDENCE_DIR","value":"/tmp"}]
-        + [($ARGS.positional[] | split("=") | {name: .[0], value: (.[1:] | join("="))})]
-      )
-    }]
-  }')
+  '
+  def kv: split("=") | {name: .[0], value: (.[1:] | join("="))};
+  ($ARGS.positional | map(kv)) as $user
+  | ($user | map(.name)) as $names
+  | [
+      {name: "EVIDENCE_DIR", value: "/tmp"},
+      {name: "POS_BASE_URL", value: $internal},
+      {name: "PAYMENTS_BASE_URL", value: $internal},
+      {name: "API_URL", value: $internal}
+    ]
+    | map(select(.name as $n | ($names | index($n)) | not))
+    | . + $user
+  | {
+      containerOverrides: [{
+        name: "app",
+        command: ["node", $script],
+        environment: .
+      }]
+    }
+  ')
 
 echo "run-task ${FAMILY} node ${SCRIPT}" >&2
 TASK_ARN=$(aws ecs run-task \
