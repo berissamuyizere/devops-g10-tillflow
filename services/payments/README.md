@@ -297,17 +297,38 @@ on `/health`, no `latest` tag.
 | `DATABASE_URL` | — | local/CI |
 | `DB_SECRET_ID` | — | ECS: `devops-g10/db/payments` (Secrets Manager) |
 | `MPESA_MODE` | `fake` | `daraja` only at G3 |
-| `DARAJA_CALLBACK_SECRET` | from `devops-g10/service-tokens` | HMAC key |
+| `DARAJA_CALLBACK_SECRET` | from `devops-g10/service-tokens` | **required** — HMAC key; unset → callbacks 500 |
 | `DARAJA_CALLBACK_URL` | API GW `/payments/callback` | set by platform |
 | `POS_BASE_URL` | internal ALB DNS | Payments → POS in-VPC |
-| `PAYMENTS_SERVICE_TOKEN` | from `devops-g10/service-tokens` | what we present to POS |
-| `POS_SERVICE_TOKEN` | from `devops-g10/service-tokens` | what POS presents to us |
-| `COMMISSION_SERVICE_TOKEN` | from `devops-g10/service-tokens` | what Commission presents to us |
+| `PAYMENTS_SERVICE_TOKEN` | from `devops-g10/service-tokens` | **required** — what we present to POS |
+| `POS_SERVICE_TOKEN` | from `devops-g10/service-tokens` | **required** — unset → 500 |
+| `COMMISSION_SERVICE_TOKEN` | from `devops-g10/service-tokens` | **required** — unset → 500 |
 | `MPESA_B2C_SHORTCODE` | `600000` | |
 | `POS_TIMEOUT_MS` | `3000` | per-request timeout on POS calls |
 
 Real Daraja credentials live in Secrets Manager under `devops-g10/daraja` and
 are never committed, never in env files, never in Terraform plaintext.
+
+## Credentials fail closed
+
+No service token and no callback secret has an in-process default. If the env
+var is missing or blank the request returns **500 `misconfigured`**, rather than
+falling back to a value published in this repository — a known fallback would
+let anyone who has read the source trigger a payout.
+
+A wrong token is still **401**. Only a *missing configuration* is 500, so the
+two cases stay distinguishable in logs.
+
+Tests and CI set these explicitly (`test/support/helpers.js`,
+`test/contract-pos-live.contract.js`, `.github/workflows/pr.yml`).
+
+## Stranded payouts
+
+If Payments crashes between writing the ledger row and sending the B2C, the row
+is left `pending` and no money has moved. A replayed daily close now **resumes**
+it: `POST /internal/v1/payouts` sees an existing `pending` row and disburses it,
+answering `200` with `resumed: true`. Rows already `disbursing`, `disbursed` or
+`failed` are untouched, so a replay still cannot produce a second B2C.
 
 ## Populating the Daraja sandbox secret
 
