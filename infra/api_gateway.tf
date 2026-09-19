@@ -46,6 +46,12 @@ resource "aws_apigatewayv2_integration" "alb" {
   # are restricted). Client IP is already in access logs as
   # $context.identity.sourceIp.
   timeout_milliseconds = 29000
+
+  # Stamp every request that entered through the public edge. The ALB
+  # refuses this header on /internal/*; service-to-service calls omit it.
+  request_parameters = {
+    "overwrite:header.x-tillflow-edge" = "public"
+  }
 }
 
 resource "aws_apigatewayv2_route" "proxy" {

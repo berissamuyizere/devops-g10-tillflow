@@ -28,7 +28,7 @@
         │       │
         ▼       ▼
    ┌────────┐ ┌──────────┐     ┌─────────────┐
-   │  POS   │ │ Payments │     │ Commission  │  EventBridge 23:45 EAT
+   │  POS   │ │ Payments │     │ Commission  │  EventBridge 01:00 EAT
    │  API   │ │   API    │◄────│   worker    │  → SQS (no public ALB)
    └───┬────┘ └────┬─────┘     └─────────────┘
        │           │
@@ -76,7 +76,7 @@ Decisions locked in [tenant/sale ADR](adr-001-tenant-sale-data-model.md) and [id
 
 ## Flow 2 — Daily close → commission → B2C
 
-1. EventBridge `devops-g10-commission-daily-close` (`cron(45 20 * * ? *)` = 23:45 EAT) enqueues SQS `devops-g10-commission-close`.
+1. EventBridge `devops-g10-commission-daily-close` (`cron(0 22 * * ? *)` = 01:00 EAT) enqueues SQS `devops-g10-commission-close`.
 2. The Commission ECS worker (no ALB) long-polls that queue, then `GET`s POS `/internal/v1/commission/eligible` for `status=paid` sales on that Africa/Nairobi business day.
 3. For each attendant it `POST`s Payments `/internal/v1/payouts` with `X-Commission-Token` and `Idempotency-Key: <agent_id>:<period>`. Payments writes **one** payout-ledger row keyed by agent + period.
 4. Replay of daily close is a `200` with `replay: true` (no second B2C). A `409` is not retryable.

@@ -5,7 +5,7 @@
 resource "aws_cloudwatch_event_rule" "commission_daily" {
   name                = "${var.name_prefix}-commission-daily-close"
   description         = "Fires once a day after business close in Africa/Nairobi (EAT)."
-  schedule_expression = "cron(45 20 * * ? *)" # 20:45 UTC = 23:45 EAT
+  schedule_expression = "cron(0 22 * * ? *)" # 22:00 UTC = 01:00 EAT, closes the previous EAT day
 
   tags = {
     service = "commission"
