@@ -104,6 +104,8 @@ These stay true at defence. Do not paper them.
    Timeout payer `stkQuery` answers 1100 forever. ADR-002: silence is
    not a decline, so those rows stay `pending` and the age climbs.
    Arsema’s drill joined an alarm already firing since 20:13 EAT.
+   Runbook `#payments-oldest-pending`: fake mode stays ALARM; do **not**
+   `SetAlarmState`; recovery is an operator resolve.
 3. **Rollback is not in `release.yml`.** Smoke can fail and the bad
    task definition stays. Circuit breaker only drops tasks that fail
    ALB `/health`. A `/ready` 500 with `/health` 200 stays deployed
