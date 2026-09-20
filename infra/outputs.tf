@@ -95,6 +95,11 @@ output "g2_base_urls" {
   }
 }
 
+output "ecs_app_env_parameters" {
+  description = "SSM documents release.yml merges into each app container on ECS roll."
+  value       = { for svc, p in aws_ssm_parameter.ecs_app_env : svc => p.name }
+}
+
 output "grafana_url" {
   description = "Amazon Managed Grafana workspace. SSO login; dashboards from infra/grafana/*.json."
   value       = "https://${aws_grafana_workspace.amg.endpoint}"

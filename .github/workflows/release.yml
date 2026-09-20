@@ -333,6 +333,10 @@ jobs:
             --name /devops-g10/adot/config \
             --query Parameter.Value \
             --output text)
+          APP_ENV=$(aws ssm get-parameter \
+            --name "/devops-g10/${{ matrix.service }}/env" \
+            --output json | jq -r .Parameter.Value)
+          echo "${APP_ENV}" | jq -e '.environment' >/dev/null
 
           jq \
             --arg image "${IMAGE_URI}" \
@@ -340,6 +344,7 @@ jobs:
             --arg digest "${DIGEST}" \
             --arg cname "${{ env.ECS_CONTAINER }}" \
             --arg adot_config "${ADOT_CONFIG}" \
+            --argjson overlay "${APP_ENV}" \
             'del(
                 .taskDefinitionArn, .revision, .status, .requiresAttributes,
                 .compatibilities, .registeredAt, .registeredBy, .deregisteredAt
@@ -350,12 +355,13 @@ jobs:
                     | del(.command, .entryPoint)
                     | .dependsOn = [{containerName: "adot", condition: "HEALTHY"}]
                     | .environment = (
-                        ((.environment // []) | map(select(.name != "COMMIT_SHA" and .name != "IMAGE_DIGEST")))
+                        ($overlay.environment // [])
                         + [
                             {name: "COMMIT_SHA", value: $commit},
                             {name: "IMAGE_DIGEST", value: $digest}
                           ]
                       )
+                    | .secrets = ($overlay.secrets // [])
                   elif .name == "adot" then
                     del(.user)
                     | .environment = (
