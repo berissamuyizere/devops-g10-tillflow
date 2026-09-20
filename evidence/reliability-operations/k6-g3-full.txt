@@ -1,0 +1,68 @@
+
+         /\      Grafana   /‾‾/  
+    /\  /  \     |\  __   /  /   
+   /  \/    \    | |/ /  /   ‾‾\ 
+  /          \   |   (  |  (‾)  |
+ / __________ \  |_|\_\  \_____/ 
+
+
+     execution: local
+        script: evidence/reliability-operations/k6/g3-load.js
+        output: -
+
+     scenarios: (100.00%) 4 scenarios, 50 max VUs, 22m30s max duration (incl. graceful stop):
+              * smoke: 5 iterations shared among 1 VUs (maxDuration: 2m0s, gracefulStop: 30s)
+              * baseline: Up to 2.00 iterations/s for 4m0s over 3 stages (maxVUs: 12-20, startTime: 2m0s, gracefulStop: 30s)
+              * spike: 6.00 iterations/s for 30s (maxVUs: 20-30, startTime: 6m0s, gracefulStop: 30s)
+              * soak: 2.00 iterations/s for 15m0s (maxVUs: 16-24, startTime: 7m0s, gracefulStop: 30s)
+
+
+  █ THRESHOLDS 
+
+    checks
+    ✓ 'rate>0.95' rate=99.97%
+
+    http_req_duration
+    ✓ 'p(95)<2000' p(95)=252.66ms
+
+    http_req_failed
+    ✓ 'rate<0.10' rate=0.01%
+
+
+  █ TOTAL RESULTS 
+
+    checks_total.......: 9496   7.191507/s
+    checks_succeeded...: 99.97% 9494 out of 9496
+    checks_failed......: 0.02%  2 out of 9496
+
+    ✓ sale created
+    ✓ pay accepted
+    ✗ callback applied
+      ↳  99% — ✓ 2373 / ✗ 1
+    ✗ sale is paid
+      ↳  99% — ✓ 2373 / ✗ 1
+
+    HTTP
+    http_req_duration..............: avg=221.28ms min=193.69ms med=217.03ms max=753.62ms p(90)=243.69ms p(95)=252.66ms
+      { expected_response:true }...: avg=221.28ms min=193.69ms med=217.04ms max=753.62ms p(90)=243.69ms p(95)=252.66ms
+    http_req_failed................: 0.01%  1 out of 9496
+    http_reqs......................: 9496   7.191507/s
+
+    EXECUTION
+    iteration_duration.............: avg=891.65ms min=832.63ms med=877.34ms max=2.18s    p(90)=922.65ms p(95)=968.61ms
+    iterations.....................: 2374   1.797877/s
+    vus............................: 1      min=0         max=7 
+    vus_max........................: 32     min=32        max=32
+
+    NETWORK
+    data_received..................: 5.9 MB 4.5 kB/s
+    data_sent......................: 2.3 MB 1.7 kB/s
+
+
+
+
+running (22m00.4s), 00/32 VUs, 2374 complete and 0 interrupted iterations
+smoke    ✓ [ 100% ] 1 VUs      0m06.3s/2m0s  5/5 shared iters
+baseline ✓ [ 100% ] 00/12 VUs  4m0s          2.00 iters/s
+spike    ✓ [ 100% ] 00/20 VUs  30s           6.00 iters/s
+soak     ✓ [ 100% ] 00/16 VUs  15m0s         2.00 iters/s
