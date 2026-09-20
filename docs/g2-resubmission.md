@@ -59,10 +59,26 @@ CloudWatch `/devops-g10/commission` for the same window. Two `close_message_rece
 
 Both `close_eligible` lines are tenant `11111111-…`, period `2026-09-20`. Task `553f78ac814c4627b8a18eaac8b7dfc8` is the live `devops-g10-commission` worker ([`ecs-commission-tasks.json`](../evidence/platform-delivery/ecs-commission-tasks.json)).
 
+## First HOLD, for reference
+
+Everything from Rob's first review, so this is one page for all of G2.
+
+| First-HOLD finding | Where it landed |
+|---|---|
+| POS: sale insert race, fail-open token, `payment_id` on paid | [#51](https://github.com/berissamuyizere/devops-g10-tillflow/pull/51) |
+| Payments: B2C timeout is not a decline, B2C result callback, atomic STK callback | [#52](https://github.com/berissamuyizere/devops-g10-tillflow/pull/52) |
+| Commission worker on ECS | [#53](https://github.com/berissamuyizere/devops-g10-tillflow/pull/53) + [`g2-commission-worker-logs.json`](../evidence/payments-integrity/g2-commission-worker-logs.json); re-proved after the lockdown in [§3](#3-commission-worker-received-both-sqs-messages) |
+| Payments: service tokens fail closed, stranded `pending` payouts resumed | [#63](https://github.com/berissamuyizere/devops-g10-tillflow/pull/63) |
+| Close cutoff and a single Commission owner | [#62](https://github.com/berissamuyizere/devops-g10-tillflow/pull/62), [#65](https://github.com/berissamuyizere/devops-g10-tillflow/pull/65) |
+
 ## What we are not claiming
 
 - Real Daraja. `MPESA_MODE=fake` for this proof. Sandbox adapter is G3 ([#59](https://github.com/berissamuyizere/devops-g10-tillflow/pull/59), still open).
 - Grafana / k6 / game day. That is G3–G4.
-- A further `develop` → `main` to copy these evidence files. Live AWS already matches the lockdown SHA above.
+
+The evidence files are on `main` at `cb0728b`
+([#79](https://github.com/berissamuyizere/devops-g10-tillflow/pull/79) `develop` → `main`),
+and live AWS matches the lockdown SHA above, so no further merge is needed to
+read them.
 
 Berissa will send this file to Rob once all four have approved the PR.
