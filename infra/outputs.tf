@@ -106,8 +106,8 @@ output "grafana_url" {
 }
 
 output "probe_canary_name" {
-  description = "CloudWatch Synthetics canary hitting public /health and / every minute."
-  value       = aws_synthetics_canary.probe.name
+  description = "Public /health + / probe. Dimension CanaryName on CloudWatchSynthetics SuccessPercent."
+  value       = aws_lambda_function.probe.function_name
 }
 
 output "alerts_topic_arn" {

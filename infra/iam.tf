@@ -338,6 +338,30 @@ data "aws_iam_policy_document" "ci_deploy" {
     ]
   }
 
+  # AWS_SSO workspaces call IAM Identity Center in us-east-1. That misses
+  # the regional grafana:* write statement (aws:RequestedRegion).
+  statement {
+    sid    = "GrafanaIdentityCenter"
+    effect = "Allow"
+    actions = [
+      "sso:DescribeRegisteredRegions",
+      "sso:ListInstances",
+      "sso:GetSharedSsoConfiguration",
+      "sso:ListDirectoryAssociations",
+      "sso:GetManagedApplicationInstance",
+      "sso:CreateManagedApplicationInstance",
+      "sso:DeleteManagedApplicationInstance",
+      "sso:UpdateManagedApplicationInstanceStatus",
+      "sso:GetProfile",
+      "sso:ListProfiles",
+      "sso:AssociateProfile",
+      "sso:DisassociateProfile",
+      "sso:ListProfileAssociations",
+      "sso-directory:DescribeDirectory",
+    ]
+    resources = ["*"]
+  }
+
   statement {
     sid    = "ManageNamespacedKMS"
     effect = "Allow"

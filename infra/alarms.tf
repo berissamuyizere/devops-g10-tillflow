@@ -429,7 +429,7 @@ resource "aws_cloudwatch_metric_alarm" "probe_down" {
   statistic   = "Average"
   period      = 60
   dimensions = {
-    CanaryName = aws_synthetics_canary.probe.name
+    CanaryName = aws_lambda_function.probe.function_name
   }
 }
 
