@@ -30,6 +30,8 @@ env:
   AWS_REGION: eu-central-1
   ECS_CLUSTER: devops-g10
   ECS_CONTAINER: app
+  # Empty GitHub var → Terraform default 200. Set WAF_RATE_LIMIT=2000 for k6.
+  TF_VAR_waf_rate_limit: ${{ vars.WAF_RATE_LIMIT || 200 }}
 
 jobs:
   changes:
