@@ -247,6 +247,8 @@ data "aws_iam_policy_document" "ci_deploy" {
         "elasticloadbalancing.amazonaws.com",
         "grafana.amazonaws.com",
         "synthetics.amazonaws.com",
+        "sso.amazonaws.com",
+        "organizations.amazonaws.com",
       ]
     }
   }
@@ -362,19 +364,72 @@ data "aws_iam_policy_document" "ci_deploy" {
     resources = ["*"]
   }
 
-  # CreateWorkspace with AWS_SSO decrypts Identity Center ciphertext.
-  # That KMS key is not alias/devops-g10-* and the call often omits
-  # aws:RequestedRegion, so ManageNamespacedKMS never matches.
+  # CreateWorkspace with AWS_SSO decrypts Identity Center ciphertext as
+  # the calling principal. The request sets kms:ViaService=sso.*.amazonaws.com
+  # and encryption context aws:sso:instance-arn. An unconstrained
+  # kms:Decrypt was not enough (Release still 403 from AWSSingleSignOn).
+  # These conditions match AWSSSOMasterAccountAdministrator.
   statement {
-    sid    = "DecryptIdentityCenterKms"
+    sid    = "DecryptViaSsoService"
+    effect = "Allow"
+    actions = [
+      "kms:Decrypt",
+      "kms:Encrypt",
+      "kms:GenerateDataKeyWithoutPlaintext",
+    ]
+    resources = ["*"]
+    condition {
+      test     = "StringLike"
+      variable = "kms:ViaService"
+      values   = ["sso.*.amazonaws.com"]
+    }
+    condition {
+      test     = "StringLike"
+      variable = "kms:EncryptionContext:aws:sso:instance-arn"
+      values   = ["*"]
+    }
+  }
+
+  # Same ViaService without encryption context — some SSO decrypts omit it.
+  statement {
+    sid    = "DecryptViaSsoServiceNoContext"
     effect = "Allow"
     actions = [
       "kms:Decrypt",
       "kms:DescribeKey",
       "kms:CreateGrant",
-      "kms:GenerateDataKey*",
     ]
     resources = ["*"]
+    condition {
+      test     = "StringLike"
+      variable = "kms:ViaService"
+      values = [
+        "sso.*.amazonaws.com",
+        "sso-directory.*.amazonaws.com",
+        "identitystore.*.amazonaws.com",
+      ]
+    }
+  }
+
+  statement {
+    sid    = "DecryptViaIdentityStoreService"
+    effect = "Allow"
+    actions = [
+      "kms:Decrypt",
+      "kms:Encrypt",
+      "kms:GenerateDataKeyWithoutPlaintext",
+    ]
+    resources = ["*"]
+    condition {
+      test     = "StringLike"
+      variable = "kms:ViaService"
+      values   = ["identitystore.*.amazonaws.com"]
+    }
+    condition {
+      test     = "StringLike"
+      variable = "kms:EncryptionContext:aws:identitystore:identitystore-arn"
+      values   = ["*"]
+    }
   }
 
   statement {
@@ -477,6 +532,37 @@ resource "aws_iam_policy" "ci_deploy" {
 resource "aws_iam_role_policy_attachment" "ci_deploy" {
   role       = aws_iam_role.ci_deploy.name
   policy_arn = aws_iam_policy.ci_deploy.arn
+}
+
+# AWS's documented set for creating Amazon Managed Grafana with IAM
+# Identity Center in a standalone account. AWSSSOMasterAccountAdministrator
+# is the policy that actually allows kms:Decrypt via sso.*.amazonaws.com.
+resource "aws_iam_role_policy_attachment" "ci_grafana_account" {
+  role       = aws_iam_role.ci_deploy.name
+  policy_arn = "arn:${data.aws_partition.current.partition}:iam::aws:policy/AWSGrafanaAccountAdministrator"
+}
+
+resource "aws_iam_role_policy_attachment" "ci_sso_master" {
+  role       = aws_iam_role.ci_deploy.name
+  policy_arn = "arn:${data.aws_partition.current.partition}:iam::aws:policy/AWSSSOMasterAccountAdministrator"
+}
+
+resource "aws_iam_role_policy_attachment" "ci_sso_directory" {
+  role       = aws_iam_role.ci_deploy.name
+  policy_arn = "arn:${data.aws_partition.current.partition}:iam::aws:policy/AWSSSODirectoryAdministrator"
+}
+
+# IAM and Identity Center are eventual-consistent across regions. The last
+# Release updated ci-deploy then CreateWorkspace in the same second; SSO
+# in us-east-1 still evaluated the old policy.
+resource "time_sleep" "ci_iam_propagate" {
+  create_duration = "45s"
+  triggers = {
+    ci_policy     = aws_iam_policy.ci_deploy.policy
+    grafana_admin = aws_iam_role_policy_attachment.ci_grafana_account.id
+    sso_master    = aws_iam_role_policy_attachment.ci_sso_master.id
+    sso_directory = aws_iam_role_policy_attachment.ci_sso_directory.id
+  }
 }
 
 # ---------------------------------------------------------------------
