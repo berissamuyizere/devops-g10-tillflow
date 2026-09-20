@@ -431,7 +431,7 @@ async function main() {
     console.log(`evidence written to ${outFile}`);
   } catch (err) {
     console.log(`could not write ${outFile}: ${err.code || err.message}`);
-    console.log('recover it from the EVIDENCE_JSON line above.');
+    console.log('the evidence was printed to stdout above; recover it from the logs.');
   }
 
   console.log(`\n${failures === 0 ? 'ALL CHECKS PASSED' : `${failures} CHECK(S) FAILED`}`);
