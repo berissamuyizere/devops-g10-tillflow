@@ -429,7 +429,7 @@ resource "aws_cloudwatch_metric_alarm" "probe_down" {
   statistic   = "Average"
   period      = 60
   dimensions = {
-    CanaryName = aws_synthetics_canary.probe.name
+    CanaryName = aws_lambda_function.probe.function_name
   }
 }
 
@@ -731,6 +731,7 @@ resource "aws_lambda_function" "payout_cutoff" {
   depends_on = [
     aws_iam_role_policy_attachment.payout_cutoff,
     aws_cloudwatch_log_group.payout_cutoff,
+    aws_iam_policy.ci_deploy,
   ]
 }
 

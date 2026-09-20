@@ -106,6 +106,7 @@ resource "aws_lambda_function" "slack_notifier" {
   depends_on = [
     aws_iam_role_policy_attachment.slack_notifier,
     aws_cloudwatch_log_group.slack_notifier,
+    aws_iam_policy.ci_deploy,
   ]
 }
 
@@ -154,6 +155,10 @@ resource "aws_kms_key" "alerts" {
   enable_key_rotation     = true
   policy                  = data.aws_iam_policy_document.alerts_kms.json
   tags                    = { service = "reliability" }
+
+  # Same apply that first mints this key also expands ci-deploy. Wait for
+  # that policy so TagResource is allowed before CreateKey+tags.
+  depends_on = [aws_iam_policy.ci_deploy]
 }
 
 resource "aws_kms_alias" "alerts" {

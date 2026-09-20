@@ -1,61 +1,36 @@
-# External uptime probe (Y3). Runs outside the VPC against the public
-# API Gateway. SuccessPercent is the Grafana uptime signal.
+# External uptime probe (Y3). Hits public API Gateway /health and /.
+# SuccessPercent (CloudWatchSynthetics / CanaryName=devops-g10-probe) is
+# the Grafana uptime signal and devops-g10-probe-down.
+#
+# Not a CloudWatch Synthetics canary: that runtime needs >= 960 MB and
+# this account's Lambda quota caps MemorySize at 512 MB (CREATE_FAILED
+# on the first Release). A 128 MB Lambda on a 1-minute EventBridge rule
+# publishes the same metric contract.
 
 data "aws_iam_policy_document" "probe_trust" {
   statement {
     effect  = "Allow"
     actions = ["sts:AssumeRole"]
     principals {
-      type = "Service"
-      identifiers = [
-        "lambda.amazonaws.com",
-        "synthetics.amazonaws.com",
-      ]
+      type        = "Service"
+      identifiers = ["lambda.amazonaws.com"]
     }
   }
 }
 
 data "aws_iam_policy_document" "probe" {
   statement {
-    sid    = "WriteArtifacts"
+    sid    = "ProbeLogs"
     effect = "Allow"
     actions = [
-      "s3:PutObject",
-      "s3:GetBucketLocation",
-    ]
-    resources = [
-      aws_s3_bucket.artifacts.arn,
-      "${aws_s3_bucket.artifacts.arn}/synthetics/probe/*",
-    ]
-  }
-
-  statement {
-    sid       = "ListArtifacts"
-    effect    = "Allow"
-    actions   = ["s3:ListBucket"]
-    resources = [aws_s3_bucket.artifacts.arn]
-    condition {
-      test     = "StringLike"
-      variable = "s3:prefix"
-      values   = ["synthetics/probe/*"]
-    }
-  }
-
-  statement {
-    sid    = "CanaryLogs"
-    effect = "Allow"
-    actions = [
-      "logs:CreateLogGroup",
       "logs:CreateLogStream",
       "logs:PutLogEvents",
     ]
-    resources = [
-      "arn:${local.partition}:logs:${local.region}:${local.account_id}:log-group:/aws/lambda/cwsyn-${var.name_prefix}-probe*",
-    ]
+    resources = ["${aws_cloudwatch_log_group.probe.arn}:*"]
   }
 
   statement {
-    sid       = "CanaryMetrics"
+    sid       = "ProbeMetrics"
     effect    = "Allow"
     actions   = ["cloudwatch:PutMetricData"]
     resources = ["*"]
@@ -69,7 +44,7 @@ data "aws_iam_policy_document" "probe" {
 
 resource "aws_iam_role" "probe" {
   name               = "${var.name_prefix}-probe"
-  description        = "CloudWatch Synthetics execution role for devops-g10-probe."
+  description        = "Scheduled public /health + / probe. Emits CloudWatchSynthetics SuccessPercent."
   assume_role_policy = data.aws_iam_policy_document.probe_trust.json
   tags               = { service = "reliability" }
 }
@@ -84,41 +59,64 @@ resource "aws_iam_role_policy_attachment" "probe" {
   policy_arn = aws_iam_policy.probe.arn
 }
 
-data "archive_file" "probe" {
-  type        = "zip"
-  output_path = "${path.module}/.build/probe.zip"
-
-  source {
-    content  = file("${path.module}/canaries/probe/index.js")
-    filename = "index.js"
-  }
+resource "aws_cloudwatch_log_group" "probe" {
+  name              = "/aws/lambda/${var.name_prefix}-probe"
+  retention_in_days = 30
+  tags              = { service = "reliability" }
 }
 
-resource "aws_synthetics_canary" "probe" {
-  name                 = "${var.name_prefix}-probe"
-  artifact_s3_location = "s3://${aws_s3_bucket.artifacts.bucket}/synthetics/probe"
-  execution_role_arn   = aws_iam_role.probe.arn
-  handler              = "index.handler"
-  runtime_version      = "syn-nodejs-puppeteer-17.0"
-  zip_file             = data.archive_file.probe.output_path
-  start_canary         = true
-  delete_lambda        = true
+data "archive_file" "probe" {
+  type        = "zip"
+  source_file = "${path.module}/lambda/probe/index.py"
+  output_path = "${path.module}/.build/probe.zip"
+}
 
-  success_retention_period = 2
-  failure_retention_period = 14
+resource "aws_lambda_function" "probe" {
+  function_name    = "${var.name_prefix}-probe"
+  role             = aws_iam_role.probe.arn
+  filename         = data.archive_file.probe.output_path
+  source_code_hash = data.archive_file.probe.output_base64sha256
+  handler          = "index.handler"
+  runtime          = "python3.12"
+  timeout          = 30
+  memory_size      = 128
 
-  schedule {
-    expression = "rate(1 minute)"
+  environment {
+    variables = {
+      API_URL     = aws_apigatewayv2_api.app.api_endpoint
+      CANARY_NAME = "${var.name_prefix}-probe"
+    }
   }
 
-  run_config {
-    timeout_in_seconds = 30
-    environment_variables = {
-      API_URL = aws_apigatewayv2_api.app.api_endpoint
-    }
+  tracing_config {
+    mode = "PassThrough"
   }
 
   tags = { service = "reliability" }
 
-  depends_on = [aws_iam_role_policy_attachment.probe]
+  depends_on = [
+    aws_iam_role_policy_attachment.probe,
+    aws_cloudwatch_log_group.probe,
+    aws_iam_policy.ci_deploy,
+  ]
+}
+
+resource "aws_cloudwatch_event_rule" "probe" {
+  name                = "${var.name_prefix}-probe"
+  description         = "Public uptime probe every 1 minute (Y3)."
+  schedule_expression = "rate(1 minute)"
+  tags                = { service = "reliability" }
+}
+
+resource "aws_cloudwatch_event_target" "probe" {
+  rule = aws_cloudwatch_event_rule.probe.name
+  arn  = aws_lambda_function.probe.arn
+}
+
+resource "aws_lambda_permission" "probe" {
+  statement_id  = "AllowEventBridge"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.probe.function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.probe.arn
 }

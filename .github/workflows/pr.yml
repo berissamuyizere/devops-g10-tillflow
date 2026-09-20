@@ -120,6 +120,10 @@ jobs:
             -backend-config="region=eu-central-1" \
             -backend-config="key=platform/terraform.tfstate"
 
+      - name: Adopt Grafana workspace from a failed apply
+        if: ${{ vars.AWS_CI_ROLE_ARN != '' && vars.TF_STATE_BUCKET != '' }}
+        run: bash scripts/adopt-grafana-workspace.sh
+
       - name: terraform plan
         if: ${{ vars.AWS_CI_ROLE_ARN != '' && vars.TF_STATE_BUCKET != '' }}
         run: terraform plan -input=false -no-color -out=plan.bin
@@ -252,9 +256,21 @@ jobs:
       - name: Docker build (validate)
         if: steps.run.outputs.go == 'true'
         run: |
-          if [ "${{ matrix.service }}" = "payments" ]; then
-            docker build -f "${GITHUB_WORKSPACE}/services/payments/Dockerfile" \
-              -t local/payments:pr "${GITHUB_WORKSPACE}"
-          else
-            docker build -t local/${{ matrix.service }}:pr .
-          fi
+          set -euo pipefail
+          build() {
+            if [ "${{ matrix.service }}" = "payments" ]; then
+              docker build -f "${GITHUB_WORKSPACE}/services/payments/Dockerfile" \
+                -t local/payments:pr "${GITHUB_WORKSPACE}"
+            else
+              docker build -t local/${{ matrix.service }}:pr .
+            fi
+          }
+          n=0
+          until build; do
+            n=$((n + 1))
+            if [ "$n" -ge 3 ]; then
+              exit 1
+            fi
+            echo "docker hub flake, retry ${n}/3"
+            sleep $((n * 8))
+          done
