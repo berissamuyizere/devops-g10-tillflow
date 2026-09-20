@@ -90,3 +90,20 @@ variable "codeconnections_arn" {
   type        = string
   default     = null
 }
+
+variable "waf_rate_limit" {
+  description = <<-EOT
+    WAF RateLimitExceptCallback: requests per 5 minutes per IP (not the
+    callback path). Default 200 (~0.66 rps) is the G3/G5 envelope.
+    Raise via GitHub variable WAF_RATE_LIMIT (Release sets
+    TF_VAR_waf_rate_limit) for Saloi's k6 soak, then set it back to 200
+    and workflow_dispatch Release. Do not leave a high limit overnight.
+  EOT
+  type        = number
+  default     = 200
+
+  validation {
+    condition     = var.waf_rate_limit >= 100
+    error_message = "AWS WAF rate-based limits must be at least 100."
+  }
+}
