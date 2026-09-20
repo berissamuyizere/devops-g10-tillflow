@@ -153,7 +153,10 @@ resource "aws_cloudwatch_metric_alarm" "web_slow_burn" {
 }
 
 # ---------------------------------------------------------------------
-# POS / Payments / Commission — TillFlow EMF via SEARCH (extra OTel dims).
+# POS / Payments / Commission — TillFlow EMF.
+# SEARCH is for Grafana only (AWS will not alarm on SEARCH; PutMetricAlarm
+# then returns "Period must not be null"). Alarms use the awsemf
+# ZeroAndSingleDimensionRollup series (exact label set from ADR-005).
 # Denominator 0 (no traffic) is 0, not a burn.
 # ---------------------------------------------------------------------
 resource "aws_cloudwatch_metric_alarm" "pos_fast_burn" {
@@ -179,18 +182,36 @@ resource "aws_cloudwatch_metric_alarm" "pos_fast_burn" {
 
   metric_query {
     id          = "e1"
-    expression  = "SUM(SEARCH('{TillFlow} MetricName=\"pos_sale_writes_total\" outcome=\"error\"', 'Sum', 300))"
     return_data = false
+    metric {
+      namespace   = "TillFlow"
+      metric_name = "pos_sale_writes_total"
+      period      = 300
+      stat        = "Sum"
+      dimensions  = { outcome = "error" }
+    }
   }
   metric_query {
     id          = "e2"
-    expression  = "SUM(SEARCH('{TillFlow} MetricName=\"pos_sale_writes_total\" outcome=\"created\"', 'Sum', 300))"
     return_data = false
+    metric {
+      namespace   = "TillFlow"
+      metric_name = "pos_sale_writes_total"
+      period      = 300
+      stat        = "Sum"
+      dimensions  = { outcome = "created" }
+    }
   }
   metric_query {
     id          = "e3"
-    expression  = "SUM(SEARCH('{TillFlow} MetricName=\"pos_sale_writes_total\" outcome=\"replay\"', 'Sum', 300))"
     return_data = false
+    metric {
+      namespace   = "TillFlow"
+      metric_name = "pos_sale_writes_total"
+      period      = 300
+      stat        = "Sum"
+      dimensions  = { outcome = "replay" }
+    }
   }
   metric_query {
     id          = "error_rate"
@@ -223,18 +244,36 @@ resource "aws_cloudwatch_metric_alarm" "pos_slow_burn" {
 
   metric_query {
     id          = "e1"
-    expression  = "SUM(SEARCH('{TillFlow} MetricName=\"pos_sale_writes_total\" outcome=\"error\"', 'Sum', 1800))"
     return_data = false
+    metric {
+      namespace   = "TillFlow"
+      metric_name = "pos_sale_writes_total"
+      period      = 1800
+      stat        = "Sum"
+      dimensions  = { outcome = "error" }
+    }
   }
   metric_query {
     id          = "e2"
-    expression  = "SUM(SEARCH('{TillFlow} MetricName=\"pos_sale_writes_total\" outcome=\"created\"', 'Sum', 1800))"
     return_data = false
+    metric {
+      namespace   = "TillFlow"
+      metric_name = "pos_sale_writes_total"
+      period      = 1800
+      stat        = "Sum"
+      dimensions  = { outcome = "created" }
+    }
   }
   metric_query {
     id          = "e3"
-    expression  = "SUM(SEARCH('{TillFlow} MetricName=\"pos_sale_writes_total\" outcome=\"replay\"', 'Sum', 1800))"
     return_data = false
+    metric {
+      namespace   = "TillFlow"
+      metric_name = "pos_sale_writes_total"
+      period      = 1800
+      stat        = "Sum"
+      dimensions  = { outcome = "replay" }
+    }
   }
   metric_query {
     id          = "error_rate"
@@ -267,13 +306,25 @@ resource "aws_cloudwatch_metric_alarm" "payments_fast_burn" {
 
   metric_query {
     id          = "t"
-    expression  = "SUM(SEARCH('{TillFlow} MetricName=\"payments_commands_total\" outcome=\"timeout\"', 'Sum', 300))"
     return_data = false
+    metric {
+      namespace   = "TillFlow"
+      metric_name = "payments_commands_total"
+      period      = 300
+      stat        = "Sum"
+      dimensions  = { outcome = "timeout" }
+    }
   }
   metric_query {
     id          = "a"
-    expression  = "SUM(SEARCH('{TillFlow} MetricName=\"payments_commands_total\" outcome=\"accepted\"', 'Sum', 300))"
     return_data = false
+    metric {
+      namespace   = "TillFlow"
+      metric_name = "payments_commands_total"
+      period      = 300
+      stat        = "Sum"
+      dimensions  = { outcome = "accepted" }
+    }
   }
   metric_query {
     id          = "error_rate"
@@ -306,13 +357,25 @@ resource "aws_cloudwatch_metric_alarm" "payments_slow_burn" {
 
   metric_query {
     id          = "t"
-    expression  = "SUM(SEARCH('{TillFlow} MetricName=\"payments_commands_total\" outcome=\"timeout\"', 'Sum', 1800))"
     return_data = false
+    metric {
+      namespace   = "TillFlow"
+      metric_name = "payments_commands_total"
+      period      = 1800
+      stat        = "Sum"
+      dimensions  = { outcome = "timeout" }
+    }
   }
   metric_query {
     id          = "a"
-    expression  = "SUM(SEARCH('{TillFlow} MetricName=\"payments_commands_total\" outcome=\"accepted\"', 'Sum', 1800))"
     return_data = false
+    metric {
+      namespace   = "TillFlow"
+      metric_name = "payments_commands_total"
+      period      = 1800
+      stat        = "Sum"
+      dimensions  = { outcome = "accepted" }
+    }
   }
   metric_query {
     id          = "error_rate"
@@ -345,13 +408,25 @@ resource "aws_cloudwatch_metric_alarm" "commission_fast_burn" {
 
   metric_query {
     id          = "err"
-    expression  = "SUM(SEARCH('{TillFlow} MetricName=\"commission_close_runs_total\" outcome=\"error\"', 'Sum', 300))"
     return_data = false
+    metric {
+      namespace   = "TillFlow"
+      metric_name = "commission_close_runs_total"
+      period      = 300
+      stat        = "Sum"
+      dimensions  = { outcome = "error" }
+    }
   }
   metric_query {
     id          = "ok"
-    expression  = "SUM(SEARCH('{TillFlow} MetricName=\"commission_close_runs_total\" outcome=\"success\"', 'Sum', 300))"
     return_data = false
+    metric {
+      namespace   = "TillFlow"
+      metric_name = "commission_close_runs_total"
+      period      = 300
+      stat        = "Sum"
+      dimensions  = { outcome = "success" }
+    }
   }
   metric_query {
     id          = "error_rate"
@@ -384,13 +459,25 @@ resource "aws_cloudwatch_metric_alarm" "commission_slow_burn" {
 
   metric_query {
     id          = "err"
-    expression  = "SUM(SEARCH('{TillFlow} MetricName=\"commission_close_runs_total\" outcome=\"error\"', 'Sum', 1800))"
     return_data = false
+    metric {
+      namespace   = "TillFlow"
+      metric_name = "commission_close_runs_total"
+      period      = 1800
+      stat        = "Sum"
+      dimensions  = { outcome = "error" }
+    }
   }
   metric_query {
     id          = "ok"
-    expression  = "SUM(SEARCH('{TillFlow} MetricName=\"commission_close_runs_total\" outcome=\"success\"', 'Sum', 1800))"
     return_data = false
+    metric {
+      namespace   = "TillFlow"
+      metric_name = "commission_close_runs_total"
+      period      = 1800
+      stat        = "Sum"
+      dimensions  = { outcome = "success" }
+    }
   }
   metric_query {
     id          = "error_rate"
@@ -455,8 +542,30 @@ resource "aws_cloudwatch_metric_alarm" "payments_oldest_pending" {
   tags          = { service = "payments" }
 
   metric_query {
+    id          = "payment"
+    return_data = false
+    metric {
+      namespace   = "TillFlow"
+      metric_name = "payments_oldest_pending_age_seconds"
+      period      = 60
+      stat        = "Maximum"
+      dimensions  = { kind = "payment" }
+    }
+  }
+  metric_query {
+    id          = "payout"
+    return_data = false
+    metric {
+      namespace   = "TillFlow"
+      metric_name = "payments_oldest_pending_age_seconds"
+      period      = 60
+      stat        = "Maximum"
+      dimensions  = { kind = "payout" }
+    }
+  }
+  metric_query {
     id          = "age"
-    expression  = "MAX(SEARCH('{TillFlow} MetricName=\"payments_oldest_pending_age_seconds\"', 'Maximum', 60))"
+    expression  = "MAX([payment, payout])"
     label       = "Oldest pending age seconds"
     return_data = true
   }
