@@ -69,24 +69,18 @@ jobs:
               - '.github/workflows/release.yml'
       - id: out
         run: |
+          # Terraform stays path-filtered. Services always rebuild on main:
+          # a failed apply followed by infra-only hotfixes otherwise leaves
+          # ECS on an old digest (payments stayed on cb0728b through G3 A1/A2).
+          echo "web=true" >> "$GITHUB_OUTPUT"
+          echo "pos=true" >> "$GITHUB_OUTPUT"
+          echo "payments=true" >> "$GITHUB_OUTPUT"
+          echo "commission=true" >> "$GITHUB_OUTPUT"
+          echo "backend=true" >> "$GITHUB_OUTPUT"
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             echo "infra=true" >> "$GITHUB_OUTPUT"
-            echo "web=true" >> "$GITHUB_OUTPUT"
-            echo "pos=true" >> "$GITHUB_OUTPUT"
-            echo "payments=true" >> "$GITHUB_OUTPUT"
-            echo "commission=true" >> "$GITHUB_OUTPUT"
-            echo "backend=true" >> "$GITHUB_OUTPUT"
           else
             echo "infra=${{ steps.filter.outputs.infra }}" >> "$GITHUB_OUTPUT"
-            echo "web=${{ steps.filter.outputs.web }}" >> "$GITHUB_OUTPUT"
-            echo "pos=${{ steps.filter.outputs.pos }}" >> "$GITHUB_OUTPUT"
-            echo "payments=${{ steps.filter.outputs.payments }}" >> "$GITHUB_OUTPUT"
-            echo "commission=${{ steps.filter.outputs.commission }}" >> "$GITHUB_OUTPUT"
-            if [ "${{ steps.filter.outputs.pos }}" = "true" ] || [ "${{ steps.filter.outputs.payments }}" = "true" ] || [ "${{ steps.filter.outputs.infra }}" = "true" ]; then
-              echo "backend=true" >> "$GITHUB_OUTPUT"
-            else
-              echo "backend=false" >> "$GITHUB_OUTPUT"
-            fi
           fi
 
   plan:
