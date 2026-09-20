@@ -24,7 +24,8 @@ const mpesa = createMpesaClient();               // MPESA_MODE, defaults to fake
 
 await mpesa.stkPush({ shortcode, amountMinor, msisdn, accountReference,
                       transactionDesc, callbackUrl });   // → StkPushResult
-await mpesa.stkQuery({ shortcode, checkoutRequestId });  // → StkQueryResult
+await mpesa.stkQuery({ shortcode, checkoutRequestId,
+                       accountReference, msisdn, amountMinor });  // → StkQueryResult
 mpesa.verifyCallback(rawBody, headers);                  // → { valid, reason }
 await mpesa.b2c({ shortcode, amountMinor, msisdn, remarks,
                   originatorConversationId });           // → B2CResult
@@ -60,6 +61,9 @@ they are distinct failures to know something:
 
 - **`PUSH_TIMEOUT` (3)** — we never learned whether the command was executed.
   The fake still records it in-flight, so a later `stkQuery` can settle it.
+  The in-flight map is per-process, so `stkQuery` also accepts `accountReference`,
+  `msisdn` and `amountMinor` and recomputes the outcome when the query lands on a
+  different task than the push. Real Daraja ignores the extra fields.
 - **`NO_CALLBACK` (4)** — the command was accepted and then nothing came back.
 
 `1032` (cancelled) and `1037` (no user response) look alike on the wire and

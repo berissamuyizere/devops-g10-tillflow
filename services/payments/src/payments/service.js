@@ -280,6 +280,9 @@ async function reconcilePayment(db, mpesa, pos, paymentId) {
   const query = await mpesa.stkQuery({
     shortcode: payment.shortcode,
     checkoutRequestId: payment.checkout_request_id,
+    accountReference: payment.sale_id,
+    msisdn: payment.msisdn,
+    amountMinor: payment.amount_minor,
   });
 
   const target = statusForResultCode(query.resultCode, { fromReconciliation: true });
