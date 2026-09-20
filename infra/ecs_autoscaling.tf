@@ -17,6 +17,10 @@ resource "aws_appautoscaling_target" "cpu" {
   resource_id        = "service/${aws_ecs_cluster.app.name}/${each.value}"
   scalable_dimension = "ecs:service:DesiredCount"
   service_namespace  = "ecs"
+
+  # Last apply updated ci-deploy and RegisterScalableTarget in the same
+  # second; the API still evaluated the old policy (no autoscaling allow).
+  depends_on = [time_sleep.ci_iam_propagate]
 }
 
 resource "aws_appautoscaling_policy" "cpu" {
