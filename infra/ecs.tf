@@ -132,13 +132,7 @@ resource "aws_ecs_task_definition" "web" {
         portMappings = [
           { containerPort = 8080, protocol = "tcp" },
         ]
-        environment = [
-          { name = "PORT", value = "8080" },
-          { name = "OTEL_EXPORTER_OTLP_ENDPOINT", value = "http://localhost:4318" },
-          { name = "OTEL_SERVICE_NAME", value = "web" },
-          { name = "OTEL_RESOURCE_ATTRIBUTES", value = "service.namespace=tillflow,deployment.environment=${var.environment}" },
-          { name = "LOG_LEVEL", value = "info" },
-        ]
+        environment = local.ecs_app_env.web.environment
         mountPoints = [
           { sourceVolume = "tmp", containerPath = "/tmp", readOnly = false },
         ]

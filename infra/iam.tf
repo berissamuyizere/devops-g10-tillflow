@@ -134,6 +134,15 @@ data "aws_iam_policy_document" "ci_deploy" {
       "ssm:Describe*",
       "ssm:List*",
       "sts:GetCallerIdentity",
+      "grafana:Describe*",
+      "grafana:List*",
+      "synthetics:Describe*",
+      "synthetics:Get*",
+      "synthetics:List*",
+      "lambda:Get*",
+      "lambda:List*",
+      "sns:Get*",
+      "sns:List*",
     ]
     resources = ["*"]
   }
@@ -177,6 +186,10 @@ data "aws_iam_policy_document" "ci_deploy" {
       "wafv2:*",
       "codepipeline:*",
       "codebuild:*",
+      "grafana:*",
+      "synthetics:*",
+      "lambda:*",
+      "sns:*",
     ]
     resources = ["*"]
     condition {
@@ -232,6 +245,8 @@ data "aws_iam_policy_document" "ci_deploy" {
         "rds.amazonaws.com",
         "elasticache.amazonaws.com",
         "elasticloadbalancing.amazonaws.com",
+        "grafana.amazonaws.com",
+        "synthetics.amazonaws.com",
       ]
     }
   }
@@ -259,6 +274,57 @@ data "aws_iam_policy_document" "ci_deploy" {
       "arn:${data.aws_partition.current.partition}:secretsmanager:${var.region}:${data.aws_caller_identity.current.account_id}:secret:${var.name_prefix}/*",
       "arn:${data.aws_partition.current.partition}:ssm:${var.region}:${data.aws_caller_identity.current.account_id}:parameter/${var.name_prefix}/*",
     ]
+  }
+
+  # CreateKey has no namespaced ARN. Tag the key group=g10 (default_tags)
+  # so this cannot mint keys for other work in the account.
+  statement {
+    sid       = "CreateNamespacedKMSKeys"
+    effect    = "Allow"
+    actions   = ["kms:CreateKey"]
+    resources = ["*"]
+    condition {
+      test     = "StringEquals"
+      variable = "aws:RequestedRegion"
+      values   = [var.region]
+    }
+    condition {
+      test     = "StringEquals"
+      variable = "aws:RequestTag/group"
+      values   = ["g10"]
+    }
+  }
+
+  statement {
+    sid    = "ManageNamespacedKMS"
+    effect = "Allow"
+    actions = [
+      "kms:CreateAlias",
+      "kms:DeleteAlias",
+      "kms:UpdateAlias",
+      "kms:DescribeKey",
+      "kms:GetKeyPolicy",
+      "kms:PutKeyPolicy",
+      "kms:ScheduleKeyDeletion",
+      "kms:CancelKeyDeletion",
+      "kms:EnableKeyRotation",
+      "kms:GetKeyRotationStatus",
+      "kms:TagResource",
+      "kms:UntagResource",
+      "kms:ListResourceTags",
+      "kms:UpdateKeyDescription",
+      "kms:EnableKey",
+      "kms:DisableKey",
+    ]
+    resources = [
+      "arn:${data.aws_partition.current.partition}:kms:${var.region}:${data.aws_caller_identity.current.account_id}:key/*",
+      "arn:${data.aws_partition.current.partition}:kms:${var.region}:${data.aws_caller_identity.current.account_id}:alias/${var.name_prefix}-*",
+    ]
+    condition {
+      test     = "StringEquals"
+      variable = "aws:RequestedRegion"
+      values   = [var.region]
+    }
   }
 
   # Docker push.
@@ -290,6 +356,27 @@ data "aws_iam_policy_document" "ci_deploy" {
       test     = "StringEquals"
       variable = "iam:PassedToService"
       values   = ["ecs-tasks.amazonaws.com"]
+    }
+  }
+
+  statement {
+    sid     = "PassRolesToGrafanaLambdaSynthetics"
+    effect  = "Allow"
+    actions = ["iam:PassRole"]
+    resources = [
+      "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/${var.name_prefix}-grafana",
+      "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/${var.name_prefix}-probe",
+      "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/${var.name_prefix}-slack-notifier",
+      "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/${var.name_prefix}-payout-cutoff",
+    ]
+    condition {
+      test     = "StringEquals"
+      variable = "iam:PassedToService"
+      values = [
+        "grafana.amazonaws.com",
+        "lambda.amazonaws.com",
+        "synthetics.amazonaws.com",
+      ]
     }
   }
 }

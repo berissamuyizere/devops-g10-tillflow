@@ -78,9 +78,10 @@ function saleBody(overrides = {}) {
   };
 }
 
-function createTestApp() {
+function createTestApp(options = {}) {
   return createApp({
     logger: require('pino')({ level: 'silent' }),
+    ...options,
   });
 }
 

@@ -1,6 +1,13 @@
 // Daily close → POS eligibility → Payments payouts.
 // Commission never calls Daraja (ADR-002). Payments owns B2C.
 
+const { trace, SpanStatusCode } = require('@opentelemetry/api');
+const commissionMetrics = require('./metrics');
+
+function getTracer() {
+  return trace.getTracer('tillflow.commission');
+}
+
 function eatDate(value) {
   const d = value ? new Date(value) : new Date();
   if (Number.isNaN(d.getTime())) {
@@ -76,6 +83,14 @@ async function fetchEligible(fetchImpl, { posBaseUrl, paymentsToken, tenantId, p
   return Array.isArray(body.sales) ? body.sales : [];
 }
 
+function payoutOutcomeFromResult(result) {
+  if (result.skipped) return 'skipped';
+  if (result.conflict) return 'conflict';
+  if (result.replay) return 'replay';
+  if (result.http === 201 || result.http === 200) return 'accepted';
+  return 'error';
+}
+
 async function requestPayout(fetchImpl, { paymentsBaseUrl, commissionToken, period, group }) {
   const res = await fetchImpl(`${paymentsBaseUrl.replace(/\/+$/, '')}/internal/v1/payouts`, {
     method: 'POST',
@@ -107,7 +122,7 @@ async function requestPayout(fetchImpl, { paymentsBaseUrl, commissionToken, peri
   return { http: res.status, replay: body.replay === true, ledger: body };
 }
 
-async function runDailyClose({
+async function runDailyCloseInner({
   fetchImpl = fetch,
   posBaseUrl,
   paymentsBaseUrl,
@@ -140,6 +155,9 @@ async function runDailyClose({
     for (const group of groups) {
       if (!group.msisdn) {
         logger.warn?.({ tenant_id: tenantId, agent_id: group.agent_id }, 'close_skip_missing_msisdn');
+        const skipped = { tenant_id: tenantId, agent_id: group.agent_id, skipped: true };
+        commissionMetrics.recordPayoutRequested('skipped');
+        payouts.push(skipped);
         continue;
       }
       const result = await requestPayout(fetchImpl, {
@@ -148,10 +166,33 @@ async function runDailyClose({
         period,
         group,
       });
+      commissionMetrics.recordPayoutRequested(payoutOutcomeFromResult(result));
       payouts.push({ tenant_id: tenantId, agent_id: group.agent_id, ...result });
     }
   }
   return { period, payouts };
+}
+
+async function runDailyClose(options = {}) {
+  return getTracer().startActiveSpan('commission.daily_close', async (span) => {
+    try {
+      const period = resolveClosePeriod({
+        scheduledAt: options.scheduledAt,
+        businessDay: options.businessDay,
+      });
+      span.setAttribute('commission.period', period);
+      const result = await runDailyCloseInner(options);
+      commissionMetrics.recordCloseRun('success');
+      return result;
+    } catch (err) {
+      commissionMetrics.recordCloseRun('error');
+      span.recordException(err);
+      span.setStatus({ code: SpanStatusCode.ERROR, message: String(err.message || err) });
+      throw err;
+    } finally {
+      span.end();
+    }
+  });
 }
 
 module.exports = {

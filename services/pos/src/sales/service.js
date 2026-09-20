@@ -1,5 +1,6 @@
 const { hashSaleRequest } = require('../hash');
 const { STATUSES, ACTORS, assertTransition } = require('./state');
+const posMetrics = require('../metrics');
 
 function mapSale(row, lines = []) {
   if (!row) return null;
@@ -385,6 +386,7 @@ async function markPaid(db, saleId, { paymentId, paidAt } = {}) {
        RETURNING *`,
       [STATUSES.PAID, paidAtDate, paymentId, saleId]
     );
+    posMetrics.recordSalePaid();
     const lines = await loadLines(client, saleId);
     return mapSale(updated.rows[0], lines);
   });

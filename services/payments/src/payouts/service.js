@@ -1,6 +1,8 @@
 const { hashPayoutRequest } = require('../hash');
 const { LEDGER_STATUSES, evaluate, statusForB2cResultCode } = require('./state');
 const { MpesaTimeoutError, MpesaRejectedError } = require('../../../_shared/mpesa');
+const metrics = require('../metrics');
+const tracing = require('../tracing');
 
 const UNIQUE_VIOLATION = '23505';
 
@@ -231,6 +233,8 @@ async function disburse(db, mpesa, ledgerId, { shortcode } = {}) {
   const row = claimed.ledger;
   const period = row.period;
 
+  tracing.annotateLedger(row);
+
   try {
     const result = await mpesa.b2c({
       shortcode: shortcode || process.env.MPESA_B2C_SHORTCODE || '600000',
@@ -239,6 +243,8 @@ async function disburse(db, mpesa, ledgerId, { shortcode } = {}) {
       remarks: `TillFlow commission ${period}`,
       originatorConversationId: row.originator_conversation_id,
     });
+
+    metrics.recordCommand('b2c', 'accepted');
 
     const accepted = await db.query(
       `UPDATE payments.payout_ledger
@@ -255,6 +261,8 @@ async function disburse(db, mpesa, ledgerId, { shortcode } = {}) {
       reason: 'accepted_awaiting_result',
     };
   } catch (err) {
+    metrics.recordCommand('b2c', err instanceof MpesaRejectedError ? 'rejected' : 'timeout');
+
     if (err instanceof MpesaRejectedError) {
       const failed = await db.withTransaction(async (client) => {
         const current = await lockLedger(client, ledgerId);

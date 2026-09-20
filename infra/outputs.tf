@@ -94,3 +94,48 @@ output "g2_base_urls" {
     pos_internal = "http://${aws_lb.app.dns_name}"
   }
 }
+
+output "ecs_app_env_parameters" {
+  description = "SSM documents release.yml merges into each app container on ECS roll."
+  value       = { for svc, p in aws_ssm_parameter.ecs_app_env : svc => p.name }
+}
+
+output "grafana_url" {
+  description = "Amazon Managed Grafana workspace. SSO login; dashboards from infra/grafana/*.json."
+  value       = "https://${aws_grafana_workspace.amg.endpoint}"
+}
+
+output "probe_canary_name" {
+  description = "CloudWatch Synthetics canary hitting public /health and / every minute."
+  value       = aws_synthetics_canary.probe.name
+}
+
+output "alerts_topic_arn" {
+  description = "SNS topic CloudWatch alarms (Y5) publish to. Lambda posts Slack firing and recovered."
+  value       = aws_sns_topic.alerts.arn
+}
+
+output "slack_notifier_function_name" {
+  value = aws_lambda_function.slack_notifier.function_name
+}
+
+output "alarm_names" {
+  description = "Y5 CloudWatch alarms from docs/alerts.md. Alarm + OK both go to devops-g10-alerts."
+  value = [
+    aws_cloudwatch_metric_alarm.web_fast_burn.alarm_name,
+    aws_cloudwatch_metric_alarm.web_slow_burn.alarm_name,
+    aws_cloudwatch_metric_alarm.pos_fast_burn.alarm_name,
+    aws_cloudwatch_metric_alarm.pos_slow_burn.alarm_name,
+    aws_cloudwatch_metric_alarm.payments_fast_burn.alarm_name,
+    aws_cloudwatch_metric_alarm.payments_slow_burn.alarm_name,
+    aws_cloudwatch_metric_alarm.commission_fast_burn.alarm_name,
+    aws_cloudwatch_metric_alarm.commission_slow_burn.alarm_name,
+    aws_cloudwatch_metric_alarm.probe_down.alarm_name,
+    aws_cloudwatch_metric_alarm.payments_oldest_pending.alarm_name,
+    aws_cloudwatch_metric_alarm.commission_dlq.alarm_name,
+    aws_cloudwatch_metric_alarm.payout_not_settled.alarm_name,
+    aws_cloudwatch_metric_alarm.payments_callbacks_dlq.alarm_name,
+    aws_cloudwatch_metric_alarm.ecs_cpu_high.alarm_name,
+    aws_cloudwatch_metric_alarm.rds_cpu_high.alarm_name,
+  ]
+}

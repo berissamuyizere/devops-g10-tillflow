@@ -84,7 +84,7 @@ Decisions locked in [tenant/sale ADR](adr-001-tenant-sale-data-model.md) and [id
 
 ## Observability path
 
-Apps export OTLP to the localhost ADOT sidecar. JSON logs carry `trace_id` / `span_id`. Target traces for G3: sale → payment → callback/reconcile, and scheduled commission → B2C. Grafana shows uptime, SLO target, budget burn, RED, and saturation ([`docs/slo-error-budgets.md`](slo-error-budgets.md)).
+Apps export OTLP to the localhost ADOT sidecar. JSON logs carry `trace_id` / `span_id`. Target traces for G3: sale → payment → callback/reconcile, and scheduled commission → B2C. Grafana is Amazon Managed Grafana (SSO) with CloudWatch + X-Ray; dashboards live in `infra/grafana/*.json` ([ADR-005](adrs/ADR-005-observability.md)). Uptime is CloudWatch Synthetics canary `devops-g10-probe` (public `/health` and `/`, every minute). Alarms publish to SNS `devops-g10-alerts`; Lambda `devops-g10-slack-notifier` reads the webhook from Secrets Manager and posts firing and recovered.
 
 ## Related decisions
 
@@ -93,5 +93,6 @@ Apps export OTLP to the localhost ADOT sidecar. JSON logs carry `trace_id` / `sp
 | Region + naming | [ADR-001](adrs/ADR-001-region-and-naming.md) |
 | Tenant / sale model | [ADR](adr-001-tenant-sale-data-model.md) |
 | Idempotency + replay | [ADR-002](adrs/ADR-002-idempotency-and-replay-safety.md) |
+| Observability | [ADR-005](adrs/ADR-005-observability.md) |
 | Draft SLOs | [slo-error-budgets.md](slo-error-budgets.md) |
 | Threats | [threat-model.md](threat-model.md) |

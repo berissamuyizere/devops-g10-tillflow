@@ -1,0 +1,1011 @@
+{
+  "uid": "tillflow-overview",
+  "title": "TillFlow overview",
+  "tags": [
+    "tillflow",
+    "g3",
+    "overview"
+  ],
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 2,
+  "refresh": "1m",
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "templating": {
+    "list": []
+  },
+  "annotations": {
+    "list": []
+  },
+  "panels": [
+    {
+      "id": 1,
+      "type": "stat",
+      "title": "Uptime 5m (probe)",
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 0,
+        "y": 0
+      },
+      "datasource": {
+        "type": "cloudwatch"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "decimals": 2
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "cloudwatch"
+          },
+          "queryMode": "Metrics",
+          "namespace": "CloudWatchSynthetics",
+          "metricName": "SuccessPercent",
+          "dimensions": {
+            "CanaryName": [
+              "devops-g10-probe"
+            ]
+          },
+          "statistic": "Average",
+          "period": "300",
+          "region": "default",
+          "metricQueryType": 0,
+          "metricEditorMode": 0,
+          "expression": "",
+          "id": "",
+          "label": "",
+          "matchExact": false,
+          "hide": false
+        }
+      ],
+      "timeFrom": "5m"
+    },
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "Uptime 1h (probe)",
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 8,
+        "y": 0
+      },
+      "datasource": {
+        "type": "cloudwatch"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "decimals": 2
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "cloudwatch"
+          },
+          "queryMode": "Metrics",
+          "namespace": "CloudWatchSynthetics",
+          "metricName": "SuccessPercent",
+          "dimensions": {
+            "CanaryName": [
+              "devops-g10-probe"
+            ]
+          },
+          "statistic": "Average",
+          "period": "300",
+          "region": "default",
+          "metricQueryType": 0,
+          "metricEditorMode": 0,
+          "expression": "",
+          "id": "",
+          "label": "",
+          "matchExact": false,
+          "hide": false
+        }
+      ],
+      "timeFrom": "1h"
+    },
+    {
+      "id": 3,
+      "type": "stat",
+      "title": "Uptime 28d (probe)",
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 16,
+        "y": 0
+      },
+      "datasource": {
+        "type": "cloudwatch"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "decimals": 2
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "cloudwatch"
+          },
+          "queryMode": "Metrics",
+          "namespace": "CloudWatchSynthetics",
+          "metricName": "SuccessPercent",
+          "dimensions": {
+            "CanaryName": [
+              "devops-g10-probe"
+            ]
+          },
+          "statistic": "Average",
+          "period": "3600",
+          "region": "default",
+          "metricQueryType": 0,
+          "metricEditorMode": 0,
+          "expression": "",
+          "id": "",
+          "label": "",
+          "matchExact": false,
+          "hide": false
+        }
+      ],
+      "timeFrom": "28d"
+    },
+    {
+      "id": 4,
+      "type": "stat",
+      "title": "POS error rate (eligible)",
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 0,
+        "y": 6
+      },
+      "datasource": {
+        "type": "cloudwatch"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "min": 0,
+          "decimals": 3,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 0.006
+              },
+              {
+                "color": "red",
+                "value": 0.0144
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "cloudwatch"
+          },
+          "queryMode": "Metrics",
+          "namespace": "",
+          "metricName": "",
+          "dimensions": {},
+          "statistic": "Sum",
+          "period": "60",
+          "region": "default",
+          "metricQueryType": 1,
+          "metricEditorMode": 1,
+          "expression": "SEARCH('{TillFlow} MetricName=\"pos_sale_writes_total\" outcome=\"error\"', 'Sum', 60)",
+          "id": "err",
+          "label": "",
+          "matchExact": false,
+          "hide": true
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "cloudwatch"
+          },
+          "queryMode": "Metrics",
+          "namespace": "",
+          "metricName": "",
+          "dimensions": {},
+          "statistic": "Sum",
+          "period": "60",
+          "region": "default",
+          "metricQueryType": 1,
+          "metricEditorMode": 1,
+          "expression": "SEARCH('{TillFlow} MetricName=\"pos_sale_writes_total\" outcome=\"created\"', 'Sum', 60)",
+          "id": "okc",
+          "label": "",
+          "matchExact": false,
+          "hide": true
+        },
+        {
+          "refId": "C",
+          "datasource": {
+            "type": "cloudwatch"
+          },
+          "queryMode": "Metrics",
+          "namespace": "",
+          "metricName": "",
+          "dimensions": {},
+          "statistic": "Sum",
+          "period": "60",
+          "region": "default",
+          "metricQueryType": 1,
+          "metricEditorMode": 1,
+          "expression": "SEARCH('{TillFlow} MetricName=\"pos_sale_writes_total\" outcome=\"replay\"', 'Sum', 60)",
+          "id": "okr",
+          "label": "",
+          "matchExact": false,
+          "hide": true
+        },
+        {
+          "refId": "D",
+          "datasource": {
+            "type": "cloudwatch"
+          },
+          "queryMode": "Metrics",
+          "namespace": "",
+          "metricName": "",
+          "dimensions": {},
+          "statistic": "Sum",
+          "period": "60",
+          "region": "default",
+          "metricQueryType": 1,
+          "metricEditorMode": 1,
+          "expression": "IF((err+okc+okr)>0, err/(err+okc+okr), 0)",
+          "id": "rate",
+          "label": "",
+          "matchExact": false,
+          "hide": false
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "type": "stat",
+      "title": "Payments timeout rate",
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 8,
+        "y": 6
+      },
+      "datasource": {
+        "type": "cloudwatch"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "min": 0,
+          "decimals": 3,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 0.03
+              },
+              {
+                "color": "red",
+                "value": 0.072
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "cloudwatch"
+          },
+          "queryMode": "Metrics",
+          "namespace": "",
+          "metricName": "",
+          "dimensions": {},
+          "statistic": "Sum",
+          "period": "60",
+          "region": "default",
+          "metricQueryType": 1,
+          "metricEditorMode": 1,
+          "expression": "SEARCH('{TillFlow} MetricName=\"payments_commands_total\" outcome=\"timeout\"', 'Sum', 60)",
+          "id": "tmo",
+          "label": "",
+          "matchExact": false,
+          "hide": true
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "cloudwatch"
+          },
+          "queryMode": "Metrics",
+          "namespace": "",
+          "metricName": "",
+          "dimensions": {},
+          "statistic": "Sum",
+          "period": "60",
+          "region": "default",
+          "metricQueryType": 1,
+          "metricEditorMode": 1,
+          "expression": "SEARCH('{TillFlow} MetricName=\"payments_commands_total\" outcome=\"accepted\"', 'Sum', 60)",
+          "id": "acc",
+          "label": "",
+          "matchExact": false,
+          "hide": true
+        },
+        {
+          "refId": "C",
+          "datasource": {
+            "type": "cloudwatch"
+          },
+          "queryMode": "Metrics",
+          "namespace": "",
+          "metricName": "",
+          "dimensions": {},
+          "statistic": "Sum",
+          "period": "60",
+          "region": "default",
+          "metricQueryType": 1,
+          "metricEditorMode": 1,
+          "expression": "IF((tmo+acc)>0, tmo/(tmo+acc), 0)",
+          "id": "rate",
+          "label": "",
+          "matchExact": false,
+          "hide": false
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "type": "stat",
+      "title": "Commission close error rate",
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 16,
+        "y": 6
+      },
+      "datasource": {
+        "type": "cloudwatch"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "min": 0,
+          "decimals": 3,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 0.06
+              },
+              {
+                "color": "red",
+                "value": 0.144
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "cloudwatch"
+          },
+          "queryMode": "Metrics",
+          "namespace": "",
+          "metricName": "",
+          "dimensions": {},
+          "statistic": "Sum",
+          "period": "60",
+          "region": "default",
+          "metricQueryType": 1,
+          "metricEditorMode": 1,
+          "expression": "SEARCH('{TillFlow} MetricName=\"commission_close_runs_total\" outcome=\"error\"', 'Sum', 60)",
+          "id": "err",
+          "label": "",
+          "matchExact": false,
+          "hide": true
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "cloudwatch"
+          },
+          "queryMode": "Metrics",
+          "namespace": "",
+          "metricName": "",
+          "dimensions": {},
+          "statistic": "Sum",
+          "period": "60",
+          "region": "default",
+          "metricQueryType": 1,
+          "metricEditorMode": 1,
+          "expression": "SEARCH('{TillFlow} MetricName=\"commission_close_runs_total\" outcome=\"success\"', 'Sum', 60)",
+          "id": "ok",
+          "label": "",
+          "matchExact": false,
+          "hide": true
+        },
+        {
+          "refId": "C",
+          "datasource": {
+            "type": "cloudwatch"
+          },
+          "queryMode": "Metrics",
+          "namespace": "",
+          "metricName": "",
+          "dimensions": {},
+          "statistic": "Sum",
+          "period": "60",
+          "region": "default",
+          "metricQueryType": 1,
+          "metricEditorMode": 1,
+          "expression": "IF((err+ok)>0, err/(err+ok), 0)",
+          "id": "rate",
+          "label": "",
+          "matchExact": false,
+          "hide": false
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "type": "timeseries",
+      "title": "Sales paid",
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 12
+      },
+      "datasource": {
+        "type": "cloudwatch"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops",
+          "min": 0,
+          "decimals": 2,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "linear",
+            "barAlignment": 0,
+            "lineWidth": 1,
+            "fillOpacity": 15,
+            "gradientMode": "none",
+            "spanNulls": false,
+            "insertNulls": false,
+            "showPoints": "never",
+            "pointSize": 5,
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            },
+            "axisPlacement": "auto",
+            "axisLabel": "",
+            "axisColorMode": "text",
+            "axisBorderShow": false,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "axisCenteredZero": false,
+            "hideFrom": {
+              "tooltip": false,
+              "viz": false,
+              "legend": false
+            },
+            "thresholdsStyle": {
+              "mode": "line"
+            }
+          },
+          "color": {
+            "mode": "palette-classic"
+          },
+          "mappings": []
+        },
+        "overrides": []
+      },
+      "options": {
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        },
+        "legend": {
+          "showLegend": true,
+          "displayMode": "list",
+          "placement": "bottom",
+          "calcs": []
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "cloudwatch"
+          },
+          "queryMode": "Metrics",
+          "namespace": "TillFlow",
+          "metricName": "pos_sales_paid_total",
+          "dimensions": {},
+          "statistic": "Sum",
+          "period": "60",
+          "region": "default",
+          "metricQueryType": 0,
+          "metricEditorMode": 0,
+          "expression": "",
+          "id": "",
+          "label": "",
+          "matchExact": false,
+          "hide": false
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "type": "timeseries",
+      "title": "Payouts by status",
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 12
+      },
+      "datasource": {
+        "type": "cloudwatch"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "min": 0,
+          "decimals": 2,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "linear",
+            "barAlignment": 0,
+            "lineWidth": 1,
+            "fillOpacity": 15,
+            "gradientMode": "none",
+            "spanNulls": false,
+            "insertNulls": false,
+            "showPoints": "never",
+            "pointSize": 5,
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            },
+            "axisPlacement": "auto",
+            "axisLabel": "",
+            "axisColorMode": "text",
+            "axisBorderShow": false,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "axisCenteredZero": false,
+            "hideFrom": {
+              "tooltip": false,
+              "viz": false,
+              "legend": false
+            },
+            "thresholdsStyle": {
+              "mode": "line"
+            }
+          },
+          "color": {
+            "mode": "palette-classic"
+          },
+          "mappings": []
+        },
+        "overrides": []
+      },
+      "options": {
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        },
+        "legend": {
+          "showLegend": true,
+          "displayMode": "list",
+          "placement": "bottom",
+          "calcs": []
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "cloudwatch"
+          },
+          "queryMode": "Metrics",
+          "namespace": "TillFlow",
+          "metricName": "payouts_by_status",
+          "dimensions": {},
+          "statistic": "Average",
+          "period": "60",
+          "region": "default",
+          "metricQueryType": 0,
+          "metricEditorMode": 0,
+          "expression": "",
+          "id": "",
+          "label": "",
+          "matchExact": false,
+          "hide": false
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "type": "timeseries",
+      "title": "Oldest pending age",
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 12
+      },
+      "datasource": {
+        "type": "cloudwatch"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "min": 0,
+          "decimals": 2,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "linear",
+            "barAlignment": 0,
+            "lineWidth": 1,
+            "fillOpacity": 15,
+            "gradientMode": "none",
+            "spanNulls": false,
+            "insertNulls": false,
+            "showPoints": "never",
+            "pointSize": 5,
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            },
+            "axisPlacement": "auto",
+            "axisLabel": "",
+            "axisColorMode": "text",
+            "axisBorderShow": false,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "axisCenteredZero": false,
+            "hideFrom": {
+              "tooltip": false,
+              "viz": false,
+              "legend": false
+            },
+            "thresholdsStyle": {
+              "mode": "line"
+            }
+          },
+          "color": {
+            "mode": "palette-classic"
+          },
+          "mappings": []
+        },
+        "overrides": []
+      },
+      "options": {
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        },
+        "legend": {
+          "showLegend": true,
+          "displayMode": "list",
+          "placement": "bottom",
+          "calcs": []
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "cloudwatch"
+          },
+          "queryMode": "Metrics",
+          "namespace": "TillFlow",
+          "metricName": "payments_oldest_pending_age_seconds",
+          "dimensions": {},
+          "statistic": "Maximum",
+          "period": "60",
+          "region": "default",
+          "metricQueryType": 0,
+          "metricEditorMode": 0,
+          "expression": "",
+          "id": "",
+          "label": "",
+          "matchExact": false,
+          "hide": false
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "type": "timeseries",
+      "title": "ECS CPU (autoscale target 70%)",
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 20
+      },
+      "datasource": {
+        "type": "cloudwatch"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "decimals": 1,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 70
+              },
+              {
+                "color": "red",
+                "value": 85
+              }
+            ]
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "linear",
+            "barAlignment": 0,
+            "lineWidth": 1,
+            "fillOpacity": 15,
+            "gradientMode": "none",
+            "spanNulls": false,
+            "insertNulls": false,
+            "showPoints": "never",
+            "pointSize": 5,
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            },
+            "axisPlacement": "auto",
+            "axisLabel": "",
+            "axisColorMode": "text",
+            "axisBorderShow": false,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "axisCenteredZero": false,
+            "hideFrom": {
+              "tooltip": false,
+              "viz": false,
+              "legend": false
+            },
+            "thresholdsStyle": {
+              "mode": "line"
+            }
+          },
+          "color": {
+            "mode": "palette-classic"
+          },
+          "mappings": []
+        },
+        "overrides": []
+      },
+      "options": {
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        },
+        "legend": {
+          "showLegend": true,
+          "displayMode": "list",
+          "placement": "bottom",
+          "calcs": []
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "cloudwatch"
+          },
+          "queryMode": "Metrics",
+          "namespace": "AWS/ECS",
+          "metricName": "CPUUtilization",
+          "dimensions": {
+            "ClusterName": [
+              "devops-g10"
+            ]
+          },
+          "statistic": "Average",
+          "period": "60",
+          "region": "default",
+          "metricQueryType": 0,
+          "metricEditorMode": 0,
+          "expression": "",
+          "id": "",
+          "label": "",
+          "matchExact": false,
+          "hide": false
+        }
+      ]
+    }
+  ]
+}
