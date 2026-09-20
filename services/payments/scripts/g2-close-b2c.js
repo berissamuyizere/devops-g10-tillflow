@@ -397,13 +397,20 @@ async function main() {
     passed: failures === 0,
   };
 
-  fs.mkdirSync(OUT_DIR, { recursive: true });
+  console.log('EVIDENCE_JSON ' + JSON.stringify(evidence));
+
   const outFile = path.join(OUT_DIR, 'g2-close-b2c.json');
-  fs.writeFileSync(outFile, JSON.stringify(evidence, null, 2) + '\n');
+
+  try {
+    fs.mkdirSync(OUT_DIR, { recursive: true });
+    fs.writeFileSync(outFile, JSON.stringify(evidence, null, 2) + '\n');
+    console.log(`evidence written to ${outFile}`);
+  } catch (err) {
+    console.log(`could not write ${outFile}: ${err.code || err.message}`);
+    console.log('recover it from the EVIDENCE_JSON line above.');
+  }
 
   console.log(`\n${failures === 0 ? 'ALL CHECKS PASSED' : `${failures} CHECK(S) FAILED`}`);
-  console.log(`evidence written to ${outFile}`);
-  console.log('EVIDENCE_JSON ' + JSON.stringify(evidence));
   console.log(`X-Ray trace id: 1-${traceId.slice(0, 8)}-${traceId.slice(8)}\n`);
   process.exit(failures === 0 ? 0 : 1);
 }
