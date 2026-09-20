@@ -124,6 +124,15 @@ Then: `#payments-oldest-pending`.
 - **Owner:** Arsema
 - **First safe action:** Do **not** mark `failed`. List pending payments
   older than 60s and reconcile. Timeout stays `pending`.
+- **Fake mode stays ALARM.** The timeout payer’s `stkQuery` answers
+  1100 forever, so pending age never falls. That is expected under
+  ADR-002 (silence is not a decline). Do not treat a standing ALARM
+  as a new incident during the G5 walk-through.
+- Do **not** `SetAlarmState` to invent an OK. Clearing it that way is
+  a lie; the rows are still `pending`.
+- **Operator resolve** is the only recovery: a signed callback, a real
+  Daraja answer, or a written hand-close. Reconcile alone cannot clear
+  fake-mode timeouts.
 
 Then: `payments.callback_log` for `rejected_bad_signature` vs silence
 (Daraja). Grafana `tillflow-payments`.
