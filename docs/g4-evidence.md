@@ -42,6 +42,6 @@ Scar log: [`docs/scar-log.md`](scar-log.md).
 | Saloi | Reliability | 2026-09-20 23:10 EAT |
 | Yordanos | Platform | 2026-09-20 23:34 EAT |
 | Arsema | Payments | 2026-09-21 00:08 EAT |
-| Berissa | Product + POS | |
+| Berissa | Product + POS | 2026-09-20 23:55 EAT |
 
 Arsema’s payment drills are landed. The first run failed on reconcile with a 500 — the fake Daraja adapter held in-flight pushes in per-process memory while Payments runs two tasks — fixed in PR #130 and re-run against `:22`. `payments-oldest-pending` stays in ALARM by design: in fake mode a timeout payment can never be reconciled out of `pending`, so that alarm cannot self-recover. SG rule ids were imported onto the live Terraform state (`cache_from_ecs` `sgr-0f50e811b25ab2ed0`, `alb_from_ecs` `sgr-06deea1208cdcbcb4`) so the next apply does not recreate them.
