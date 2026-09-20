@@ -12,7 +12,7 @@ is not this work.
 
 | Item | Pointer |
 |---|---|
-| Grafana | Grafana Cloud `punywaxwing1700` — https://punywaxwing1700.grafana.net (ADR-005 fallback). AMG `g-ede3f6a694` stays up; SSO assignment is denied |
+| Grafana | **Defence login:** Grafana Cloud `punywaxwing1700` — https://punywaxwing1700.grafana.net. CloudWatch `eu-central-1`. Five `tillflow-*` JSON imported. Yordanos, Arsema, Berissa invited. AMG `g-ede3f6a694` stays up; SSO assignment is denied (Yordanos asking the cohort admin — we do not wait). Proof: [`g3-grafana-cloud-dashboards.json`](../evidence/reliability-operations/g3-grafana-cloud-dashboards.json) + [`g3-grafana-cloud-overview.png`](../evidence/reliability-operations/g3-grafana-cloud-overview.png) |
 | Dashboards | uids `tillflow-overview`, `tillflow-web`, `tillflow-pos`, `tillflow-payments`, `tillflow-commission` from `infra/grafana/*.json` |
 | Metrics | CloudWatch namespace `TillFlow` after the forced image rebuild ([35519412591](https://github.com/berissamuyizere/devops-g10-tillflow/actions/runs/35519412591), SHA `3b0fd3f1`) and Arsema’s public pay+trace ([#112](https://github.com/berissamuyizere/devops-g10-tillflow/pull/112)) |
 | Slack | SNS `devops-g10-alerts` → Lambda `devops-g10-slack-notifier` → secret `devops-g10/slack-webhook` |
@@ -78,11 +78,23 @@ The g10 permission set has an **explicit deny** on
 URL returns `sso.auth.access-denied` because **no users are assigned**.
 This role cannot fix that.
 
-ADR-005 same-day fallback: **Grafana Cloud free** stack
-`punywaxwing1700` — https://punywaxwing1700.grafana.net
-JSON in `infra/grafana/*.json` stays the contract. Invite all four;
-CloudWatch in `eu-central-1`. Saloi logged into this Cloud org
-**2026-09-20 19:30 EAT** (`akezasaloi@gmail.com`, Admin).
+ADR-005 same-day fallback — this is what we open at defence:
+
+**Grafana Cloud** `punywaxwing1700` — https://punywaxwing1700.grafana.net  
+Saloi Admin **2026-09-20 19:30 EAT** (`akezasaloi@gmail.com`). CloudWatch
+data source `eu-central-1`. Five dashboards imported from
+`infra/grafana/*.json` (`tillflow-overview`, `tillflow-web`,
+`tillflow-pos`, `tillflow-payments`, `tillflow-commission`). Invited
+Yordanos, Arsema, Berissa. Do **not** use AMG at defence.
+
+Proof (Cloud API + screenshot):
+
+- [`g3-grafana-cloud-dashboards.json`](../evidence/reliability-operations/g3-grafana-cloud-dashboards.json)
+- [`g3-grafana-cloud-datasources.json`](../evidence/reliability-operations/g3-grafana-cloud-datasources.json)
+- [`g3-grafana-cloud-overview.png`](../evidence/reliability-operations/g3-grafana-cloud-overview.png)
+
+Capture with [`g3-grafana-cloud-proof.sh`](../evidence/reliability-operations/g3-grafana-cloud-proof.sh)
+plus one PNG of overview panels 11–14 with live data.
 
 ## Budget remaining (28d)
 

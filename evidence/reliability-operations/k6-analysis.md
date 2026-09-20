@@ -35,6 +35,8 @@ Across the whole 22 min run:
 | HTTP max | 754 ms |
 | Iteration p95 | 969 ms |
 
+Brief requires failures under 1% (got **0.01%**), p95 under 500 ms (got **253 ms**), checks over 99% (got **99.97%**). The script’s own HTTP p95 threshold was 2000 ms; the brief is the bar Rob will use.
+
 Spike at 6 iter/s (~18 counted rps) for 30s did not move p95 out of the 250 ms band. Pay stayed `accepted` on **2374 / 2374**. One callback + one “sale is paid” miss (same iteration). Arsema not needed.
 
 ## Bottleneck
