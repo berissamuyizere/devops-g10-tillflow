@@ -106,6 +106,11 @@ G1–G4 stack is live in `eu-central-1`. Quick smoke: `$API_URL/health` (see tab
 
 `infra/rds.tf` sets `deletion_protection = var.rds_deletion_protection` (default **true**) on `devops-g10-pg`. A bare `terraform destroy` returns `InvalidParameterCombination: Cannot delete protected DB instance`. The ALB already has `enable_deletion_protection = false`.
 
+Do **not** destroy before Rob has seen this URL — rebuild mints a new
+API Gateway. Apply deletion flags (S3 `force_destroy`, ECR
+`force_delete`, secrets `recovery_window_in_days = 0`) in the **same**
+plan as the RDS unlock. They do not change runtime behaviour.
+
 In front of Rob, disable protection **first**, wait until AWS shows it off, then destroy:
 
 ```bash

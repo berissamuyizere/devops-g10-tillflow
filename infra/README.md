@@ -98,8 +98,13 @@ Refresh live dumps: `./evidence/platform-delivery/collect.sh`.
 (default `true`). `terraform destroy` fails on `devops-g10-pg` until that
 is off. Do **not** start with destroy.
 
+Apply the deletion flags in the same plan (S3 `force_destroy`, ECR
+`force_delete`, secrets `recovery_window_in_days = 0`). They do not
+change runtime behaviour. Do **not** apply them before Rob has seen
+the live URL — they only matter at destroy time.
+
 ```bash
-# 1. Disable protection via the same apply path as Release.
+# 1. Disable RDS protection + deletion flags via the same apply path as Release.
 TF_VAR_rds_deletion_protection=false terraform plan -out=plan.bin
 terraform apply plan.bin
 
