@@ -114,6 +114,12 @@ resource "aws_grafana_workspace" "amg" {
 
   tags = { service = "grafana" }
 
+  timeouts {
+    create = "30m"
+    update = "10m"
+    delete = "10m"
+  }
+
   depends_on = [
     aws_iam_role_policy_attachment.grafana,
     aws_iam_policy.ci_deploy,
