@@ -249,7 +249,7 @@ function createApp(options = {}) {
     }
   });
 
-  app.post('/callbacks/mpesa/:secret', async (req, res) => {
+  app.post(['/payments/callbacks/:secret', '/callbacks/mpesa/:secret'], async (req, res) => {
     const ip = pathAuth.sourceIp(req);
     const verdict = pathAuth.verifyPath({
       presented: req.params.secret,

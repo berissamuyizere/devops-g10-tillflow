@@ -45,7 +45,7 @@ See [`src/payments/state.js`](src/payments/state.js).
 | `POST` | `/internal/v1/payments/:id/reconcile` | POS / scheduler | `X-Pos-Token` |
 | `POST` | `/internal/v1/pos-sync/sweep` | scheduler / runbook | `X-Pos-Token` |
 | `POST` | `/payments/callback` | Daraja (fake mode) | HMAC signature |
-| `POST` | `/callbacks/mpesa/:secret` | real Daraja | secret path segment + optional IP allowlist |
+| `POST` | `/payments/callbacks/:secret` | real Daraja | secret path segment + optional IP allowlist |
 | `POST` | `/internal/v1/payouts` | Commission | `X-Commission-Token` |
 | `POST` | `/internal/v1/payouts/:id/reconcile` | scheduler / runbook | `X-Commission-Token` |
 | `POST` | `/payments/b2c/callback` | Daraja | HMAC signature |
@@ -69,7 +69,10 @@ Safaricom does not sign its callbacks, so the HMAC route only works for
 callbacks we generate ourselves. `/callbacks/mpesa/:secret` is the route a
 real Daraja can authenticate against: the segment is compared in constant
 time and, when `DARAJA_CALLBACK_IP_ALLOWLIST` is set, the source address must
-fall inside it. Both routes share the same body handling, so the
+fall inside it. It is mounted under `/payments/` because the ALB only forwards
+`/payments/*` and `/internal/*` to this service; `/callbacks/mpesa/:secret` is
+kept as an alias for the conventional shape, but it needs an edge rule before
+it is reachable. Both routes share the same body handling, so the
 `CheckoutRequestID` must still match a push we initiated, the amount must
 still match, illegal transitions are still refused, and every rejection is
 still written to `callback_log`.

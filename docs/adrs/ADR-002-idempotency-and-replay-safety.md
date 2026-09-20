@@ -99,10 +99,13 @@ callbacks. Safaricom does not sign, so switching `MPESA_MODE` to `daraja`
 would have made every inbound callback 401. That was recorded as an accepted
 residual; it is now fixed rather than accepted.
 
-`POST /callbacks/mpesa/:secret` authenticates on a secret path segment
+`POST /payments/callbacks/:secret` authenticates on a secret path segment
 compared in constant time, with an optional source-IP allowlist
 (`DARAJA_CALLBACK_IP_ALLOWLIST`, e.g. `196.201.212.0/24`). The HMAC route
-stays as it is, so nothing that works today changes.
+stays as it is, so nothing that works today changes. It lives under
+`/payments/` deliberately: the ALB forwards only `/payments/*` and
+`/internal/*` here, so mounting it there means this needs no edge rule and no
+change in the platform area.
 
 Everything that does not depend on the transport still applies to both routes:
 the `CheckoutRequestID` must match a push we initiated, the amount must match,

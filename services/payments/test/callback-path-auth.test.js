@@ -166,6 +166,19 @@ describe('POST /callbacks/mpesa/:secret', () => {
     assert.equal(res.body.error, 'misconfigured');
   });
 
+  it('is reachable on the edge-routed /payments prefix too', async () => {
+    const { app, mpesa, pos } = appWithPath();
+    const { payment, body } = await pendingPayment(app, pos, mpesa);
+
+    const res = await request(app)
+      .post(`/payments/callbacks/${PATH_SECRET}`)
+      .set('content-type', 'application/json')
+      .send(body);
+
+    assert.equal(res.status, 200, 'the ALB only forwards /payments/* to this service');
+    assert.equal((await db.query('SELECT status FROM payments.payments WHERE id = $1', [payment.id])).rows[0].status, 'paid');
+  });
+
   it('absorbs a byte-identical replay on the secret path', async () => {
     const { app, mpesa, pos } = appWithPath();
     const { payment, body } = await pendingPayment(app, pos, mpesa);
