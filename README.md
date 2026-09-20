@@ -51,11 +51,50 @@ evidence/<area>/       # per-DRI runtime proof
 CODEOWNERS
 ```
 
+## Public demo (G5)
+
+**Base URL (API Gateway, public edge only):**
+
+`https://f9nla14lfh.execute-api.eu-central-1.amazonaws.com`
+
+| Check | Command |
+|---|---|
+| Health | `curl -sS "$API/health" \| jq .` |
+| Ready | `curl -sS "$API/ready" \| jq .` |
+| Auth gate | `curl -sS -o /dev/null -w '%{http_code}\n' "$API/sales/00000000-0000-0000-0000-000000000001"` → **401** |
+
+Demo tenant / attendant (seeded on live RDS):
+
+- `TENANT_ID=11111111-1111-1111-1111-111111111111`
+- `ATTENDANT_ID=22222222-2222-2222-2222-222222222222`
+
+`MPESA_MODE=fake` on Payments — sandbox MSISDNs only. Success payer: **`254700000000`**.
+
+### Sale → fake pay → paid (one script)
+
+Public path only (`POST /sales` → `POST /sales/:id/pay` → signed `POST /payments/callback` → `GET /sales/:id` shows `paid`):
+
+```bash
+aws sso login --profile g10
+export AWS_PROFILE=g10 AWS_REGION=eu-central-1
+
+export API_URL=https://f9nla14lfh.execute-api.eu-central-1.amazonaws.com
+export TENANT_ID=11111111-1111-1111-1111-111111111111
+export ATTENDANT_ID=22222222-2222-2222-2222-222222222222
+TOKENS=$(aws secretsmanager get-secret-value \
+  --secret-id devops-g10/service-tokens \
+  --query SecretString --output text)
+export DARAJA_CALLBACK_SECRET=$(echo "$TOKENS" | jq -r .daraja_callback_secret)
+
+node services/payments/scripts/g3-trace-payment.js
+```
+
+Writes `evidence/payments-integrity/g3-trace-payment.json`. k6 variant:
+`evidence/reliability-operations/k6/g3-public-pay.js`.
+
 ## Bootstrap / deploy / destroy
 
-G1 (web) and G2 (POS + Payments) are live in `eu-central-1`. Public smoke:
-
-`https://f9nla14lfh.execute-api.eu-central-1.amazonaws.com/health`
+G1–G4 stack is live in `eu-central-1`. Quick smoke: `$API_URL/health` (see table above).
 
 - **PRs** → `develop`, then `develop` → `main`. Cross-reviewer reviews the area.
 - **Apply on `main`** waits on the GitHub Environment `production` (required reviewers) and applies the saved `plan.bin` — it does not re-plan.
@@ -101,7 +140,30 @@ aws rds modify-db-instance \
 
 If the destroy is aborted, set `TF_VAR_rds_deletion_protection=true` and apply again. Do not leave protection off overnight.
 
-G2 happy-path JSON: [`evidence/payments-integrity/`](evidence/payments-integrity/). Platform dumps (ECS including the Commission SQS worker, path-routing smoke, tag audit): [`evidence/platform-delivery/`](evidence/platform-delivery/).
+## Cost (capstone)
+
+At rest, expect **~$45–60/month** before free tier (NAT ~$32, RDS `db.t4g.micro` ~$14, plus Fargate/Valkey/logs). See [`infra/README.md`](infra/README.md) for detail.
+
+Between demos you may set ECS `desired_count = 0` on non-critical services to cut Fargate spend — **do not** `terraform destroy` until after the defence walk-through.
+
+## Cleanup
+
+| When | Action |
+|---|---|
+| **Now → defence** | Leave the stack up. No deploys after `develop` → `main` promote. No destroy. |
+| **Between demos** | Optional: scale ECS services to 0 (platform DRI). RDS and NAT stay. |
+| **G5 teardown (last)** | Yordanos only, after Rob says the demo is over: `TF_VAR_rds_deletion_protection=false` → apply → confirm AWS → `terraform destroy` → bootstrap last. See [G5 teardown](#g5-teardown-rds-will-fail-if-you-skip-this) above. |
+
+## Evidence index
+
+| Folder | DRI | Contents |
+|---|---|---|
+| [`evidence/product-pos/`](evidence/product-pos/) | Berissa | POS seed, commission eligible, Valkey cache, G4 cache break + DLQ |
+| [`evidence/payments-integrity/`](evidence/payments-integrity/) | Arsema | Happy path, timeout, B2C close, G3/G4 payment drills |
+| [`evidence/platform-delivery/`](evidence/platform-delivery/) | Yordanos | ECS/ECR/smoke, G4 broken release + rollback |
+| [`evidence/reliability-operations/`](evidence/reliability-operations/) | Saloi | k6, Slack drill, Grafana Cloud, G4 PITR + game-day |
+
+Gate packs: [`docs/g3-evidence.md`](docs/g3-evidence.md), [`docs/g4-evidence.md`](docs/g4-evidence.md). Saloi owns [`docs/production-readiness.md`](docs/production-readiness.md) (G5).
 
 ## Group facts
 
