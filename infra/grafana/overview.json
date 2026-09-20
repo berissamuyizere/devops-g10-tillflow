@@ -8,7 +8,7 @@
   ],
   "timezone": "browser",
   "schemaVersion": 39,
-  "version": 2,
+  "version": 3,
   "refresh": "1m",
   "time": {
     "from": "now-6h",
@@ -1006,6 +1006,518 @@
           "hide": false
         }
       ]
+    },
+    {
+      "id": 11,
+      "type": "stat",
+      "title": "Web budget remaining (28d)",
+      "gridPos": {
+        "h": 6,
+        "w": 6,
+        "x": 0,
+        "y": 28
+      },
+      "datasource": {
+        "type": "cloudwatch"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "min": 0,
+          "max": 1,
+          "decimals": 2,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 0.25
+              },
+              {
+                "color": "green",
+                "value": 0.5
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "cloudwatch"
+          },
+          "queryMode": "Metrics",
+          "namespace": "",
+          "metricName": "",
+          "dimensions": {},
+          "statistic": "Sum",
+          "period": "86400",
+          "region": "default",
+          "metricQueryType": 1,
+          "metricEditorMode": 1,
+          "expression": "SEARCH('{AWS/ApplicationELB,LoadBalancer,TargetGroup} MetricName=\"HTTPCode_Target_5XX_Count\" TargetGroup=\"targetgroup/devops-g10-web-tg\"', 'Sum', 86400)",
+          "id": "e5",
+          "label": "",
+          "matchExact": false,
+          "hide": true
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "cloudwatch"
+          },
+          "queryMode": "Metrics",
+          "namespace": "",
+          "metricName": "",
+          "dimensions": {},
+          "statistic": "Sum",
+          "period": "86400",
+          "region": "default",
+          "metricQueryType": 1,
+          "metricEditorMode": 1,
+          "expression": "SEARCH('{AWS/ApplicationELB,LoadBalancer,TargetGroup} MetricName=\"RequestCount\" TargetGroup=\"targetgroup/devops-g10-web-tg\"', 'Sum', 86400)",
+          "id": "req",
+          "label": "",
+          "matchExact": false,
+          "hide": true
+        },
+        {
+          "refId": "C",
+          "datasource": {
+            "type": "cloudwatch"
+          },
+          "queryMode": "Metrics",
+          "namespace": "",
+          "metricName": "",
+          "dimensions": {},
+          "statistic": "Sum",
+          "period": "86400",
+          "region": "default",
+          "metricQueryType": 1,
+          "metricEditorMode": 1,
+          "expression": "SEARCH('{AWS/ApplicationELB,LoadBalancer,TargetGroup} MetricName=\"HTTPCode_Target_4XX_Count\" TargetGroup=\"targetgroup/devops-g10-web-tg\"', 'Sum', 86400)",
+          "id": "e4",
+          "label": "",
+          "matchExact": false,
+          "hide": true
+        },
+        {
+          "refId": "D",
+          "datasource": {
+            "type": "cloudwatch"
+          },
+          "queryMode": "Metrics",
+          "namespace": "",
+          "metricName": "",
+          "dimensions": {},
+          "statistic": "Sum",
+          "period": "86400",
+          "region": "default",
+          "metricQueryType": 1,
+          "metricEditorMode": 1,
+          "expression": "IF((req-e4)>0, MAX([0, 1 - e5/((req-e4)*0.001)]), 1)",
+          "id": "bud",
+          "label": "",
+          "matchExact": false,
+          "hide": false
+        }
+      ],
+      "timeFrom": "28d",
+      "description": "1 \u2212 (errors \u00f7 (eligible \u00d7 (1 \u2212 SLO target))) over 28 days. Freeze at 0; resume when >25% for 24h."
+    },
+    {
+      "id": 12,
+      "type": "stat",
+      "title": "POS budget remaining (28d)",
+      "gridPos": {
+        "h": 6,
+        "w": 6,
+        "x": 6,
+        "y": 28
+      },
+      "datasource": {
+        "type": "cloudwatch"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "min": 0,
+          "max": 1,
+          "decimals": 2,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 0.25
+              },
+              {
+                "color": "green",
+                "value": 0.5
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "cloudwatch"
+          },
+          "queryMode": "Metrics",
+          "namespace": "",
+          "metricName": "",
+          "dimensions": {},
+          "statistic": "Sum",
+          "period": "86400",
+          "region": "default",
+          "metricQueryType": 1,
+          "metricEditorMode": 1,
+          "expression": "SEARCH('{TillFlow} MetricName=\"pos_sale_writes_total\" outcome=\"error\"', 'Sum', 86400)",
+          "id": "err",
+          "label": "",
+          "matchExact": false,
+          "hide": true
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "cloudwatch"
+          },
+          "queryMode": "Metrics",
+          "namespace": "",
+          "metricName": "",
+          "dimensions": {},
+          "statistic": "Sum",
+          "period": "86400",
+          "region": "default",
+          "metricQueryType": 1,
+          "metricEditorMode": 1,
+          "expression": "SEARCH('{TillFlow} MetricName=\"pos_sale_writes_total\" outcome=\"created\"', 'Sum', 86400)",
+          "id": "okc",
+          "label": "",
+          "matchExact": false,
+          "hide": true
+        },
+        {
+          "refId": "C",
+          "datasource": {
+            "type": "cloudwatch"
+          },
+          "queryMode": "Metrics",
+          "namespace": "",
+          "metricName": "",
+          "dimensions": {},
+          "statistic": "Sum",
+          "period": "86400",
+          "region": "default",
+          "metricQueryType": 1,
+          "metricEditorMode": 1,
+          "expression": "SEARCH('{TillFlow} MetricName=\"pos_sale_writes_total\" outcome=\"replay\"', 'Sum', 86400)",
+          "id": "okr",
+          "label": "",
+          "matchExact": false,
+          "hide": true
+        },
+        {
+          "refId": "D",
+          "datasource": {
+            "type": "cloudwatch"
+          },
+          "queryMode": "Metrics",
+          "namespace": "",
+          "metricName": "",
+          "dimensions": {},
+          "statistic": "Sum",
+          "period": "86400",
+          "region": "default",
+          "metricQueryType": 1,
+          "metricEditorMode": 1,
+          "expression": "IF((err+okc+okr)>0, MAX([0, 1 - err/((err+okc+okr)*0.001)]), 1)",
+          "id": "bud",
+          "label": "",
+          "matchExact": false,
+          "hide": false
+        }
+      ],
+      "timeFrom": "28d",
+      "description": "1 \u2212 (errors \u00f7 (eligible \u00d7 (1 \u2212 SLO target))) over 28 days. Freeze at 0; resume when >25% for 24h."
+    },
+    {
+      "id": 13,
+      "type": "stat",
+      "title": "Payments budget remaining (28d)",
+      "gridPos": {
+        "h": 6,
+        "w": 6,
+        "x": 12,
+        "y": 28
+      },
+      "datasource": {
+        "type": "cloudwatch"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "min": 0,
+          "max": 1,
+          "decimals": 2,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 0.25
+              },
+              {
+                "color": "green",
+                "value": 0.5
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "cloudwatch"
+          },
+          "queryMode": "Metrics",
+          "namespace": "",
+          "metricName": "",
+          "dimensions": {},
+          "statistic": "Sum",
+          "period": "86400",
+          "region": "default",
+          "metricQueryType": 1,
+          "metricEditorMode": 1,
+          "expression": "SEARCH('{TillFlow} MetricName=\"payments_commands_total\" outcome=\"timeout\"', 'Sum', 86400)",
+          "id": "tmo",
+          "label": "",
+          "matchExact": false,
+          "hide": true
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "cloudwatch"
+          },
+          "queryMode": "Metrics",
+          "namespace": "",
+          "metricName": "",
+          "dimensions": {},
+          "statistic": "Sum",
+          "period": "86400",
+          "region": "default",
+          "metricQueryType": 1,
+          "metricEditorMode": 1,
+          "expression": "SEARCH('{TillFlow} MetricName=\"payments_commands_total\" outcome=\"accepted\"', 'Sum', 86400)",
+          "id": "acc",
+          "label": "",
+          "matchExact": false,
+          "hide": true
+        },
+        {
+          "refId": "D",
+          "datasource": {
+            "type": "cloudwatch"
+          },
+          "queryMode": "Metrics",
+          "namespace": "",
+          "metricName": "",
+          "dimensions": {},
+          "statistic": "Sum",
+          "period": "86400",
+          "region": "default",
+          "metricQueryType": 1,
+          "metricEditorMode": 1,
+          "expression": "IF((tmo+acc)>0, MAX([0, 1 - tmo/((tmo+acc)*0.005)]), 1)",
+          "id": "bud",
+          "label": "",
+          "matchExact": false,
+          "hide": false
+        }
+      ],
+      "timeFrom": "28d",
+      "description": "1 \u2212 (errors \u00f7 (eligible \u00d7 (1 \u2212 SLO target))) over 28 days. Freeze at 0; resume when >25% for 24h."
+    },
+    {
+      "id": 14,
+      "type": "stat",
+      "title": "Commission budget remaining (28d)",
+      "gridPos": {
+        "h": 6,
+        "w": 6,
+        "x": 18,
+        "y": 28
+      },
+      "datasource": {
+        "type": "cloudwatch"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "min": 0,
+          "max": 1,
+          "decimals": 2,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 0.25
+              },
+              {
+                "color": "green",
+                "value": 0.5
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "cloudwatch"
+          },
+          "queryMode": "Metrics",
+          "namespace": "",
+          "metricName": "",
+          "dimensions": {},
+          "statistic": "Sum",
+          "period": "86400",
+          "region": "default",
+          "metricQueryType": 1,
+          "metricEditorMode": 1,
+          "expression": "SEARCH('{TillFlow} MetricName=\"commission_close_runs_total\" outcome=\"error\"', 'Sum', 86400)",
+          "id": "err",
+          "label": "",
+          "matchExact": false,
+          "hide": true
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "cloudwatch"
+          },
+          "queryMode": "Metrics",
+          "namespace": "",
+          "metricName": "",
+          "dimensions": {},
+          "statistic": "Sum",
+          "period": "86400",
+          "region": "default",
+          "metricQueryType": 1,
+          "metricEditorMode": 1,
+          "expression": "SEARCH('{TillFlow} MetricName=\"commission_close_runs_total\" outcome=\"success\"', 'Sum', 86400)",
+          "id": "ok",
+          "label": "",
+          "matchExact": false,
+          "hide": true
+        },
+        {
+          "refId": "D",
+          "datasource": {
+            "type": "cloudwatch"
+          },
+          "queryMode": "Metrics",
+          "namespace": "",
+          "metricName": "",
+          "dimensions": {},
+          "statistic": "Sum",
+          "period": "86400",
+          "region": "default",
+          "metricQueryType": 1,
+          "metricEditorMode": 1,
+          "expression": "IF((err+ok)>0, MAX([0, 1 - err/((err+ok)*0.01)]), 1)",
+          "id": "bud",
+          "label": "",
+          "matchExact": false,
+          "hide": false
+        }
+      ],
+      "timeFrom": "28d",
+      "description": "1 \u2212 (errors \u00f7 (eligible \u00d7 (1 \u2212 SLO target))) over 28 days. Freeze at 0; resume when >25% for 24h."
     }
   ]
 }

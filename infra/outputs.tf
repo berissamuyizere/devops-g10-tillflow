@@ -100,6 +100,11 @@ output "ecs_app_env_parameters" {
   value       = { for svc, p in aws_ssm_parameter.ecs_app_env : svc => p.name }
 }
 
+output "waf_rate_limit" {
+  description = "Current WAF IP rate limit (requests / 5 minutes), excluding /payments/callback."
+  value       = var.waf_rate_limit
+}
+
 output "grafana_url" {
   description = "Amazon Managed Grafana workspace. SSO login; dashboards from infra/grafana/*.json."
   value       = "https://${aws_grafana_workspace.amg.endpoint}"

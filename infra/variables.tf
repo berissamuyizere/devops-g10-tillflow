@@ -80,6 +80,17 @@ variable "adot_collector_image" {
   default     = "public.ecr.aws/aws-observability/aws-otel-collector:v0.43.1"
 }
 
+variable "waf_rate_limit" {
+  description = "WAFv2 IP rate limit (requests / 5 minutes) except /payments/callback. Default 200. Raise only for a timed k6 window, then set back to 200."
+  type        = number
+  default     = 200
+
+  validation {
+    condition     = var.waf_rate_limit >= 100 && var.waf_rate_limit <= 2000000
+    error_message = "waf_rate_limit must be between 100 and 2000000."
+  }
+}
+
 variable "codeconnections_arn" {
   description = <<-EOT
     ARN of a pre-created AWS CodeStar / CodeConnections connection to GitHub.
