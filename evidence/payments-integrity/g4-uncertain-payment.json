@@ -1,0 +1,127 @@
+{
+  "drill": "uncertain-payment",
+  "fault_injected_at": "2026-09-20T21:05:08.009Z",
+  "recovery_started_at": "2026-09-20T21:06:38.656Z",
+  "completed_at": "2026-09-20T21:06:38.828Z",
+  "trace_id": "6ab04a8351f89325d6a4c8bb357ec100",
+  "xray_trace_id": "1-6ab04a83-51f89325d6a4c8bb357ec100",
+  "payer_msisdn": "254700000003",
+  "sale_id": "f024c4da-fe35-4d60-9b97-44ba7157ab0a",
+  "payment_id": "bb93dd50-e196-499a-8f05-4265bc4a2089",
+  "final_status": "pending",
+  "internal_base_url": "http://internal-devops-g10-alb-878071676.eu-central-1.elb.amazonaws.com",
+  "detection": {
+    "alarm": "devops-g10-payments-oldest-pending",
+    "metric": "payments_oldest_pending_age_seconds",
+    "dimensions": {
+      "kind": "payment",
+      "OTelLib": "tillflow.payments"
+    },
+    "threshold_seconds": 60,
+    "evaluation_periods": 1,
+    "state_during_drill": "ALARM",
+    "state_entered_at": "2026-09-20T17:13:37Z",
+    "already_firing_before_the_drill": true,
+    "observed_max_seconds": {
+      "2026-09-20T21:04:00Z": 14068.58,
+      "2026-09-20T21:05:00Z": 14128.59,
+      "2026-09-20T21:07:00Z": 14185.82
+    },
+    "note": "The alarm was already in ALARM for 3h55m when this drill started, so there is no clean OK to ALARM to OK transition for this window. The backlog is fake-mode timeout payments from earlier G2 and G3 runs: the fake Daraja stkQuery answers 1100 (still processing) for the timeout payer forever, so reconciliation can never move them out of pending and the age climbs 60s per minute. This drill's own payment behaves the same way by design, and correctly so. ADR-002 says silence is not a decline, so an uncertain payment stays pending until Daraja speaks. The consequence is that this alarm cannot recover on its own in fake mode. The detection proof here is that the alarm is firing on exactly the condition the drill creates, not a recovery transition."
+  },
+  "steps": [
+    {
+      "at": "2026-09-20T21:05:08.008Z",
+      "check": "sale created",
+      "ok": true,
+      "actual": 201,
+      "expected": 201
+    },
+    {
+      "at": "2026-09-20T21:05:08.009Z",
+      "note": "injecting the fault: charge the timeout payer",
+      "payer": "254700000003"
+    },
+    {
+      "at": "2026-09-20T21:05:08.546Z",
+      "check": "charge accepted despite the timeout",
+      "ok": true,
+      "actual": 201,
+      "expected": 201
+    },
+    {
+      "at": "2026-09-20T21:05:08.547Z",
+      "check": "payment is pending, not failed",
+      "ok": true,
+      "actual": "pending",
+      "expected": "pending"
+    },
+    {
+      "at": "2026-09-20T21:05:08.547Z",
+      "check": "no failure_reason recorded",
+      "ok": true,
+      "actual": null,
+      "expected": null
+    },
+    {
+      "at": "2026-09-20T21:05:08.547Z",
+      "check": "correlation id survived the timeout",
+      "ok": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "at": "2026-09-20T21:06:38.655Z",
+      "check": "still pending after the hold",
+      "ok": true,
+      "actual": "pending",
+      "expected": "pending"
+    },
+    {
+      "at": "2026-09-20T21:06:38.655Z",
+      "check": "never became failed",
+      "ok": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "at": "2026-09-20T21:06:38.655Z",
+      "check": "never became timed_out without reconciliation",
+      "ok": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "at": "2026-09-20T21:06:38.656Z",
+      "note": "first safe action: reconcile (queries Daraja, never re-sends)"
+    },
+    {
+      "at": "2026-09-20T21:06:38.688Z",
+      "check": "reconcile answered",
+      "ok": true,
+      "actual": 200,
+      "expected": 200
+    },
+    {
+      "at": "2026-09-20T21:06:38.688Z",
+      "note": "reconcile reason",
+      "reason": "still_processing",
+      "status": "pending"
+    },
+    {
+      "at": "2026-09-20T21:06:38.828Z",
+      "check": "a retry cannot open a second charge",
+      "ok": true,
+      "actual": 409,
+      "expected": 409
+    },
+    {
+      "at": "2026-09-20T21:06:38.828Z",
+      "check": "the retry names the existing payment",
+      "ok": true,
+      "actual": "PAYMENT_ALREADY_EXISTS",
+      "expected": "PAYMENT_ALREADY_EXISTS"
+    }
+  ],
+  "passed": true
+}
