@@ -2,9 +2,10 @@
 # Put an existing Amazon Managed Grafana workspace into Terraform state
 # so apply does not call CreateWorkspace again (409 Duplicate request).
 #
-# ADOPT_WAIT=1 (Release apply): poll for several minutes. Earlier 403s
-# still submitted a create; the workspace shows up after SSO finishes.
-# Plan job leaves ADOPT_WAIT unset so a missing workspace is a no-op.
+# If the name is not in AWS, that is success: terraform apply creates it.
+# ADOPT_WAIT=1 only waits when a leftover workspace already exists
+# (CREATING / FAILED / DELETING). Waiting for a missing name blocks apply
+# forever — nothing will appear until Terraform itself creates it.
 set -euo pipefail
 
 NAME="${1:-devops-g10-grafana}"
@@ -25,19 +26,21 @@ lookup() {
     --query "workspaces[?name=='${NAME}'].id | [0]" --output text 2>/dev/null || true
 }
 
-id=""
+seen=""
 for i in $(seq 1 "${ATTEMPTS}"); do
   id="$(lookup)"
   if [[ -z "${id}" || "${id}" == "None" || "${id}" == "null" ]]; then
     echo "attempt ${i}/${ATTEMPTS}: no workspace named ${NAME}"
-    if [[ "${WAIT}" != "1" ]]; then
-      echo "plan will create it"
+    if [[ -n "${seen}" ]]; then
+      # FAILED delete finished; name is free for CreateWorkspace.
+      echo "leftover ${NAME} is gone; apply will create it"
       exit 0
     fi
-    sleep 10
-    continue
+    echo "no leftover workspace; apply will create it"
+    exit 0
   fi
 
+  seen="${id}"
   status="$(aws grafana describe-workspace --region "${REGION}" --workspace-id "${id}" \
     --query 'workspace.status' --output text)"
   echo "found ${NAME} id=${id} status=${status}"
@@ -63,9 +66,9 @@ for i in $(seq 1 "${ATTEMPTS}"); do
   esac
 done
 
-if [[ "${WAIT}" == "1" ]]; then
-  echo "timed out waiting for ${NAME}"
+if [[ -n "${seen}" ]]; then
+  echo "timed out waiting for leftover ${NAME} (${seen}) to become ACTIVE or disappear"
   exit 1
 fi
-echo "no Grafana workspace named ${NAME}; plan will create it"
+echo "no Grafana workspace named ${NAME}; apply will create it"
 exit 0
