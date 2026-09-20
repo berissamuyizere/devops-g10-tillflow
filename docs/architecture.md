@@ -93,5 +93,6 @@ Apps export OTLP to the localhost ADOT sidecar. JSON logs carry `trace_id` / `sp
 | Region + naming | [ADR-001](adrs/ADR-001-region-and-naming.md) |
 | Tenant / sale model | [ADR](adr-001-tenant-sale-data-model.md) |
 | Idempotency + replay | [ADR-002](adrs/ADR-002-idempotency-and-replay-safety.md) |
+| Observability | [ADR-005](adrs/ADR-005-observability.md) |
 | Draft SLOs | [slo-error-budgets.md](slo-error-budgets.md) |
 | Threats | [threat-model.md](threat-model.md) |
