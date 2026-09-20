@@ -36,6 +36,16 @@ data "aws_iam_policy_document" "slack_notifier" {
     ]
     resources = ["${aws_cloudwatch_log_group.slack_notifier.arn}:*"]
   }
+
+  statement {
+    sid    = "XRay"
+    effect = "Allow"
+    actions = [
+      "xray:PutTraceSegments",
+      "xray:PutTelemetryRecords",
+    ]
+    resources = ["*"]
+  }
 }
 
 resource "aws_iam_role" "slack_notifier" {
@@ -88,7 +98,7 @@ resource "aws_lambda_function" "slack_notifier" {
   }
 
   tracing_config {
-    mode = "PassThrough"
+    mode = "Active"
   }
 
   tags = { service = "reliability" }
@@ -99,12 +109,62 @@ resource "aws_lambda_function" "slack_notifier" {
   ]
 }
 
-# Unencrypted: CloudWatch alarms cannot publish to a topic encrypted with
-# the AWS-managed SNS key (alias/aws/sns). A customer-managed key is the
-# hardening step; do not "fix" this with alias/aws/sns.
+# Customer-managed key — CloudWatch/EventBridge cannot publish to a topic
+# encrypted with alias/aws/sns. This key's policy lets those services
+# GenerateDataKey so alarms still reach Slack.
+data "aws_iam_policy_document" "alerts_kms" {
+  statement {
+    sid    = "EnableAccountAdmin"
+    effect = "Allow"
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:${local.partition}:iam::${local.account_id}:root"]
+    }
+    actions   = ["kms:*"]
+    resources = ["*"]
+  }
+
+  statement {
+    sid    = "AllowSNSAndPublishers"
+    effect = "Allow"
+    principals {
+      type = "Service"
+      identifiers = [
+        "sns.amazonaws.com",
+        "cloudwatch.amazonaws.com",
+        "events.amazonaws.com",
+      ]
+    }
+    actions = [
+      "kms:Decrypt",
+      "kms:GenerateDataKey*",
+    ]
+    resources = ["*"]
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceAccount"
+      values   = [local.account_id]
+    }
+  }
+}
+
+resource "aws_kms_key" "alerts" {
+  description             = "Encrypt SNS topic ${var.name_prefix}-alerts."
+  deletion_window_in_days = 7
+  enable_key_rotation     = true
+  policy                  = data.aws_iam_policy_document.alerts_kms.json
+  tags                    = { service = "reliability" }
+}
+
+resource "aws_kms_alias" "alerts" {
+  name          = "alias/${var.name_prefix}-alerts"
+  target_key_id = aws_kms_key.alerts.key_id
+}
+
 resource "aws_sns_topic" "alerts" {
-  name = "${var.name_prefix}-alerts"
-  tags = { service = "reliability" }
+  name              = "${var.name_prefix}-alerts"
+  kms_master_key_id = aws_kms_key.alerts.arn
+  tags              = { service = "reliability" }
 }
 
 data "aws_iam_policy_document" "alerts_sns" {

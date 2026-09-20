@@ -276,6 +276,57 @@ data "aws_iam_policy_document" "ci_deploy" {
     ]
   }
 
+  # CreateKey has no namespaced ARN. Tag the key group=g10 (default_tags)
+  # so this cannot mint keys for other work in the account.
+  statement {
+    sid       = "CreateNamespacedKMSKeys"
+    effect    = "Allow"
+    actions   = ["kms:CreateKey"]
+    resources = ["*"]
+    condition {
+      test     = "StringEquals"
+      variable = "aws:RequestedRegion"
+      values   = [var.region]
+    }
+    condition {
+      test     = "StringEquals"
+      variable = "aws:RequestTag/group"
+      values   = ["g10"]
+    }
+  }
+
+  statement {
+    sid    = "ManageNamespacedKMS"
+    effect = "Allow"
+    actions = [
+      "kms:CreateAlias",
+      "kms:DeleteAlias",
+      "kms:UpdateAlias",
+      "kms:DescribeKey",
+      "kms:GetKeyPolicy",
+      "kms:PutKeyPolicy",
+      "kms:ScheduleKeyDeletion",
+      "kms:CancelKeyDeletion",
+      "kms:EnableKeyRotation",
+      "kms:GetKeyRotationStatus",
+      "kms:TagResource",
+      "kms:UntagResource",
+      "kms:ListResourceTags",
+      "kms:UpdateKeyDescription",
+      "kms:EnableKey",
+      "kms:DisableKey",
+    ]
+    resources = [
+      "arn:${data.aws_partition.current.partition}:kms:${var.region}:${data.aws_caller_identity.current.account_id}:key/*",
+      "arn:${data.aws_partition.current.partition}:kms:${var.region}:${data.aws_caller_identity.current.account_id}:alias/${var.name_prefix}-*",
+    ]
+    condition {
+      test     = "StringEquals"
+      variable = "aws:RequestedRegion"
+      values   = [var.region]
+    }
+  }
+
   # Docker push.
   statement {
     sid    = "ECRPushImages"
