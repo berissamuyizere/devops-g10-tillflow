@@ -88,6 +88,11 @@ output "cpu_autoscale" {
   }
 }
 
+output "waf_rate_limit" {
+  description = "WAF IP rate limit (requests per 5 minutes). Raise via GitHub WAF_RATE_LIMIT for k6, then set back to 200."
+  value       = var.waf_rate_limit
+}
+
 output "commission_close_queue_url" {
   description = "SQS queue the Commission worker long-polls. No public ingress."
   value       = aws_sqs_queue.commission_close.url

@@ -178,7 +178,7 @@ resource "aws_wafv2_web_acl" "app" {
 
     statement {
       rate_based_statement {
-        limit              = 200
+        limit              = var.waf_rate_limit
         aggregate_key_type = "IP"
 
         scope_down_statement {
