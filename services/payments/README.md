@@ -335,6 +335,29 @@ The two gauges are read from the database on a timer (`METRICS_REFRESH_MS`,
 default 15s) rather than tracked in memory, so they stay correct across restarts
 and multiple tasks.
 
+## Trace labels
+
+The money path sets these span attributes, so one trace can be followed from a
+sale through the charge, callback and reconcile:
+
+| Attribute | Set on |
+|---|---|
+| `sale.id` | charge, callback, settle |
+| `payment.id` | charge, callback, reconcile, settle |
+| `checkout_request_id` | charge (including a timed-out push), reconcile |
+| `callback.outcome` | both callback routes — `applied`, `replay_noop`, or the specific rejection |
+| `ledger.id` | payout disbursement, B2C result callback |
+
+A timed-out push still carries `checkout_request_id`, because that is exactly
+the case someone will be tracing.
+
+These ids belong on spans but **not** on metrics: spans are per-request and
+sampled, metric labels are aggregated and unbounded. See the Metrics section —
+a test enforces that separation.
+
+Annotation attaches to the active span and is a no-op when there is none, so
+nothing throws outside a request.
+
 ## Credentials fail closed
 
 No service token and no callback secret has an in-process default. If the env

@@ -3,6 +3,7 @@ const { hashChargeRequest } = require('../hash');
 const { MpesaTimeoutError, MpesaRejectedError } = require('../../../_shared/mpesa');
 const { PosConflictError } = require('../pos/client');
 const metrics = require('../metrics');
+const tracing = require('../tracing');
 
 const UNIQUE_VIOLATION = '23505';
 
@@ -184,6 +185,13 @@ async function sendStkPush(db, mpesa, pos, payment, { callbackUrl }) {
     pushError = err;
   }
 
+  tracing.annotatePayment({
+    id: payment.id,
+    sale_id: payment.sale_id,
+    checkout_request_id:
+      pushResult?.checkoutRequestId || pushError?.checkoutRequestId || payment.checkout_request_id,
+  });
+
   metrics.recordCommand(
     'stk',
     pushError instanceof MpesaRejectedError
@@ -234,6 +242,8 @@ async function settleConfirmedPayment(db, pos, paymentId, paidAt = new Date()) {
     return { payment: current, changed: false };
   }
 
+  tracing.annotatePayment(current);
+
   try {
     await pos.markPaid(current.sale_id, current.id, paidAt);
   } catch (err) {
@@ -264,6 +274,8 @@ async function reconcilePayment(db, mpesa, pos, paymentId) {
   if (!payment.checkout_request_id) {
     return { payment, changed: false, reason: 'no_correlation_id' };
   }
+
+  tracing.annotatePayment(payment);
 
   const query = await mpesa.stkQuery({
     shortcode: payment.shortcode,
