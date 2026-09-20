@@ -43,6 +43,10 @@ locals {
           valueFrom = "${aws_secretsmanager_secret.service_tokens.arn}:payments_service_token::"
         },
         {
+          name      = "POS_SERVICE_TOKEN"
+          valueFrom = "${aws_secretsmanager_secret.service_tokens.arn}:pos_service_token::"
+        },
+        {
           name      = "CACHE_AUTH_TOKEN"
           valueFrom = "${aws_secretsmanager_secret.cache_auth.arn}:auth_token::"
         },

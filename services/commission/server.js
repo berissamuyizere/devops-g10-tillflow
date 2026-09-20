@@ -1,4 +1,5 @@
 const pino = require('pino');
+const otel = require('@opentelemetry/api');
 const { createApp } = require('./src/app');
 const { startPoller } = require('./src/poller');
 
@@ -6,6 +7,11 @@ const PORT = Number(process.env.PORT || 8080);
 const logger = pino({
   level: process.env.LOG_LEVEL || 'info',
   base: { service: 'commission' },
+  mixin() {
+    const span = otel.trace.getActiveSpan();
+    const ctx = span ? span.spanContext() : null;
+    return ctx ? { trace_id: ctx.traceId, span_id: ctx.spanId } : {};
+  },
 });
 
 const app = createApp({ logger });
