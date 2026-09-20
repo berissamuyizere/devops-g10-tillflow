@@ -362,6 +362,21 @@ data "aws_iam_policy_document" "ci_deploy" {
     resources = ["*"]
   }
 
+  # CreateWorkspace with AWS_SSO decrypts Identity Center ciphertext.
+  # That KMS key is not alias/devops-g10-* and the call often omits
+  # aws:RequestedRegion, so ManageNamespacedKMS never matches.
+  statement {
+    sid    = "DecryptIdentityCenterKms"
+    effect = "Allow"
+    actions = [
+      "kms:Decrypt",
+      "kms:DescribeKey",
+      "kms:CreateGrant",
+      "kms:GenerateDataKey*",
+    ]
+    resources = ["*"]
+  }
+
   statement {
     sid    = "ManageNamespacedKMS"
     effect = "Allow"
@@ -376,6 +391,11 @@ data "aws_iam_policy_document" "ci_deploy" {
       "kms:CancelKeyDeletion",
       "kms:EnableKeyRotation",
       "kms:GetKeyRotationStatus",
+      "kms:Decrypt",
+      "kms:Encrypt",
+      "kms:GenerateDataKey*",
+      "kms:CreateGrant",
+      "kms:ListGrants",
       "kms:TagResource",
       "kms:UntagResource",
       "kms:ListResourceTags",
