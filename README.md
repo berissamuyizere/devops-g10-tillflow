@@ -61,7 +61,45 @@ G1 (web) and G2 (POS + Payments) are live in `eu-central-1`. Public smoke:
 - **Apply on `main`** waits on the GitHub Environment `production` (required reviewers) and applies the saved `plan.bin` — it does not re-plan.
 - **Release** builds `web`, `pos`, `payments`, and `commission` (ARM64 native runner), rolls ECS, then runs DB bootstrap + migrate for POS/Payments.
 - **Bootstrap** (state bucket + lock table) is one-time: `infra/bootstrap/`. See [`evidence/platform-delivery/README.md`](evidence/platform-delivery/README.md).
-- **Destroy** is out of band; do not `terraform destroy` the shared platform.
+- **Destroy** is G5-only and ordered. Do not `terraform destroy` the shared platform before then.
+
+### G5 teardown (RDS will fail if you skip this)
+
+`infra/rds.tf` sets `deletion_protection = var.rds_deletion_protection` (default **true**) on `devops-g10-pg`. A bare `terraform destroy` returns `InvalidParameterCombination: Cannot delete protected DB instance`. The ALB already has `enable_deletion_protection = false`.
+
+In front of Rob, disable protection **first**, wait until AWS shows it off, then destroy:
+
+```bash
+# 1. Flip the flag in the same saved plan path Release uses.
+#    Default stays true; only this apply turns it off.
+TF_VAR_rds_deletion_protection=false terraform plan -out=plan.bin
+terraform apply plan.bin
+
+# 2. Confirm AWS, not just state.
+aws rds describe-db-instances \
+  --db-instance-identifier devops-g10-pg \
+  --region eu-central-1 \
+  --query 'DBInstances[0].DeletionProtection'
+# -> false
+
+# 3. Then destroy. Final snapshot name is timestamped.
+terraform destroy
+
+# 4. Bootstrap last, and only if the state bucket is empty.
+# cd infra/bootstrap && terraform destroy
+```
+
+CLI equivalent if Terraform is already gone and you only need the instance unlocked:
+
+```bash
+aws rds modify-db-instance \
+  --db-instance-identifier devops-g10-pg \
+  --no-deletion-protection \
+  --apply-immediately \
+  --region eu-central-1
+```
+
+If the destroy is aborted, set `TF_VAR_rds_deletion_protection=true` and apply again. Do not leave protection off overnight.
 
 G2 happy-path JSON: [`evidence/payments-integrity/`](evidence/payments-integrity/). Platform dumps (ECS including the Commission SQS worker, path-routing smoke, tag audit): [`evidence/platform-delivery/`](evidence/platform-delivery/).
 

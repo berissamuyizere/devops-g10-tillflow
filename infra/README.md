@@ -92,13 +92,42 @@ curl -sS -o /dev/null -w '%{http_code}\n' "$API_URL/internal/v1/payments/0000000
 
 Refresh live dumps: `./evidence/platform-delivery/collect.sh`.
 
-## Tear-down
+## Tear-down (G5 only)
+
+`aws_db_instance.pg` has `deletion_protection = var.rds_deletion_protection`
+(default `true`). `terraform destroy` fails on `devops-g10-pg` until that
+is off. Do **not** start with destroy.
 
 ```bash
+# 1. Disable protection via the same apply path as Release.
+TF_VAR_rds_deletion_protection=false terraform plan -out=plan.bin
+terraform apply plan.bin
+
+aws rds describe-db-instances \
+  --db-instance-identifier devops-g10-pg \
+  --region eu-central-1 \
+  --query 'DBInstances[0].DeletionProtection'
+# must be false
+
+# 2. Destroy the platform.
 terraform destroy
-# then, if you really mean it:
-cd bootstrap && terraform destroy   # will fail unless state bucket is emptied
+
+# 3. Bootstrap last, and only if the state bucket is empty.
+cd bootstrap && terraform destroy
 ```
+
+If apply is unavailable, the equivalent unlock is:
+
+```bash
+aws rds modify-db-instance \
+  --db-instance-identifier devops-g10-pg \
+  --no-deletion-protection \
+  --apply-immediately \
+  --region eu-central-1
+```
+
+Re-enable (`TF_VAR_rds_deletion_protection=true` + apply) if the
+destroy is aborted. ALB deletion protection is already `false`.
 
 ## Cost expectation (capstone)
 

@@ -203,6 +203,43 @@ budget; a duplicate disbursement is an SLO miss with **no** budget.
 Then: kill a runaway session only if it is known k6/game-day; otherwise
 stop the bad release. Slow-query threshold is 500ms.
 
+## bad-ecs-release
+
+- **Alarm:** none automatic. Release smoke (`/health` `/ready` on web;
+  `POST /sales` → 401 on POS) is the detector. Circuit breaker only
+  rolls back when new tasks fail ALB `/health` — a `/ready` 500 with
+  `/health` 200 **stays deployed**. Rollback is a **manual** runbook
+  step (ADR-004). `release.yml` does not revert the previous task
+  definition on a failed smoke.
+- **Owner:** Yordanos
+- **RTO / RPO:** 10 min / 0 (no data loss; roll the digest).
+- **First safe action:** Confirm `/health` 200 vs `/ready` 5xx through
+  API Gateway. Do not bounce RDS. Do not `terraform apply` to "fix"
+  an image — the service `ignore_changes`es `task_definition`.
+
+Then:
+
+```bash
+# Previous healthy revision — note it BEFORE the bad roll.
+aws ecs describe-services --cluster devops-g10 --services devops-g10-pos \
+  --region eu-central-1 \
+  --query 'services[0].taskDefinition'
+
+aws ecs update-service \
+  --cluster devops-g10 \
+  --service devops-g10-pos \
+  --task-definition devops-g10-pos:<previous> \
+  --force-new-deployment \
+  --region eu-central-1
+
+aws ecs wait services-stable \
+  --cluster devops-g10 --services devops-g10-pos --region eu-central-1
+```
+
+Re-run the POS smoke (`POST /sales` → 401, `/ready` 200). Page Slack
+`RECOVERED` when it passes. Evidence:
+[`evidence/platform-delivery/g4-broken-release.json`](../evidence/platform-delivery/g4-broken-release.json).
+
 ---
 
 ## Standing recovery targets
