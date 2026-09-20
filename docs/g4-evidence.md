@@ -10,6 +10,7 @@ merge [#12](https://github.com/berissamuyizere/devops-g10-tillflow/pull/12).
 
 Runbook: [`docs/runbook.md`](runbook.md) (`#rds-pitr`, standing table).
 Scar log: [`docs/scar-log.md`](scar-log.md).
+G5 verdict: [`docs/production-readiness.md`](production-readiness.md).
 
 ## Drills
 

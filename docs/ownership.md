@@ -21,6 +21,7 @@ area's PRs.
 | `docs/slo-error-budgets.md` | Saloi |
 | `docs/alerts.md` | Saloi |
 | `docs/runbook.md` | Saloi |
+| `docs/production-readiness.md` | Saloi |
 | Tenant / sale data model ADR | Berissa |
 | Commission close worker (`services/commission/`) | Berissa |
 | ADR-001 region + naming | Yordanos |

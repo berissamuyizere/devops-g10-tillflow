@@ -29,6 +29,10 @@
 /docs/slo-error-budgets.md                  @akezasaloi
 /docs/alerts.md                             @akezasaloi
 /docs/runbook.md                            @akezasaloi
+/docs/scar-log.md                           @akezasaloi
+/docs/g3-evidence.md                        @akezasaloi
+/docs/g4-evidence.md                        @akezasaloi
+/docs/production-readiness.md               @akezasaloi
 /docs/adrs/ADR-005-observability.md         @akezasaloi
 /evidence/reliability-operations/           @akezasaloi
 
