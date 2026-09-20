@@ -161,6 +161,11 @@ jobs:
         with:
           name: terraform-plan-${{ github.sha }}
           path: infra
+      - name: Drop leftover Synthetics canary (account Lambda max 512 MB)
+        run: |
+          set +e
+          aws synthetics delete-canary --name devops-g10-probe --delete-lambda
+          true
       - name: Rebuild lambda/canary zips if the plan artifact omitted them
         run: |
           set -euo pipefail
@@ -172,7 +177,7 @@ jobs:
             zip -j .build/slack_notifier.zip lambda/slack_notifier/index.py
           fi
           if [ ! -f .build/probe.zip ]; then
-            zip -j .build/probe.zip canaries/probe/index.js
+            zip -j .build/probe.zip lambda/probe/index.py
           fi
       - name: terraform init
         run: |
