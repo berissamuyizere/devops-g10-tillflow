@@ -75,6 +75,19 @@ output "ecs_services" {
   }
 }
 
+output "cpu_autoscale" {
+  description = "Y6 — ECS CPU target tracking 70% (POS and Payments). Min 2, max 4."
+  value = {
+    for k, t in aws_appautoscaling_target.cpu : k => {
+      resource_id  = t.resource_id
+      min_capacity = t.min_capacity
+      max_capacity = t.max_capacity
+      policy       = aws_appautoscaling_policy.cpu[k].name
+      target_value = 70
+    }
+  }
+}
+
 output "commission_close_queue_url" {
   description = "SQS queue the Commission worker long-polls. No public ingress."
   value       = aws_sqs_queue.commission_close.url
