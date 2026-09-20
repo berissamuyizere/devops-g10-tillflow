@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>G5 Yordanos preflight 21 Sep 2026</title>
+  <style>
+    body { font: 16px/1.45 Arial, Helvetica, sans-serif; margin: 32px; color: #111; background: #fff; font-variant-ligatures: none; }
+    h1 { font-size: 22px; margin: 0 0 4px; }
+    .sub { color: #555; margin: 0 0 20px; }
+    table { border-collapse: collapse; width: 100%; margin: 12px 0 24px; }
+    th, td { border: 1px solid #ccc; padding: 8px 10px; text-align: left; }
+    th { background: #f4f4f4; }
+    .ok { color: #0a7a32; font-weight: 600; }
+    code { background: #f4f4f4; padding: 1px 4px; }
+    .box { border: 1px solid #ccc; padding: 12px 16px; margin: 0 0 20px; }
+  </style>
+</head>
+<body>
+  <h1>TillFlow G5 — Yordanos preflight</h1>
+  <p class="sub">2026-09-21 00:21 EAT · eu-central-1 · public edge only · no apply · no destroy</p>
+  <div class="box">
+    <strong>Smoke (API Gateway)</strong><br>
+    GET /health <span class="ok">200</span> {"status":"ok","service":"web"}<br>
+    GET /ready <span class="ok">200</span> {"status":"ready","service":"web"}<br>
+    GET /version <span class="ok">200</span> web commit 0b1126f3<br>
+    POST /sales <span class="ok">401</span> unauthorized (auth ran on POS)
+  </div>
+  <table>
+    <tr><th>Service</th><th>Tasks</th><th>Task def</th><th>Rollout</th></tr>
+    <tr><td>devops-g10-pos</td><td>2/2</td><td>devops-g10-pos:20</td><td>1 deploy</td></tr>
+    <tr><td>devops-g10-web</td><td>2/2</td><td>devops-g10-web:18</td><td>1 deploy</td></tr>
+    <tr><td>devops-g10-payments</td><td>2/2</td><td>devops-g10-payments:22</td><td>1 deploy</td></tr>
+    <tr><td>devops-g10-commission</td><td>1/1</td><td>devops-g10-commission:11</td><td>1 deploy</td></tr>
+  </table>
+  <table>
+    <tr><th>Check</th><th>Live</th></tr>
+    <tr><td>RDS devops-g10-pg</td><td>available · deletion_protection <strong>true</strong></td></tr>
+    <tr><td>cache_from_ecs</td><td><code>sgr-0f50e811b25ab2ed0</code> — state matches · plan No changes</td></tr>
+    <tr><td>alb_from_ecs</td><td><code>sgr-06deea1208cdcbcb4</code> — state matches · plan No changes</td></tr>
+    <tr><td>G4 rollback</td><td>:19 broken → :18 in 163s. Healthy now is <strong>POS :20</strong></td></tr>
+  </table>
+  <p>Do not terraform destroy until the walk-through is over.</p>
+</body>
+</html>
