@@ -2,6 +2,7 @@ const { STATUSES, evaluate, statusForResultCode } = require('./state');
 const { hashChargeRequest } = require('../hash');
 const { MpesaTimeoutError, MpesaRejectedError } = require('../../../_shared/mpesa');
 const { PosConflictError } = require('../pos/client');
+const metrics = require('../metrics');
 
 const UNIQUE_VIOLATION = '23505';
 
@@ -182,6 +183,15 @@ async function sendStkPush(db, mpesa, pos, payment, { callbackUrl }) {
     }
     pushError = err;
   }
+
+  metrics.recordCommand(
+    'stk',
+    pushError instanceof MpesaRejectedError
+      ? 'rejected'
+      : pushError instanceof MpesaTimeoutError
+        ? 'timeout'
+        : 'accepted'
+  );
 
   const settled = await db.withTransaction(async (client) => {
     const row = await lockPayment(client, payment.id);
