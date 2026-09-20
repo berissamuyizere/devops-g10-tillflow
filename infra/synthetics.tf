@@ -120,5 +120,8 @@ resource "aws_synthetics_canary" "probe" {
 
   tags = { service = "reliability" }
 
-  depends_on = [aws_iam_role_policy_attachment.probe]
+  depends_on = [
+    aws_iam_role_policy_attachment.probe,
+    aws_iam_policy.ci_deploy,
+  ]
 }

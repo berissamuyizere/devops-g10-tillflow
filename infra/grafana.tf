@@ -114,7 +114,10 @@ resource "aws_grafana_workspace" "amg" {
 
   tags = { service = "grafana" }
 
-  depends_on = [aws_iam_role_policy_attachment.grafana]
+  depends_on = [
+    aws_iam_role_policy_attachment.grafana,
+    aws_iam_policy.ci_deploy,
+  ]
 }
 
 # Terraform publishes dashboards through the Grafana HTTP API. SSO user

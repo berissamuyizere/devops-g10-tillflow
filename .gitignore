@@ -27,5 +27,5 @@ tmp/
 __pycache__/
 *.pyc
 
-# Terraform archive_file output (probe zip + Slack Lambda zip).
+# Terraform archive_file output (probe / Slack / payout-cutoff zips).
 infra/.build/
