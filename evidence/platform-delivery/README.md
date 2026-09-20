@@ -24,6 +24,8 @@ Current-tree G2 files (replace on every clean collect):
 | `ecr-tags.json` | No `latest` tag on web/pos/payments/commission repos. |
 | `tag-audit.json` / `tag-audit.txt` | `capstone=tillflow` + the six required tags. |
 | `outputs.json` | Live ALB DNS + API Gateway URL. |
+| `g4-broken-release.json` | G4: broken POS `/ready` 500, smoke fail, **manual** rollback to previous task def. |
+| `screenshots/g4/` | Baseline dumps + shot list. PNGs go here during the drill. |
 
 ```bash
 export AWS_PROFILE=g10-yordanos AWS_REGION=eu-central-1

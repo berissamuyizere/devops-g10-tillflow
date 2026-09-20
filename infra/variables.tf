@@ -91,6 +91,18 @@ variable "codeconnections_arn" {
   default     = null
 }
 
+variable "rds_deletion_protection" {
+  description = <<-EOT
+    Keep true in prod. terraform destroy fails on devops-g10-pg while
+    this is true. For the G5 teardown only: apply with
+    TF_VAR_rds_deletion_protection=false (wait until the instance
+    shows deletion_protection=false), then terraform destroy. Flip it
+    back if the destroy is aborted. Do not leave it false overnight.
+  EOT
+  type        = bool
+  default     = true
+}
+
 variable "waf_rate_limit" {
   description = <<-EOT
     WAF RateLimitExceptCallback: requests per 5 minutes per IP (not the

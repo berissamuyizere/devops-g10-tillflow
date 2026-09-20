@@ -1,0 +1,35 @@
+{
+    "taskDefinition": "arn:aws:ecs:eu-central-1:240462142849:task-definition/devops-g10-pos:17",
+    "running": 2,
+    "desired": 2,
+    "deployments": [
+        {
+            "id": "ecs-svc/5942987582774268334",
+            "status": "PRIMARY",
+            "taskDefinition": "arn:aws:ecs:eu-central-1:240462142849:task-definition/devops-g10-pos:17",
+            "desiredCount": 2,
+            "pendingCount": 0,
+            "runningCount": 2,
+            "failedTasks": 0,
+            "createdAt": "2026-09-20T21:48:26.201000+03:00",
+            "updatedAt": "2026-09-20T21:51:14.174000+03:00",
+            "launchType": "FARGATE",
+            "platformVersion": "1.4.0",
+            "platformFamily": "Linux",
+            "networkConfiguration": {
+                "awsvpcConfiguration": {
+                    "subnets": [
+                        "subnet-034c31442d6c6c438",
+                        "subnet-0dff0f1bc9e4c8ba1"
+                    ],
+                    "securityGroups": [
+                        "sg-05cc34784cf1ed3e2"
+                    ],
+                    "assignPublicIp": "DISABLED"
+                }
+            },
+            "rolloutState": "COMPLETED",
+            "rolloutStateReason": "ECS deployment ecs-svc/5942987582774268334 completed."
+        }
+    ]
+}
