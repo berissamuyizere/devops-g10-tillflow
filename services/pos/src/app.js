@@ -8,6 +8,7 @@ const { requireMembership, requirePaymentsService } = require('./auth');
 const sales = require('./sales/service');
 const posMetrics = require('./metrics');
 const { createPaymentsClient, PaymentsError, PaymentsUnavailableError } = require('./payments/client');
+const { createSaleCache } = require('./cache/sales');
 
 function createApp(options = {}) {
   const database = options.db || db;
@@ -36,6 +37,8 @@ function createApp(options = {}) {
         level: (label) => ({ level: label }),
       },
     });
+
+  const saleCache = options.saleCache || createSaleCache({ logger });
 
   const app = express();
   app.disable('x-powered-by');
@@ -128,14 +131,20 @@ function createApp(options = {}) {
 
   app.get('/sales/:id', requireMembership, async (req, res) => {
     try {
-      const sale = await sales.getSaleForTenant(
-        database,
-        req.actor.tenantId,
-        req.params.id
-      );
+      const tenantId = req.actor.tenantId;
+      const saleId = req.params.id;
+      const cached = await saleCache.get(tenantId, saleId);
+      if (cached.status === 'hit') {
+        posMetrics.recordCacheRequest('hit');
+        return res.status(200).json(cached.value);
+      }
+      posMetrics.recordCacheRequest(cached.status === 'error' ? 'error' : 'miss');
+
+      const sale = await sales.getSaleForTenant(database, tenantId, saleId);
       if (!sale) {
         return res.status(404).json({ error: 'not_found' });
       }
+      await saleCache.set(tenantId, saleId, sale);
       return res.status(200).json(sale);
     } catch (err) {
       return sendError(req, res, err);
@@ -182,6 +191,7 @@ function createApp(options = {}) {
       if (!sale) {
         return res.status(404).json({ error: 'not_found' });
       }
+      await saleCache.invalidate(req.actor.tenantId, req.params.id);
       return res.status(200).json(sale);
     } catch (err) {
       return sendError(req, res, err);
@@ -232,6 +242,7 @@ function createApp(options = {}) {
       if (!sale) {
         return res.status(404).json({ error: 'not_found' });
       }
+      await saleCache.invalidate(sale.tenant_id, sale.id);
       return res.status(200).json(sale);
     } catch (err) {
       return sendError(req, res, err);
