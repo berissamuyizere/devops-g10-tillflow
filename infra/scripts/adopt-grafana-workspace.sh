@@ -30,9 +30,14 @@ for _ in $(seq 1 60); do
       terraform import -input=false -lock-timeout=5m aws_grafana_workspace.amg "${id}"
       exit 0
       ;;
-    FAILED|DELETING)
-      echo "workspace is ${status}; not importing"
+    FAILED)
+      echo "deleting FAILED workspace ${id} so the next apply can create it"
+      aws grafana delete-workspace --region "${REGION}" --workspace-id "${id}" || true
       exit 0
+      ;;
+    DELETING)
+      echo "workspace is DELETING; wait for it to go away"
+      sleep 10
       ;;
     *)
       echo "waiting for ACTIVE"
