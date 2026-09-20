@@ -1,0 +1,333 @@
+{
+  "drill": "g4-cache-break",
+  "owner": "Berissa",
+  "runbook": "docs/runbook.md (cache fail-open — Valkey unreachable, Postgres serves)",
+  "times": {
+    "started_utc": "2026-09-20T19:32:15.208Z",
+    "started_eat": "2026-09-20 22:32:15+03:00",
+    "cache_rule_revoked_utc": "2026-09-20T19:32:17.511Z",
+    "cache_rule_restored_utc": "2026-09-20T19:34:10.343Z",
+    "ended_utc": "2026-09-20T19:34:18.426Z",
+    "ended_eat": "2026-09-20 22:34:18+03:00",
+    "recovery_seconds": 113
+  },
+  "break_action": {
+    "type": "revoke_security_group_ingress",
+    "rule_id": "sgr-07f88466a6ed37640",
+    "cache_sg": "sg-09f5f26c6b661d778",
+    "description": "Removed ECS tasks → Valkey :6379 ingress on devops-g10-cache"
+  },
+  "restore_action": {
+    "type": "authorize_security_group_ingress",
+    "rule_id_after_restore": "sgr-0f50e811b25ab2ed0",
+    "note": "CLI re-create yields a new rule ID; run terraform apply in infra/ to reconcile state"
+  },
+  "api_url": "https://f9nla14lfh.execute-api.eu-central-1.amazonaws.com",
+  "sale_id": "fe563513-ddbd-4f0d-ac06-0f6874c404a8",
+  "reads_during_break": [
+    {
+      "status": 200,
+      "latencyMs": 592,
+      "body": {
+        "id": "fe563513-ddbd-4f0d-ac06-0f6874c404a8",
+        "tenant_id": "11111111-1111-1111-1111-111111111111",
+        "attendant_id": "22222222-2222-2222-2222-222222222222",
+        "idempotency_key": "g4-cache-c18493ef",
+        "status": "created",
+        "currency": "KES",
+        "total_minor": 500,
+        "created_at": "2026-09-20T19:32:15.886Z",
+        "paid_at": null,
+        "payment_id": null,
+        "lines": [
+          {
+            "id": "1dcdfafc-813c-4e6a-8b63-2ac77c2e4d19",
+            "description": "G4 cache break drill",
+            "quantity": 1,
+            "unit_price_minor": 500,
+            "line_total_minor": 500
+          }
+        ]
+      }
+    },
+    {
+      "status": 200,
+      "latencyMs": 209,
+      "body": {
+        "id": "fe563513-ddbd-4f0d-ac06-0f6874c404a8",
+        "tenant_id": "11111111-1111-1111-1111-111111111111",
+        "attendant_id": "22222222-2222-2222-2222-222222222222",
+        "idempotency_key": "g4-cache-c18493ef",
+        "status": "created",
+        "currency": "KES",
+        "total_minor": 500,
+        "created_at": "2026-09-20T19:32:15.886Z",
+        "paid_at": null,
+        "payment_id": null,
+        "lines": [
+          {
+            "id": "1dcdfafc-813c-4e6a-8b63-2ac77c2e4d19",
+            "description": "G4 cache break drill",
+            "quantity": 1,
+            "unit_price_minor": 500,
+            "line_total_minor": 500
+          }
+        ]
+      }
+    },
+    {
+      "status": 200,
+      "latencyMs": 202,
+      "body": {
+        "id": "fe563513-ddbd-4f0d-ac06-0f6874c404a8",
+        "tenant_id": "11111111-1111-1111-1111-111111111111",
+        "attendant_id": "22222222-2222-2222-2222-222222222222",
+        "idempotency_key": "g4-cache-c18493ef",
+        "status": "created",
+        "currency": "KES",
+        "total_minor": 500,
+        "created_at": "2026-09-20T19:32:15.886Z",
+        "paid_at": null,
+        "payment_id": null,
+        "lines": [
+          {
+            "id": "1dcdfafc-813c-4e6a-8b63-2ac77c2e4d19",
+            "description": "G4 cache break drill",
+            "quantity": 1,
+            "unit_price_minor": 500,
+            "line_total_minor": 500
+          }
+        ]
+      }
+    },
+    {
+      "status": 200,
+      "latencyMs": 209,
+      "body": {
+        "id": "fe563513-ddbd-4f0d-ac06-0f6874c404a8",
+        "tenant_id": "11111111-1111-1111-1111-111111111111",
+        "attendant_id": "22222222-2222-2222-2222-222222222222",
+        "idempotency_key": "g4-cache-c18493ef",
+        "status": "created",
+        "currency": "KES",
+        "total_minor": 500,
+        "created_at": "2026-09-20T19:32:15.886Z",
+        "paid_at": null,
+        "payment_id": null,
+        "lines": [
+          {
+            "id": "1dcdfafc-813c-4e6a-8b63-2ac77c2e4d19",
+            "description": "G4 cache break drill",
+            "quantity": 1,
+            "unit_price_minor": 500,
+            "line_total_minor": 500
+          }
+        ]
+      }
+    },
+    {
+      "status": 200,
+      "latencyMs": 203,
+      "body": {
+        "id": "fe563513-ddbd-4f0d-ac06-0f6874c404a8",
+        "tenant_id": "11111111-1111-1111-1111-111111111111",
+        "attendant_id": "22222222-2222-2222-2222-222222222222",
+        "idempotency_key": "g4-cache-c18493ef",
+        "status": "created",
+        "currency": "KES",
+        "total_minor": 500,
+        "created_at": "2026-09-20T19:32:15.886Z",
+        "paid_at": null,
+        "payment_id": null,
+        "lines": [
+          {
+            "id": "1dcdfafc-813c-4e6a-8b63-2ac77c2e4d19",
+            "description": "G4 cache break drill",
+            "quantity": 1,
+            "unit_price_minor": 500,
+            "line_total_minor": 500
+          }
+        ]
+      }
+    },
+    {
+      "status": 200,
+      "latencyMs": 215,
+      "body": {
+        "id": "fe563513-ddbd-4f0d-ac06-0f6874c404a8",
+        "tenant_id": "11111111-1111-1111-1111-111111111111",
+        "attendant_id": "22222222-2222-2222-2222-222222222222",
+        "idempotency_key": "g4-cache-c18493ef",
+        "status": "created",
+        "currency": "KES",
+        "total_minor": 500,
+        "created_at": "2026-09-20T19:32:15.886Z",
+        "paid_at": null,
+        "payment_id": null,
+        "lines": [
+          {
+            "id": "1dcdfafc-813c-4e6a-8b63-2ac77c2e4d19",
+            "description": "G4 cache break drill",
+            "quantity": 1,
+            "unit_price_minor": 500,
+            "line_total_minor": 500
+          }
+        ]
+      }
+    },
+    {
+      "status": 200,
+      "latencyMs": 223,
+      "body": {
+        "id": "fe563513-ddbd-4f0d-ac06-0f6874c404a8",
+        "tenant_id": "11111111-1111-1111-1111-111111111111",
+        "attendant_id": "22222222-2222-2222-2222-222222222222",
+        "idempotency_key": "g4-cache-c18493ef",
+        "status": "created",
+        "currency": "KES",
+        "total_minor": 500,
+        "created_at": "2026-09-20T19:32:15.886Z",
+        "paid_at": null,
+        "payment_id": null,
+        "lines": [
+          {
+            "id": "1dcdfafc-813c-4e6a-8b63-2ac77c2e4d19",
+            "description": "G4 cache break drill",
+            "quantity": 1,
+            "unit_price_minor": 500,
+            "line_total_minor": 500
+          }
+        ]
+      }
+    },
+    {
+      "status": 200,
+      "latencyMs": 202,
+      "body": {
+        "id": "fe563513-ddbd-4f0d-ac06-0f6874c404a8",
+        "tenant_id": "11111111-1111-1111-1111-111111111111",
+        "attendant_id": "22222222-2222-2222-2222-222222222222",
+        "idempotency_key": "g4-cache-c18493ef",
+        "status": "created",
+        "currency": "KES",
+        "total_minor": 500,
+        "created_at": "2026-09-20T19:32:15.886Z",
+        "paid_at": null,
+        "payment_id": null,
+        "lines": [
+          {
+            "id": "1dcdfafc-813c-4e6a-8b63-2ac77c2e4d19",
+            "description": "G4 cache break drill",
+            "quantity": 1,
+            "unit_price_minor": 500,
+            "line_total_minor": 500
+          }
+        ]
+      }
+    }
+  ],
+  "reads_after_restore": [
+    {
+      "status": 200,
+      "latencyMs": 604,
+      "body": {
+        "id": "fe563513-ddbd-4f0d-ac06-0f6874c404a8",
+        "tenant_id": "11111111-1111-1111-1111-111111111111",
+        "attendant_id": "22222222-2222-2222-2222-222222222222",
+        "idempotency_key": "g4-cache-c18493ef",
+        "status": "created",
+        "currency": "KES",
+        "total_minor": 500,
+        "created_at": "2026-09-20T19:32:15.886Z",
+        "paid_at": null,
+        "payment_id": null,
+        "lines": [
+          {
+            "id": "1dcdfafc-813c-4e6a-8b63-2ac77c2e4d19",
+            "description": "G4 cache break drill",
+            "quantity": 1,
+            "unit_price_minor": 500,
+            "line_total_minor": 500
+          }
+        ]
+      }
+    },
+    {
+      "status": 200,
+      "latencyMs": 576,
+      "body": {
+        "id": "fe563513-ddbd-4f0d-ac06-0f6874c404a8",
+        "tenant_id": "11111111-1111-1111-1111-111111111111",
+        "attendant_id": "22222222-2222-2222-2222-222222222222",
+        "idempotency_key": "g4-cache-c18493ef",
+        "status": "created",
+        "currency": "KES",
+        "total_minor": 500,
+        "created_at": "2026-09-20T19:32:15.886Z",
+        "paid_at": null,
+        "payment_id": null,
+        "lines": [
+          {
+            "id": "1dcdfafc-813c-4e6a-8b63-2ac77c2e4d19",
+            "description": "G4 cache break drill",
+            "quantity": 1,
+            "unit_price_minor": 500,
+            "line_total_minor": 500
+          }
+        ]
+      }
+    }
+  ],
+  "metrics": {
+    "baseline_cache_error": 0,
+    "during_cache_error_total": 8,
+    "during_cache_error_delta": 8,
+    "cloudwatch_bucket_eat": "2026-09-20T22:32:00+03:00",
+    "otel_lib": "tillflow.pos",
+    "http_5xx_during_break": 0
+  },
+  "detection": {
+    "method": "CloudWatch TillFlow pos_cache_requests_total{result=error,OTelLib=tillflow.pos}",
+    "note": "No dedicated cache alarm; metric rise is the detection proof (EMF ~60s lag)"
+  },
+  "first_safe_action": "Confirm GET /sales/:id still 200 from Postgres (fail-open); do not restart ECS",
+  "checks": [
+    {
+      "check": "all GETs 200 during break",
+      "ok": true,
+      "actual": [
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200
+      ],
+      "expected": "all 200"
+    },
+    {
+      "check": "cache error metric rose",
+      "ok": true,
+      "actual": 8,
+      "expected": "> 0"
+    },
+    {
+      "check": "zero HTTP 5xx during break",
+      "ok": true,
+      "actual": 0,
+      "expected": 0
+    },
+    {
+      "check": "restore GETs 200",
+      "ok": true,
+      "actual": [
+        200,
+        200
+      ],
+      "expected": "all 200"
+    }
+  ],
+  "passed": true
+}
