@@ -16,6 +16,7 @@ and the Payments status contract in
 | GET | `/version` | pipeline | `{ commit, digest, … }` |
 | POST | `/sales` | attendant | Create sale (`Idempotency-Key` required) |
 | GET | `/sales/:id` | tenant member | Read sale (404 cross-tenant) |
+| POST | `/sales/:id/pay` | tenant member | Start STK via Payments (`Idempotency-Key`, `msisdn` required) |
 | POST | `/sales/:id/cancel` | owner/attendant | Cancel — **only while `created`** (409 once `awaiting_payment`) |
 | GET | `/internal/v1/sales/:id` | Payments | Charge inputs |
 | POST | `/internal/v1/sales/:id/awaiting-payment` | Payments | `created` → `awaiting_payment` |

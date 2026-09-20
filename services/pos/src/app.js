@@ -6,9 +6,18 @@ const otel = require('@opentelemetry/api');
 const db = require('./db');
 const { requireMembership, requirePaymentsService } = require('./auth');
 const sales = require('./sales/service');
+const posMetrics = require('./metrics');
+const { createPaymentsClient, PaymentsError, PaymentsUnavailableError } = require('./payments/client');
 
 function createApp(options = {}) {
   const database = options.db || db;
+  let paymentsClient = options.paymentsClient || null;
+  function getPaymentsClient() {
+    if (!paymentsClient) {
+      paymentsClient = createPaymentsClient(options.paymentsClientOptions);
+    }
+    return paymentsClient;
+  }
   const COMMIT_SHA = options.commitSha || process.env.COMMIT_SHA || 'unknown';
   const IMAGE_DIGEST = options.imageDigest || process.env.IMAGE_DIGEST || 'unknown';
   const ENVIRONMENT = options.environment || process.env.DEPLOYMENT_ENVIRONMENT || 'prod';
@@ -95,6 +104,7 @@ function createApp(options = {}) {
   // --- Attendant / owner API ----------------------------------------------
 
   app.post('/sales', requireMembership, async (req, res) => {
+    const started = performance.now();
     try {
       const idempotencyKey = req.header('idempotency-key');
       const result = await sales.createSale(database, {
@@ -104,9 +114,14 @@ function createApp(options = {}) {
         idempotencyKey,
         body: req.body,
       });
+      posMetrics.recordSaleWrite(result.created ? 'created' : 'replay', performance.now() - started);
       const status = result.created ? 201 : 200;
       res.status(status).json(result.sale);
     } catch (err) {
+      posMetrics.recordSaleWrite(
+        err.status && err.status < 500 ? 'rejected' : 'error',
+        performance.now() - started
+      );
       return sendError(req, res, err);
     }
   });
@@ -124,6 +139,36 @@ function createApp(options = {}) {
       return res.status(200).json(sale);
     } catch (err) {
       return sendError(req, res, err);
+    }
+  });
+
+  app.post('/sales/:id/pay', requireMembership, async (req, res) => {
+    try {
+      const idempotencyKey = req.header('idempotency-key');
+      if (!idempotencyKey) {
+        return res.status(400).json({ error: 'MISSING_IDEMPOTENCY_KEY' });
+      }
+      const msisdn = req.body?.msisdn;
+      if (!msisdn || typeof msisdn !== 'string') {
+        return res.status(400).json({ error: 'VALIDATION', message: 'msisdn required' });
+      }
+
+      const sale = await sales.getSaleForTenant(database, req.actor.tenantId, req.params.id);
+      if (!sale) {
+        return res.status(404).json({ error: 'not_found' });
+      }
+      if (sale.status === 'cancelled' || sale.status === 'paid') {
+        return res.status(409).json({ error: 'sale_not_chargeable', sale_status: sale.status });
+      }
+
+      const { payment, replay } = await getPaymentsClient().startCharge({
+        saleId: sale.id,
+        msisdn,
+        idempotencyKey,
+      });
+      return res.status(replay ? 200 : 201).json(payment);
+    } catch (err) {
+      return sendPayError(req, res, err);
     }
   });
 
@@ -239,6 +284,33 @@ function sendError(req, res, err) {
     error: err.code || 'error',
     message: err.message,
   });
+}
+
+function sendPayError(req, res, err) {
+  if (err instanceof PaymentsUnavailableError) {
+    req.log.error({ err }, 'payments_unavailable');
+    return res.status(err.status || 503).json({
+      error: err.code || 'PAYMENTS_UNAVAILABLE',
+      message: err.message,
+    });
+  }
+  if (err instanceof PaymentsError) {
+    const status = err.status || 502;
+    if (status >= 500) {
+      req.log.error({ err }, 'payments_error');
+    } else {
+      req.log.warn({ err: { message: err.message, code: err.code } }, 'pay_rejected');
+    }
+    return res.status(status).json({
+      error: err.code || 'payments_error',
+      message: err.message,
+    });
+  }
+  if (err.message === 'POS_SERVICE_TOKEN is not set') {
+    req.log.error({ err }, 'pay_misconfigured');
+    return res.status(500).json({ error: 'misconfigured', hint: 'POS_SERVICE_TOKEN is not set' });
+  }
+  return sendError(req, res, err);
 }
 
 module.exports = { createApp };
