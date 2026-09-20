@@ -110,7 +110,7 @@ See [`k6-analysis.md`](../evidence/reliability-operations/k6-analysis.md).
 | Name | Role | Signed |
 |---|---|---|
 | Saloi | Reliability | 2026-09-20 20:16 EAT |
-| Yordanos | Platform | |
+| Yordanos | Platform | 2026-09-20 21:11 EAT |
 | Arsema | Payments | |
 | Berissa | Product + POS | |
 
