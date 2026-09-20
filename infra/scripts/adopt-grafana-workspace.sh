@@ -1,24 +1,41 @@
 #!/usr/bin/env bash
-# Adopt a Grafana workspace that AWS already created (failed apply still
-# left it in CREATING/ACTIVE) so terraform plan does not call
-# CreateWorkspace again (409 Duplicate request for workspace).
+# Put an existing Amazon Managed Grafana workspace into Terraform state
+# so apply does not call CreateWorkspace again (409 Duplicate request).
+#
+# ADOPT_WAIT=1 (Release apply): poll for several minutes. Earlier 403s
+# still submitted a create; the workspace shows up after SSO finishes.
+# Plan job leaves ADOPT_WAIT unset so a missing workspace is a no-op.
 set -euo pipefail
 
 NAME="${1:-devops-g10-grafana}"
 REGION="${AWS_REGION:-eu-central-1}"
+WAIT="${ADOPT_WAIT:-0}"
+ATTEMPTS=6
+if [[ "${WAIT}" == "1" ]]; then
+  ATTEMPTS=36
+fi
 
 if terraform state show aws_grafana_workspace.amg >/dev/null 2>&1; then
   echo "aws_grafana_workspace.amg already in state"
   exit 0
 fi
 
+lookup() {
+  aws grafana list-workspaces --region "${REGION}" \
+    --query "workspaces[?name=='${NAME}'].id | [0]" --output text 2>/dev/null || true
+}
+
 id=""
-for _ in $(seq 1 60); do
-  id="$(aws grafana list-workspaces --region "${REGION}" \
-    --query "workspaces[?name=='${NAME}'].id | [0]" --output text 2>/dev/null || true)"
+for i in $(seq 1 "${ATTEMPTS}"); do
+  id="$(lookup)"
   if [[ -z "${id}" || "${id}" == "None" || "${id}" == "null" ]]; then
-    echo "no Grafana workspace named ${NAME}; plan will create it"
-    exit 0
+    echo "attempt ${i}/${ATTEMPTS}: no workspace named ${NAME}"
+    if [[ "${WAIT}" != "1" ]]; then
+      echo "plan will create it"
+      exit 0
+    fi
+    sleep 10
+    continue
   fi
 
   status="$(aws grafana describe-workspace --region "${REGION}" --workspace-id "${id}" \
@@ -31,12 +48,12 @@ for _ in $(seq 1 60); do
       exit 0
       ;;
     FAILED)
-      echo "deleting FAILED workspace ${id} so the next apply can create it"
-      aws grafana delete-workspace --region "${REGION}" --workspace-id "${id}" || true
-      exit 0
+      echo "deleting FAILED workspace ${id}; waiting for it to disappear"
+      aws grafana delete-workspace --region "${REGION}" --workspace-id "${id}"
+      sleep 15
       ;;
     DELETING)
-      echo "workspace is DELETING; wait for it to go away"
+      echo "waiting for delete"
       sleep 10
       ;;
     *)
@@ -46,5 +63,9 @@ for _ in $(seq 1 60); do
   esac
 done
 
-echo "timed out waiting for ${NAME} to become ACTIVE"
-exit 1
+if [[ "${WAIT}" == "1" ]]; then
+  echo "timed out waiting for ${NAME}"
+  exit 1
+fi
+echo "no Grafana workspace named ${NAME}; plan will create it"
+exit 0

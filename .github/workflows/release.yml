@@ -188,6 +188,17 @@ jobs:
             -backend-config="dynamodb_table=devops-g10-tflock" \
             -backend-config="region=eu-central-1" \
             -backend-config="key=platform/terraform.tfstate"
+      - name: Adopt Grafana workspace before apply
+        env:
+          ADOPT_WAIT: '1'
+        run: bash scripts/adopt-grafana-workspace.sh
+      - name: Re-plan if Grafana was imported (saved plan still has create)
+        run: |
+          set -euo pipefail
+          if terraform state show aws_grafana_workspace.amg >/dev/null 2>&1; then
+            echo "grafana is in state; refreshing plan.bin so apply does not CreateWorkspace"
+            terraform plan -input=false -no-color -lock-timeout=5m -out=plan.bin
+          fi
       - name: terraform apply saved plan
         run: terraform apply -input=false plan.bin
       - name: Output
