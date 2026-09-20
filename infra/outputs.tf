@@ -94,3 +94,8 @@ output "g2_base_urls" {
     pos_internal = "http://${aws_lb.app.dns_name}"
   }
 }
+
+output "ecs_app_env_parameters" {
+  description = "SSM documents release.yml merges into each app container on ECS roll."
+  value       = { for svc, p in aws_ssm_parameter.ecs_app_env : svc => p.name }
+}
