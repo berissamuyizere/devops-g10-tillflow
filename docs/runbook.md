@@ -220,6 +220,39 @@ allowed; missing RTO without a written reason is not.
 
 RDS PITR window is 7 days. Anything older is out of RPO.
 
+## rds-pitr
+
+- **Restore:** `aws rds restore-db-instance-to-point-in-time` to a **new**
+  identifier (`devops-g10-pg-restore`). Never overwrite `devops-g10-pg`.
+- **Owner:** Saloi
+- **First safe action:** Confirm live `devops-g10-pg` is still `available`
+  and `deletion_protection = true`. Copy its subnet group and RDS SG.
+  Do **not** disable deletion protection on live. Do **not** failover
+  (single-AZ).
+
+Then:
+
+1. Record `LatestRestorableTime` on live (that is the restore point /
+   actual RPO) and the wall-clock start.
+2. Restore with `--use-latest-restorable-time`, same
+   `--db-subnet-group-name` and `--vpc-security-group-ids` as live,
+   `--db-instance-class db.t4g.micro`, `--no-publicly-accessible`.
+3. Wait until the **new** instance is `available`. That elapsed time is
+   RTO. Target 30 min. RPO target ≤ 5 min (`now − LatestRestorableTime`).
+4. Compare row counts (in-VPC, same app users): `pos.sales`,
+   `payments.payments`, `payments.payout_ledger`. Deltas are writes
+   after the restore point, not corruption.
+5. Reconcile **before** declaring recovery, in this order: sales →
+   payments → payouts → provider references (checkout / receipt ids).
+   Do not rewrite live from the restore copy.
+6. Delete the restore instance: disable `deletion_protection` on
+   **restore only**, then
+   `delete-db-instance --skip-final-snapshot`. Leave live protected.
+
+Live has `deletion_protection = true`, so `terraform destroy` also
+fails on RDS until that flag is cleared (G5). PITR is the recover
+path, not destroy.
+
 ## Slack webhook
 
 Terraform created `devops-g10/slack-webhook` with `PLACEHOLDER` and
