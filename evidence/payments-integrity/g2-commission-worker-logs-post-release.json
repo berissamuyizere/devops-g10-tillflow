@@ -1,0 +1,47 @@
+{
+    "events": [
+        {
+            "logStreamName": "app/app/553f78ac814c4627b8a18eaac8b7dfc8",
+            "timestamp": 1789896853836,
+            "message": "{\"level\":30,\"time\":1789896853836,\"service\":\"commission\",\"type\":\"commission.daily-close\",\"message_id\":\"0741fcbf-3008-406e-bf29-e73908aa2255\",\"msg\":\"close_message_received\"}",
+            "ingestionTime": 1789896856231,
+            "eventId": "39916033669048245573299209193576505537422638170774503424"
+        },
+        {
+            "logStreamName": "app/app/553f78ac814c4627b8a18eaac8b7dfc8",
+            "timestamp": 1789896853910,
+            "message": "{\"level\":30,\"time\":1789896853910,\"service\":\"commission\",\"tenant_id\":\"11111111-1111-1111-1111-111111111111\",\"period\":\"2026-09-20\",\"agents\":2,\"sales\":3,\"msg\":\"close_eligible\"}",
+            "ingestionTime": 1789896856231,
+            "eventId": "39916033670698500717990475306050148689598616922217054209"
+        },
+        {
+            "logStreamName": "app/app/553f78ac814c4627b8a18eaac8b7dfc8",
+            "timestamp": 1789896853979,
+            "message": "{\"level\":30,\"time\":1789896853978,\"service\":\"commission\",\"message_id\":\"0741fcbf-3008-406e-bf29-e73908aa2255\",\"msg\":\"close_message_deleted\"}",
+            "ingestionTime": 1789896856231,
+            "eventId": "39916033672237252136689088302816113250411353866129702914"
+        },
+        {
+            "logStreamName": "app/app/553f78ac814c4627b8a18eaac8b7dfc8",
+            "timestamp": 1789896863237,
+            "message": "{\"level\":30,\"time\":1789896863236,\"service\":\"commission\",\"type\":\"commission.daily-close\",\"message_id\":\"8bd3bd4e-302c-443c-a536-1d4747d448ce\",\"msg\":\"close_message_received\"}",
+            "ingestionTime": 1789896866233,
+            "eventId": "39916033878697551184685597359245949664448298548649590784"
+        },
+        {
+            "logStreamName": "app/app/553f78ac814c4627b8a18eaac8b7dfc8",
+            "timestamp": 1789896863252,
+            "message": "{\"level\":30,\"time\":1789896863252,\"service\":\"commission\",\"tenant_id\":\"11111111-1111-1111-1111-111111111111\",\"period\":\"2026-09-20\",\"agents\":2,\"sales\":3,\"msg\":\"close_eligible\"}",
+            "ingestionTime": 1789896866233,
+            "eventId": "39916033879032062362663556706368985438538023971239297025"
+        },
+        {
+            "logStreamName": "app/app/553f78ac814c4627b8a18eaac8b7dfc8",
+            "timestamp": 1789896863418,
+            "message": "{\"level\":30,\"time\":1789896863418,\"service\":\"commission\",\"message_id\":\"8bd3bd4e-302c-443c-a536-1d4747d448ce\",\"msg\":\"close_message_deleted\"}",
+            "ingestionTime": 1789896866233,
+            "eventId": "39916033882733986065619640147863914671797651981232046082"
+        }
+    ],
+    "searchedLogStreams": []
+}
