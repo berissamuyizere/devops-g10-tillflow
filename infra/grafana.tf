@@ -122,6 +122,10 @@ resource "aws_grafana_workspace" "amg" {
   depends_on = [
     aws_iam_role_policy_attachment.grafana,
     aws_iam_policy.ci_deploy,
+    aws_iam_role_policy_attachment.ci_grafana_account,
+    aws_iam_role_policy_attachment.ci_sso_master,
+    aws_iam_role_policy_attachment.ci_sso_directory,
+    time_sleep.ci_iam_propagate,
   ]
 }
 

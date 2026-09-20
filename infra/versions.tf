@@ -18,5 +18,9 @@ terraform {
       source  = "grafana/grafana"
       version = "~> 3.10"
     }
+    time = {
+      source  = "hashicorp/time"
+      version = "~> 0.12"
+    }
   }
 }
