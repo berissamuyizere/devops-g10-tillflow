@@ -82,23 +82,8 @@ resource "aws_ecs_task_definition" "pos" {
         portMappings = [
           { containerPort = 8080, protocol = "tcp" },
         ]
-        environment = [
-          { name = "PORT", value = "8080" },
-          { name = "AWS_REGION", value = var.region },
-          { name = "DB_SECRET_ID", value = aws_secretsmanager_secret.db_pos.name },
-          { name = "DB_SCHEMA", value = "pos" },
-          { name = "OTEL_EXPORTER_OTLP_ENDPOINT", value = "http://localhost:4318" },
-          { name = "OTEL_SERVICE_NAME", value = "pos" },
-          { name = "OTEL_RESOURCE_ATTRIBUTES", value = "service.namespace=tillflow,deployment.environment=${var.environment}" },
-          { name = "LOG_LEVEL", value = "info" },
-          { name = "DEPLOYMENT_ENVIRONMENT", value = var.environment },
-        ]
-        secrets = [
-          {
-            name      = "PAYMENTS_SERVICE_TOKEN"
-            valueFrom = "${aws_secretsmanager_secret.service_tokens.arn}:payments_service_token::"
-          },
-        ]
+        environment = local.ecs_app_env.pos.environment
+        secrets     = local.ecs_app_env.pos.secrets
         mountPoints = [
           { sourceVolume = "tmp", containerPath = "/tmp", readOnly = false },
         ]
@@ -242,38 +227,8 @@ resource "aws_ecs_task_definition" "payments" {
         portMappings = [
           { containerPort = 8080, protocol = "tcp" },
         ]
-        environment = [
-          { name = "PORT", value = "8080" },
-          { name = "AWS_REGION", value = var.region },
-          { name = "DB_SECRET_ID", value = aws_secretsmanager_secret.db_payments.name },
-          { name = "DB_SCHEMA", value = "payments" },
-          { name = "MPESA_MODE", value = "fake" },
-          { name = "POS_BASE_URL", value = local.pos_base_url_internal },
-          { name = "DARAJA_CALLBACK_URL", value = local.daraja_callback_url },
-          { name = "OTEL_EXPORTER_OTLP_ENDPOINT", value = "http://localhost:4318" },
-          { name = "OTEL_SERVICE_NAME", value = "payments" },
-          { name = "OTEL_RESOURCE_ATTRIBUTES", value = "service.namespace=tillflow,deployment.environment=${var.environment}" },
-          { name = "LOG_LEVEL", value = "info" },
-          { name = "DEPLOYMENT_ENVIRONMENT", value = var.environment },
-        ]
-        secrets = [
-          {
-            name      = "PAYMENTS_SERVICE_TOKEN"
-            valueFrom = "${aws_secretsmanager_secret.service_tokens.arn}:payments_service_token::"
-          },
-          {
-            name      = "POS_SERVICE_TOKEN"
-            valueFrom = "${aws_secretsmanager_secret.service_tokens.arn}:pos_service_token::"
-          },
-          {
-            name      = "COMMISSION_SERVICE_TOKEN"
-            valueFrom = "${aws_secretsmanager_secret.service_tokens.arn}:commission_service_token::"
-          },
-          {
-            name      = "DARAJA_CALLBACK_SECRET"
-            valueFrom = "${aws_secretsmanager_secret.service_tokens.arn}:daraja_callback_secret::"
-          },
-        ]
+        environment = local.ecs_app_env.payments.environment
+        secrets     = local.ecs_app_env.payments.secrets
         mountPoints = [
           { sourceVolume = "tmp", containerPath = "/tmp", readOnly = false },
         ]

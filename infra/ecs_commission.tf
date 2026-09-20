@@ -50,29 +50,8 @@ resource "aws_ecs_task_definition" "commission" {
         portMappings = [
           { containerPort = 8080, protocol = "tcp" },
         ]
-        environment = [
-          { name = "PORT", value = "8080" },
-          { name = "AWS_REGION", value = var.region },
-          { name = "SQS_QUEUE_URL", value = aws_sqs_queue.commission_close.url },
-          { name = "POS_BASE_URL", value = local.pos_base_url_internal },
-          { name = "PAYMENTS_BASE_URL", value = local.pos_base_url_internal },
-          { name = "COMMISSION_TENANT_IDS", value = "11111111-1111-1111-1111-111111111111" },
-          { name = "OTEL_EXPORTER_OTLP_ENDPOINT", value = "http://localhost:4318" },
-          { name = "OTEL_SERVICE_NAME", value = "commission" },
-          { name = "OTEL_RESOURCE_ATTRIBUTES", value = "service.namespace=tillflow,deployment.environment=${var.environment}" },
-          { name = "LOG_LEVEL", value = "info" },
-          { name = "DEPLOYMENT_ENVIRONMENT", value = var.environment },
-        ]
-        secrets = [
-          {
-            name      = "PAYMENTS_SERVICE_TOKEN"
-            valueFrom = "${aws_secretsmanager_secret.service_tokens.arn}:payments_service_token::"
-          },
-          {
-            name      = "COMMISSION_SERVICE_TOKEN"
-            valueFrom = "${aws_secretsmanager_secret.service_tokens.arn}:commission_service_token::"
-          },
-        ]
+        environment = local.ecs_app_env.commission.environment
+        secrets     = local.ecs_app_env.commission.secrets
         mountPoints = [
           { sourceVolume = "tmp", containerPath = "/tmp", readOnly = false },
         ]
