@@ -1,0 +1,47 @@
+{
+  "drill": "g4-broken-release",
+  "owner": "Yordanos",
+  "service": "pos",
+  "cluster": "devops-g10",
+  "edge": "https://f9nla14lfh.execute-api.eu-central-1.amazonaws.com",
+  "runbook": "docs/runbook.md#bad-ecs-release",
+  "what_broke": "One-off POS task definition: /health 200, /ready and POST /sales 500. Same digest as live; command override only. Not merged to main.",
+  "detected_how": "Post-deploy smoke (release.yml POS check is POST /sales -> 401). Slack page on fail. Circuit breaker did not fire because ALB /health stayed 200.",
+  "first_safe_action": "aws ecs update-service --task-definition <previous> --force-new-deployment. Do not bounce RDS. Do not terraform apply.",
+  "rollback_is_automatic": false,
+  "rollback_note": "release.yml does not revert the previous task definition when smoke fails. Circuit breaker only rolls back unhealthy /health tasks. Manual runbook step.",
+  "times": {
+    "started": "2026-09-20T23:28:06+03:00",
+    "broken_deployed": "2026-09-20T23:28:11+03:00",
+    "broken_stable": "2026-09-20T23:30:53+03:00",
+    "smoke_failed": "2026-09-20T23:30:53+03:00",
+    "slack_alarm": "2026-09-20T23:30:57+03:00",
+    "rollback_started": "2026-09-20T23:30:57+03:00",
+    "recovered_stable": "2026-09-20T23:33:40+03:00",
+    "slack_recovered": "2026-09-20T23:33:40+03:00"
+  },
+  "task_definitions": {
+    "previous_healthy": "arn:aws:ecs:eu-central-1:240462142849:task-definition/devops-g10-pos:18",
+    "broken": "arn:aws:ecs:eu-central-1:240462142849:task-definition/devops-g10-pos:19",
+    "live_after": "arn:aws:ecs:eu-central-1:240462142849:task-definition/devops-g10-pos:18"
+  },
+  "smoke": {
+    "while_broken": {
+      "post_sales": 500,
+      "web_ready": 200,
+      "sales_body": "{\"status\":\"error\",\"service\":\"pos\",\"g4\":\"broken-release\"}"
+    },
+    "after_rollback": {
+      "post_sales": 401,
+      "web_ready": 200,
+      "sales_body": "{\"error\":\"unauthorized\",\"hint\":\"X-Tenant-Id, X-User-Id, and X-Role are required\"}"
+    }
+  },
+  "rto_seconds": 163,
+  "rto_target_seconds": 600,
+  "rto_met": true,
+  "rpo": 0,
+  "wall_clock_seconds": 334,
+  "error_budget_burned": "POS sale-write SLI excludes /health and /ready. POST /sales 500s during the broken window count if they were eligible writes; this drill used unauthenticated {} so auth 5xx, not a sale write. Treat as no budget burn unless Grafana shows outcome=error on sale writes.",
+  "put_back": "Service left on previous_healthy. Broken revision is not the running task definition."
+}

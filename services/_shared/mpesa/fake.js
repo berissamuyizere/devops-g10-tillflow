@@ -150,8 +150,24 @@ function createFakeMpesaClient(options = {}) {
     }
   }
 
+  function replayEntry(req) {
+    const { accountReference, msisdn, amountMinor } = req;
+    if (!accountReference || !msisdn || amountMinor === undefined || amountMinor === null) {
+      return null;
+    }
+    const expected = derivedId('ws_CO', accountReference, msisdn, amountMinor);
+    if (expected !== req.checkoutRequestId) return null;
+    return {
+      outcome: outcomeFor(msisdn),
+      req: { accountReference, msisdn, amountMinor },
+      merchantRequestId: derivedId('mr', accountReference, msisdn),
+      acceptedAt: now(),
+      settled: false,
+    };
+  }
+
   async function stkQuery(req) {
-    const entry = inflight.get(req.checkoutRequestId);
+    const entry = inflight.get(req.checkoutRequestId) || replayEntry(req);
     if (!entry) {
       throw new MpesaRejectedError('unknown checkoutRequestId', {
         checkoutRequestId: req.checkoutRequestId,

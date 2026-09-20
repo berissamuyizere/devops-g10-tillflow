@@ -81,7 +81,7 @@ resource "aws_db_instance" "pg" {
   delete_automated_backups = false
   copy_tags_to_snapshot    = true
 
-  deletion_protection       = true
+  deletion_protection       = var.rds_deletion_protection
   skip_final_snapshot       = false
   final_snapshot_identifier = "${var.name_prefix}-pg-final-${formatdate("YYYYMMDDhhmm", timestamp())}"
 

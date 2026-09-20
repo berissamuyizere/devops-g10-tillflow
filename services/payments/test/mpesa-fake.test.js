@@ -38,6 +38,49 @@ describe('fake daraja adapter', () => {
     assert.equal(a.merchantRequestId, b.merchantRequestId);
   });
 
+  it('answers stkQuery on a task that never saw the push', async () => {
+    const otherTask = createFakeMpesaClient({ callbackSecret: 'sekret', now: () => NOW });
+    let checkoutRequestId;
+    try {
+      await mpesa.stkPush(push(TEST_MSISDNS.PUSH_TIMEOUT));
+      assert.fail('expected a timeout');
+    } catch (err) {
+      checkoutRequestId = err.checkoutRequestId;
+    }
+
+    await assert.rejects(
+      otherTask.stkQuery({ shortcode: '174379', checkoutRequestId }),
+      MpesaRejectedError,
+      'without the request fields it cannot know the outcome'
+    );
+
+    const query = await otherTask.stkQuery({
+      shortcode: '174379',
+      checkoutRequestId,
+      accountReference: 'sale-1',
+      msisdn: TEST_MSISDNS.PUSH_TIMEOUT,
+      amountMinor: 15000,
+    });
+    assert.equal(query.resultCode, RESULT_CODES.STILL_PROCESSING);
+    assert.equal(query.checkoutRequestId, checkoutRequestId);
+  });
+
+  it('refuses request fields that do not derive the checkout id', async () => {
+    const otherTask = createFakeMpesaClient({ callbackSecret: 'sekret', now: () => NOW });
+    const res = await mpesa.stkPush(push(TEST_MSISDNS.SUCCESS));
+
+    await assert.rejects(
+      otherTask.stkQuery({
+        shortcode: '174379',
+        checkoutRequestId: res.checkoutRequestId,
+        accountReference: 'sale-1',
+        msisdn: TEST_MSISDNS.SUCCESS,
+        amountMinor: 99999,
+      }),
+      MpesaRejectedError
+    );
+  });
+
   it('derives different correlation ids for different sales', async () => {
     const a = await mpesa.stkPush(push(TEST_MSISDNS.SUCCESS, { accountReference: 'sale-1' }));
     const b = await mpesa.stkPush(push(TEST_MSISDNS.SUCCESS, { accountReference: 'sale-2' }));
