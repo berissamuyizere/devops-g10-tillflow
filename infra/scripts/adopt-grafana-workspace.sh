@@ -48,9 +48,9 @@ for i in $(seq 1 "${ATTEMPTS}"); do
       exit 0
       ;;
     FAILED)
-      echo "deleting FAILED workspace ${id}"
-      aws grafana delete-workspace --region "${REGION}" --workspace-id "${id}" || true
-      sleep 10
+      echo "deleting FAILED workspace ${id}; waiting for it to disappear"
+      aws grafana delete-workspace --region "${REGION}" --workspace-id "${id}"
+      sleep 15
       ;;
     DELETING)
       echo "waiting for delete"
