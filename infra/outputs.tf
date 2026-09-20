@@ -118,3 +118,24 @@ output "alerts_topic_arn" {
 output "slack_notifier_function_name" {
   value = aws_lambda_function.slack_notifier.function_name
 }
+
+output "alarm_names" {
+  description = "Y5 CloudWatch alarms from docs/alerts.md. Alarm + OK both go to devops-g10-alerts."
+  value = [
+    aws_cloudwatch_metric_alarm.web_fast_burn.alarm_name,
+    aws_cloudwatch_metric_alarm.web_slow_burn.alarm_name,
+    aws_cloudwatch_metric_alarm.pos_fast_burn.alarm_name,
+    aws_cloudwatch_metric_alarm.pos_slow_burn.alarm_name,
+    aws_cloudwatch_metric_alarm.payments_fast_burn.alarm_name,
+    aws_cloudwatch_metric_alarm.payments_slow_burn.alarm_name,
+    aws_cloudwatch_metric_alarm.commission_fast_burn.alarm_name,
+    aws_cloudwatch_metric_alarm.commission_slow_burn.alarm_name,
+    aws_cloudwatch_metric_alarm.probe_down.alarm_name,
+    aws_cloudwatch_metric_alarm.payments_oldest_pending.alarm_name,
+    aws_cloudwatch_metric_alarm.commission_dlq.alarm_name,
+    aws_cloudwatch_metric_alarm.payout_not_settled.alarm_name,
+    aws_cloudwatch_metric_alarm.payments_callbacks_dlq.alarm_name,
+    aws_cloudwatch_metric_alarm.ecs_cpu_high.alarm_name,
+    aws_cloudwatch_metric_alarm.rds_cpu_high.alarm_name,
+  ]
+}
