@@ -67,6 +67,10 @@ locals {
         { name = "OTEL_RESOURCE_ATTRIBUTES", value = "service.namespace=tillflow,deployment.environment=${var.environment}" },
         { name = "LOG_LEVEL", value = "info" },
         { name = "DEPLOYMENT_ENVIRONMENT", value = var.environment },
+        # #144: sweep + path-auth. Off until this overlay is applied after G5.
+        { name = "RECONCILE_SWEEP_ENABLED", value = "true" },
+        { name = "RECONCILE_MIN_AGE_MS", value = "120000" },
+        { name = "DARAJA_CALLBACK_IP_ALLOWLIST", value = "196.201.212.0/24" },
       ]
       secrets = [
         {
@@ -84,6 +88,10 @@ locals {
         {
           name      = "DARAJA_CALLBACK_SECRET"
           valueFrom = "${aws_secretsmanager_secret.service_tokens.arn}:daraja_callback_secret::"
+        },
+        {
+          name      = "DARAJA_CALLBACK_PATH_SECRET"
+          valueFrom = "${aws_secretsmanager_secret.service_tokens.arn}:daraja_callback_path_secret::"
         },
       ]
     }
