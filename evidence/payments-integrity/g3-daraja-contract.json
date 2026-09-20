@@ -1,0 +1,46 @@
+{
+  "captured_at": "2026-09-20T11:29:33.695Z",
+  "purpose": "prove the Daraja adapter speaks to the real Safaricom sandbox",
+  "environment": "sandbox",
+  "shortcode": "174379",
+  "payer_msisdn": "254708374149",
+  "checkout_request_id": "ws_CO_200920261429243708374149",
+  "merchant_request_id": "4e7d-425c-aa3e-9b62f1dcf8a2557782",
+  "b2c_attempted": false,
+  "b2c_note": "B2C is not exercised here: it needs a public ResultURL and QueueTimeOutURL registered with Safaricom. Deployed service stays MPESA_MODE=fake (ADR-002).",
+  "steps": [
+    {
+      "step": "oauth token obtained",
+      "ok": true
+    },
+    {
+      "step": "stk push accepted",
+      "ok": true,
+      "response_code": "0",
+      "note": "Success. Request accepted for processing"
+    },
+    {
+      "step": "checkout request id returned",
+      "ok": true,
+      "checkout_request_id": "ws_CO_200920261429243708374149"
+    },
+    {
+      "step": "utc timestamp accepted by safaricom",
+      "ok": true,
+      "sent_timestamp": "20260920112921",
+      "note": "adapter builds the timestamp in UTC and the sandbox accepted it"
+    },
+    {
+      "step": "stk query answered",
+      "ok": true,
+      "result_code": 1037,
+      "note": "DS timeout user cannot be reached."
+    },
+    {
+      "step": "query result is a known code, not a crash",
+      "ok": true,
+      "result_code": 1037
+    }
+  ],
+  "passed": true
+}
