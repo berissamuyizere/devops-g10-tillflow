@@ -1,0 +1,83 @@
+{
+  "drill": "g4-rds-pitr",
+  "set_alarm_state": false,
+  "overwrote_live": false,
+  "source": "devops-g10-pg",
+  "target": "devops-g10-pg-restore",
+  "region": "eu-central-1",
+  "mpesa_mode": "fake",
+  "runbook": "docs/runbook.md#rds-pitr",
+  "started_utc": "2026-09-20T19:37:07Z",
+  "started_eat": "2026-09-20 22:37:07 EAT",
+  "restore_point": "2026-09-20T19:30:55+00:00",
+  "available_utc": "2026-09-20T20:04:52Z",
+  "available_eat": "2026-09-20 23:04:52 EAT",
+  "deleted_utc": "2026-09-20T20:08:00Z",
+  "deleted_eat": "2026-09-20 23:08:00 EAT",
+  "gone_utc": "2026-09-20T20:09:35Z",
+  "skip_final_snapshot": true,
+  "live_after": {
+    "id": "devops-g10-pg",
+    "status": "available",
+    "deletion_protection": true
+  },
+  "restore_instance": {
+    "class": "db.t4g.micro",
+    "az": "eu-central-1a",
+    "endpoint": "devops-g10-pg-restore.cxiicgm8iuvj.eu-central-1.rds.amazonaws.com",
+    "subnet_group": "devops-g10-vpc",
+    "vpc_security_group_ids": ["sg-0ece9add76cf20bba"],
+    "publicly_accessible": false,
+    "deletion_protection_on_create": false
+  },
+  "rto": {
+    "seconds": 1664,
+    "target_seconds": 1800,
+    "met": true
+  },
+  "rpo": {
+    "seconds": 372,
+    "target_seconds": 300,
+    "met": false,
+    "note": "now − LatestRestorableTime at the restore API call. t4g.micro automated backup lag was 6m12s. We used --use-latest-restorable-time immediately; we did not wait for a closer restore point."
+  },
+  "row_counts": {
+    "captured_utc": "2026-09-20T20:07:12Z",
+    "method": "in-VPC ECS Fargate one-off (POS + Payments task roles), same app users, host swapped to restore",
+    "pos": {
+      "live": { "pos.sales": 2430, "pos.sale_lines": 2430 },
+      "restore": { "pos.sales": 2429, "pos.sale_lines": 2429 },
+      "delta": { "pos.sales": 1, "pos.sale_lines": 1 }
+    },
+    "payments": {
+      "live": {
+        "payments.payments": 2403,
+        "payments.payout_ledger": 11,
+        "payments.callback_log": 2412
+      },
+      "restore": {
+        "payments.payments": 2403,
+        "payments.payout_ledger": 11,
+        "payments.callback_log": 2412
+      },
+      "delta": {
+        "payments.payments": 0,
+        "payments.payout_ledger": 0,
+        "payments.callback_log": 0
+      }
+    }
+  },
+  "reconcile_order": [
+    "sales",
+    "payments",
+    "payouts",
+    "provider_references"
+  ],
+  "rewrote_live_from_restore": false,
+  "detection": {
+    "kind": "planned restore",
+    "alarm": null,
+    "slack": null,
+    "note": "This class is an operator restore, not an alarm. No SetAlarmState."
+  }
+}
