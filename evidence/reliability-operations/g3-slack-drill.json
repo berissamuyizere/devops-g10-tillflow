@@ -1,0 +1,59 @@
+{
+  "drill": "devops-g10-payments-oldest-pending",
+  "set_alarm_state": false,
+  "mpesa_mode": "fake",
+  "edge": "https://f9nla14lfh.execute-api.eu-central-1.amazonaws.com",
+  "alarm": {
+    "name": "devops-g10-payments-oldest-pending",
+    "ok_to_alarm": "2026-09-20T18:57:37.130+03:00",
+    "alarm_to_ok": "2026-09-20T19:07:37.168+03:00",
+    "alarm_reason": "Threshold Crossed: 1 datapoint [278477.190771 (20/09/26 15:56:00)] was greater than the threshold (60.0).",
+    "ok_reason": "Threshold Crossed: 1 datapoint [0.0 (20/09/26 16:06:00)] was not greater than the threshold (60.0)."
+  },
+  "slack_lambda": {
+    "function": "devops-g10-slack-notifier",
+    "log_group": "/aws/lambda/devops-g10-slack-notifier",
+    "firing": {
+      "request_id": "aec6d216-02d5-487d-a6f8-08f4db12a623",
+      "started_utc": "2026-09-20T15:57:37.977Z",
+      "duration_ms": 1126.43,
+      "placeholder_log": false
+    },
+    "recovered": {
+      "request_id": "604172ba-a155-4461-890f-b92b6713a147",
+      "started_utc": "2026-09-20T16:07:37.963Z",
+      "duration_ms": 704.40,
+      "placeholder_log": false
+    }
+  },
+  "sns": {
+    "topic": "devops-g10-alerts",
+    "messages_published": [
+      { "at": "2026-09-20T18:57:00+03:00", "sum": 1 },
+      { "at": "2026-09-20T19:07:00+03:00", "sum": 1 }
+    ]
+  },
+  "symptom": {
+    "kind": "real pending STK, public edge only",
+    "preexisting_timeout": {
+      "payment_id": "01985e8b-8e7d-4600-ab73-56b61b001f49",
+      "sale_id": "52586a6c-9e17-4a10-ab42-5c9bc8270da2",
+      "msisdn": "254700000003",
+      "checkout_request_id": "ws_CO-2afa38ae5ed3",
+      "callback": "2026-09-20T15:56:05Z applied, sale paid"
+    },
+    "g3_no_callback": {
+      "sale_id": "0544ef3e-ca39-49f1-94f1-feec39badbd1",
+      "payment_id": "218e9618-150f-4265-8486-6eead2453894",
+      "msisdn": "254700000004",
+      "checkout_request_id": "ws_CO-560c13f53601",
+      "pay_accepted_utc": "2026-09-20T15:56:34Z",
+      "callback_applied_utc": "2026-09-20T15:57:40Z approx"
+    }
+  },
+  "dimension_fix": {
+    "why": "EMF series is kind=payment + OTelLib=tillflow.payments. kind-only never received datapoints (treat_missing_data notBreaching).",
+    "live": "put-metric-alarm added OTelLib on the payment query; Terraform in this PR matches.",
+    "payout_query": "left kind-only so G2 timeout payouts (disbursing) do not pin the page"
+  }
+}

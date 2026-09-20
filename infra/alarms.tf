@@ -541,6 +541,10 @@ resource "aws_cloudwatch_metric_alarm" "payments_oldest_pending" {
   ok_actions    = local.alert_actions
   tags          = { service = "payments" }
 
+  # EMF ZeroAndSingleDimensionRollup still emits OTelLib=tillflow.payments on
+  # the labelled series. kind-only never matches, so this alarm stayed OK
+  # with a 3-day pending in the gauge. Keep payout on kind-only for now:
+  # G2 timeout fixtures stay disbursing and would pin ALARM forever.
   metric_query {
     id          = "payment"
     return_data = false
@@ -549,7 +553,10 @@ resource "aws_cloudwatch_metric_alarm" "payments_oldest_pending" {
       metric_name = "payments_oldest_pending_age_seconds"
       period      = 60
       stat        = "Maximum"
-      dimensions  = { kind = "payment" }
+      dimensions = {
+        kind    = "payment"
+        OTelLib = "tillflow.payments"
+      }
     }
   }
   metric_query {
