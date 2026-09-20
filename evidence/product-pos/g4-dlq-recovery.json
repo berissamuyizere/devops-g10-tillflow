@@ -1,0 +1,96 @@
+{
+  "drill": "g4-dlq-recovery",
+  "owner": "Berissa",
+  "runbook": "docs/runbook.md#commission-dlq",
+  "times": {
+    "started_utc": "2026-09-20T19:34:49.504Z",
+    "started_eat": "2026-09-20 22:34:49+03:00",
+    "alb_rule_revoked_utc": "2026-09-20T19:34:50Z",
+    "message_sent_utc": "2026-09-20T19:34:51Z",
+    "dlq_message_visible_utc": "2026-09-20T19:50:29Z",
+    "alarm_firing_utc": "2026-09-20T19:52:14Z",
+    "alarm_firing_eat": "2026-09-20 22:52:14+03:00",
+    "alb_rule_restored_utc": "2026-09-20T19:52:37Z",
+    "move_task_started_utc": "2026-09-20T19:52:43Z",
+    "alarm_ok_utc": "2026-09-20T19:56:15Z",
+    "alarm_ok_eat": "2026-09-20 22:56:15+03:00",
+    "ended_utc": "2026-09-20T19:56:20Z",
+    "ended_eat": "2026-09-20 22:56:20+03:00",
+    "dlq_wait_seconds": 938,
+    "alarm_to_ok_seconds": 241
+  },
+  "poison_message": {
+    "queue": "devops-g10-commission-close",
+    "message_id": "df45bfab-1ef2-4e5d-ad7c-c8e12be10270",
+    "body": {
+      "type": "commission.daily-close",
+      "scheduled_at": "2026-09-20T19:34:51.000Z",
+      "drill": "g4-dlq-poison",
+      "business_day": "2099-01-01"
+    },
+    "failure_mode": "ECS→ALB ingress revoked (sgr-0fe7f2b57d9676326); commission close fetch to POS /internal/v1/commission/eligible fails with fetch failed",
+    "max_receive_count": 3,
+    "poller_visibility_seconds": 300,
+    "note": "Commission poller ReceiveMessageCommand sets VisibilityTimeout=300, so three failures take ~15 minutes regardless of queue attribute"
+  },
+  "break_action": {
+    "type": "revoke_security_group_ingress",
+    "rule_id": "sgr-0fe7f2b57d9676326",
+    "alb_sg": "sg-0635ff8540248d2c5",
+    "description": "Removed ECS tasks → internal ALB :80 hairpin"
+  },
+  "first_safe_action": "get-queue-attributes on devops-g10-commission-close-dlq — read, do not redrive until failure class known",
+  "commission_logs": [
+    {"msg": "close_message_received", "message_id": "df45bfab-1ef2-4e5d-ad7c-c8e12be10270"},
+    {"msg": "close_poller_error", "err": "fetch failed"},
+    {"msg": "close_poller_error", "err": "fetch failed"},
+    {"msg": "close_poller_error", "err": "fetch failed"}
+  ],
+  "alarm": {
+    "name": "devops-g10-commission-dlq",
+    "firing": {
+      "state": "ALARM",
+      "updated": "2026-09-20T22:52:14.436000+03:00",
+      "reason": "Threshold Crossed: 1 datapoint was greater than or equal to the threshold (1.0)."
+    },
+    "recovered": {
+      "state": "OK",
+      "updated": "2026-09-20T22:56:14.436000+03:00",
+      "reason": "Threshold Crossed: 1 datapoint was not greater than or equal to the threshold (1.0)."
+    }
+  },
+  "slack_lambda": {
+    "function": "devops-g10-slack-notifier",
+    "log_group": "/aws/lambda/devops-g10-slack-notifier",
+    "firing": {
+      "request_id": "eea65e27-7d04-4bdb-a1b5-fe24b3e5dce0",
+      "started_ms": 1789933935185,
+      "duration_ms": 732.69
+    },
+    "recovered": {
+      "request_id": "c1a9e8ec-dd2b-4e4e-802c-0d89d787a16a",
+      "started_ms": 1789934174579,
+      "duration_ms": 477.49
+    }
+  },
+  "recovery": {
+    "action": "start-message-move-task",
+    "source_arn": "arn:aws:sqs:eu-central-1:240462142849:devops-g10-commission-close-dlq",
+    "destination_arn": "arn:aws:sqs:eu-central-1:240462142849:devops-g10-commission-close",
+    "task_handle": "eyJ0YXNrSWQiOiI0ZTA1MTZkZi0yYTY1LTQ0NTItYjQ3NS00MTU3NTkzM2U4ZmMiLCJzb3VyY2VBcm4iOiJhcm46YXdzOnNxczpldS1jZW50cmFsLTE6MjQwNDYyMTQyODQ5OmRldm9wcy1nMTAtY29tbWlzc2lvbi1jbG9zZS1kbHEifQ==",
+    "note": "ALB rule restored before move; message reprocessed with 0 eligible sales for 2099-01-01 and deleted"
+  },
+  "restore": {
+    "alb_rule_id_after_restore": "sgr-06deea1208cdcbcb4",
+    "queue_visibility_restored": 300,
+    "terraform_plan": "local init timed out downloading providers; SG rule IDs differ from state (CLI re-create). Run terraform apply in infra/ to reconcile."
+  },
+  "checks": [
+    {"check": "message reached DLQ after 3 failed receives", "ok": true, "actual": 1, "expected": "visible >= 1"},
+    {"check": "alarm fired", "ok": true, "actual": "ALARM", "expected": "ALARM"},
+    {"check": "slack notifier invoked", "ok": true, "actual": 2, "expected": ">= 1"},
+    {"check": "alarm recovered to OK", "ok": true, "actual": "OK", "expected": "OK"},
+    {"check": "DLQ empty after recovery", "ok": true, "actual": 0, "expected": 0}
+  ],
+  "passed": true
+}
