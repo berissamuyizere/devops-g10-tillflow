@@ -15,6 +15,10 @@ const POS_URL =
 const PAYMENTS_TOKEN = 'dev-payments-token';
 const CALLBACK_SECRET = 'test-callback-secret';
 const NOW_MS = Date.UTC(2026, 8, 14, 12, 0, 0);
+
+process.env.PAYMENTS_SERVICE_TOKEN = process.env.PAYMENTS_SERVICE_TOKEN || PAYMENTS_TOKEN;
+process.env.POS_SERVICE_TOKEN = process.env.POS_SERVICE_TOKEN || 'dev-pos-token';
+process.env.COMMISSION_SERVICE_TOKEN = process.env.COMMISSION_SERVICE_TOKEN || 'dev-commission-token';
 const now = () => NOW_MS;
 
 describe('contract: Payments ↔ real POS', () => {

@@ -13,6 +13,10 @@ const CALLBACK_SECRET = 'test-callback-secret';
 const POS_TOKEN = 'dev-pos-token';
 const COMMISSION_TOKEN = 'dev-commission-token';
 
+process.env.POS_SERVICE_TOKEN = process.env.POS_SERVICE_TOKEN || POS_TOKEN;
+process.env.COMMISSION_SERVICE_TOKEN = process.env.COMMISSION_SERVICE_TOKEN || COMMISSION_TOKEN;
+process.env.PAYMENTS_SERVICE_TOKEN = process.env.PAYMENTS_SERVICE_TOKEN || 'dev-payments-token';
+
 const NOW_MS = Date.UTC(2026, 8, 10, 12, 0, 0);
 const now = () => NOW_MS;
 

@@ -112,6 +112,33 @@ resource "aws_lb_target_group" "payments" {
   }
 }
 
+resource "aws_lb_listener_rule" "block_internal_from_edge" {
+  listener_arn = aws_lb_listener.http.arn
+  priority     = 1
+
+  action {
+    type = "fixed-response"
+    fixed_response {
+      content_type = "application/json"
+      message_body = "{\"error\":\"not_found\"}"
+      status_code  = "404"
+    }
+  }
+
+  condition {
+    path_pattern {
+      values = ["/internal/*"]
+    }
+  }
+
+  condition {
+    http_header {
+      http_header_name = "x-tillflow-edge"
+      values           = ["public"]
+    }
+  }
+}
+
 resource "aws_lb_listener_rule" "payments_callback" {
   listener_arn = aws_lb_listener.http.arn
   priority     = 10

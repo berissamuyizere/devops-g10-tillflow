@@ -29,7 +29,10 @@ function createPosClient(options = {}) {
     /\/+$/,
     ''
   );
-  const token = options.token || process.env.PAYMENTS_SERVICE_TOKEN || 'dev-payments-token';
+  const token = options.token || (process.env.PAYMENTS_SERVICE_TOKEN || '').trim();
+  if (!token) {
+    throw new PosError('PAYMENTS_SERVICE_TOKEN is not set', 500, 'POS_MISCONFIGURED');
+  }
   const fetchImpl = options.fetch || globalThis.fetch;
   const timeoutMs = options.timeoutMs || Number(process.env.POS_TIMEOUT_MS || 3000);
 

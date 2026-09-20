@@ -89,6 +89,19 @@ Creates one **paid** sale (fake STK) + one **unpaid** control sale, calls
 `GET /internal/v1/commission/eligible`, and writes
 `evidence/product-pos/g2-close-eligible-<YYYY-MM-DD>.json`.
 
+## G2 — seed second demo attendant (Arsema unblock)
+
+Attendant **2222…** already has a cited payout for **2026-09-18**. Seed **3333…**
+on live RDS (ECS `devops-g10-db-bootstrap` + RDS master, same path as
+`g2-seed.json`):
+
+```bash
+npm run g2:seed-attendant2
+```
+
+Arsema then uses `ATTENDANT_ID=33333333-3333-3333-3333-333333333333` with
+`g2-close-seed.js` and `CLOSE_TRIGGER=manual`. Do not delete the 2222… ledger row.
+
 ## Invariants covered in CI
 
 1. Same `Idempotency-Key` + same body → one sale row  

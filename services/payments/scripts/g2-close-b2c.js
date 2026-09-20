@@ -39,30 +39,40 @@ function xrayTraceId() {
   return Math.floor(Date.now() / 1000).toString(16).padStart(8, '0') + randomBytes(12).toString('hex');
 }
 
-async function sendCloseMessage(scheduledAt) {
+async function sendCloseMessage(scheduledAt, businessDay) {
   const { SQSClient, SendMessageCommand } = require('@aws-sdk/client-sqs');
   const client = new SQSClient({ region: AWS_REGION });
-  const body = JSON.stringify({ type: 'commission.daily-close', scheduled_at: scheduledAt });
+  const body = JSON.stringify({
+    type: 'commission.daily-close',
+    scheduled_at: scheduledAt,
+    business_day: businessDay,
+  });
   const out = await client.send(
     new SendMessageCommand({ QueueUrl: SQS_QUEUE_URL, MessageBody: body })
   );
   return out.MessageId;
 }
 
-async function waitForPayout(headers, agentId, period) {
+async function lookupPayout(headers, agentId, period) {
+  const res = await fetch(
+    `${PAYMENTS}/internal/v1/payouts/by-agent-period?agent_id=${agentId}&period=${period}`,
+    { headers }
+  );
+  return res.status === 200 ? res.json() : null;
+}
+
+async function waitForPayout(headers, agentId, period, notBefore) {
   const deadline = Date.now() + CLOSE_WAIT_MS;
-  let last = null;
   while (Date.now() < deadline) {
-    const res = await fetch(
-      `${PAYMENTS}/internal/v1/payouts/by-agent-period?agent_id=${agentId}&period=${period}`,
-      { headers }
-    );
-    if (res.status === 200) return res.json();
-    last = res.status;
+    const found = await lookupPayout(headers, agentId, period);
+    if (found && (!notBefore || new Date(found.created_at).getTime() >= notBefore)) {
+      return found;
+    }
     await new Promise((r) => setTimeout(r, CLOSE_POLL_MS));
   }
   throw new Error(
-    `the deployed worker did not create a payout within ${CLOSE_WAIT_MS / 1000}s (last lookup ${last})`
+    `no payout created after this run started within ${CLOSE_WAIT_MS / 1000}s — ` +
+      'the deployed worker did not process the message'
   );
 }
 
@@ -72,6 +82,7 @@ async function main() {
     process.exit(2);
   }
 
+  const runStartedAt = Date.now();
   const traceId = xrayTraceId();
   const traceparent = `00-${traceId}-${randomBytes(8).toString('hex')}-01`;
   const trace = (extra = {}) => ({ traceparent, 'content-type': 'application/json', ...extra });
@@ -120,6 +131,41 @@ async function main() {
   const period = eatDate(new Date());
 
   const commissionHeaders = trace({ 'x-commission-token': COMMISSION_TOKEN });
+
+  const preflight = await fetch(
+    `${PAYMENTS}/internal/v1/payouts/by-agent-period?agent_id=${ATTENDANT_ID}&period=${period}`,
+    { headers: commissionHeaders }
+  );
+  if (preflight.status === 200) {
+    const existing = await preflight.json();
+    if (existing.status === 'disbursed' || existing.status === 'failed') {
+      console.error(`\nagent ${ATTENDANT_ID} already has a ${existing.status} payout for ${period}.`);
+      console.error('payout_ledger is unique per (agent_id, period), so a close for this');
+      console.error('agent-period returns the existing row and the run cannot prove');
+      console.error('"disbursing before the result callback".\n');
+      console.error('Options:');
+      console.error('  - run on the next Africa/Nairobi business day, or');
+      console.error('  - set ATTENDANT_ID to a different seeded attendant in this tenant.\n');
+      console.error(`existing ledger: ${existing.id} (${existing.status})`);
+      process.exit(2);
+    }
+    if (CLOSE_TRIGGER === 'manual' || SQS_QUEUE_URL) {
+      console.error(`\nagent ${ATTENDANT_ID} already has a ${existing.status} payout for ${period}.`);
+      console.error('a worker-triggered run must create the payout itself, so this run');
+      console.error('could not prove the worker did anything.\n');
+      console.error('Use a different seeded attendant, or the next business day.\n');
+      console.error(`existing ledger: ${existing.id} (${existing.status})`);
+      process.exit(2);
+    }
+    console.log(`  note: resuming an existing ${existing.status} payout ${existing.id}`);
+  } else if (preflight.status !== 404) {
+    console.error(
+      `\npreflight lookup returned ${preflight.status}. If this is 500, the deployed Payments`
+    );
+    console.error('does not have GET /internal/v1/payouts/by-agent-period yet.\n');
+    process.exit(2);
+  }
+
   const manual = CLOSE_TRIGGER === 'manual';
   const triggeredVia = manual ? 'sqs_manual' : SQS_QUEUE_URL ? 'sqs' : 'in_process';
   let ledger;
@@ -129,20 +175,31 @@ async function main() {
     const payload = JSON.stringify({
       type: 'commission.daily-close',
       scheduled_at: new Date().toISOString(),
+      business_day: period,
     });
     console.log('2. trigger the daily close from the SQS console');
     console.log('   Queue: devops-g10-commission-close -> Send and receive messages');
     console.log('   Message body:');
     console.log(`\n${payload}\n`);
     console.log(`   waiting up to ${CLOSE_WAIT_MS / 1000}s for the worker to create the payout...`);
-    ledger = await waitForPayout(commissionHeaders, ATTENDANT_ID, period);
+    ledger = await waitForPayout(commissionHeaders, ATTENDANT_ID, period, runStartedAt);
     check('the deployed worker created the payout', Boolean(ledger.id), true);
+    check(
+      'the payout was created by this run, not a previous one',
+      new Date(ledger.created_at).getTime() >= runStartedAt,
+      true
+    );
   } else if (SQS_QUEUE_URL) {
     console.log('2. trigger the daily close via SQS (deployed worker consumes it)');
-    messageId = await sendCloseMessage(new Date().toISOString());
+    messageId = await sendCloseMessage(new Date().toISOString(), period);
     console.log(`   sent commission.daily-close message ${messageId}`);
-    ledger = await waitForPayout(commissionHeaders, ATTENDANT_ID, period);
+    ledger = await waitForPayout(commissionHeaders, ATTENDANT_ID, period, runStartedAt);
     check('the deployed worker created the payout', Boolean(ledger.id), true);
+    check(
+      'the payout was created by this run, not a previous one',
+      new Date(ledger.created_at).getTime() >= runStartedAt,
+      true
+    );
   } else {
     console.log('2. run the daily close in-process (set SQS_QUEUE_URL to use the deployed worker)');
     const close = await runDailyClose({
@@ -152,11 +209,15 @@ async function main() {
       commissionToken: COMMISSION_TOKEN,
       tenantIds: [TENANT_ID],
       scheduledAt: new Date().toISOString(),
+      businessDay: period,
       logger: { info: () => {}, warn: () => {}, error: () => {} },
     });
-    const payout = (close.payouts || []).find((p) => p.ledger && p.ledger.id);
+    const payout = (close.payouts || []).find(
+      (p) => p.ledger && p.ledger.id && p.ledger.agent_id === ATTENDANT_ID
+    );
     if (!payout) {
-      console.error('close produced no payout — is there a paid sale for today (EAT)?');
+      console.error(`close produced no payout for agent ${ATTENDANT_ID}.`);
+      console.error('is there a paid sale for this attendant today (EAT)?');
       console.error(JSON.stringify(close, null, 2));
       process.exit(2);
     }
@@ -174,13 +235,13 @@ async function main() {
   if (manual) {
     console.log('   send the SAME message body again from the console, then wait...');
     await new Promise((r) => setTimeout(r, CLOSE_POLL_MS * 5));
-    const replayed = await waitForPayout(commissionHeaders, ATTENDANT_ID, period);
-    check('replayed close returns the same payout', replayed.id, ledgerId);
+    const replayed = await lookupPayout(commissionHeaders, ATTENDANT_ID, period);
+    check('replayed close returns the same payout', replayed?.id, ledgerId);
   } else if (SQS_QUEUE_URL) {
-    await sendCloseMessage(new Date().toISOString());
+    await sendCloseMessage(new Date().toISOString(), period);
     await new Promise((r) => setTimeout(r, CLOSE_POLL_MS * 3));
-    const replayed = await waitForPayout(commissionHeaders, ATTENDANT_ID, period);
-    check('replayed close returns the same payout', replayed.id, ledgerId);
+    const replayed = await lookupPayout(commissionHeaders, ATTENDANT_ID, period);
+    check('replayed close returns the same payout', replayed?.id, ledgerId);
   } else {
     const closeAgain = await runDailyClose({
       posBaseUrl: POS,
@@ -189,9 +250,12 @@ async function main() {
       commissionToken: COMMISSION_TOKEN,
       tenantIds: [TENANT_ID],
       scheduledAt: new Date().toISOString(),
+      businessDay: period,
       logger: { info: () => {}, warn: () => {}, error: () => {} },
     });
-    const replayPayout = (closeAgain.payouts || []).find((p) => p.ledger && p.ledger.id);
+    const replayPayout = (closeAgain.payouts || []).find(
+      (p) => p.ledger && p.ledger.id && p.ledger.agent_id === ATTENDANT_ID
+    );
     check('replayed close returns the same payout', replayPayout?.ledger?.id, ledgerId);
   }
 
@@ -320,6 +384,8 @@ async function main() {
     mpesa_mode: 'fake',
     triggered_via: triggeredVia,
     sqs_message_id: messageId,
+    run_started_at: new Date(runStartedAt).toISOString(),
+    ledger_created_at: ledger.created_at,
     period,
     sale_id: sale.id,
     payment_id: payment.id,
@@ -337,6 +403,7 @@ async function main() {
 
   console.log(`\n${failures === 0 ? 'ALL CHECKS PASSED' : `${failures} CHECK(S) FAILED`}`);
   console.log(`evidence written to ${outFile}`);
+  console.log('EVIDENCE_JSON ' + JSON.stringify(evidence));
   console.log(`X-Ray trace id: 1-${traceId.slice(0, 8)}-${traceId.slice(8)}\n`);
   process.exit(failures === 0 ? 0 : 1);
 }

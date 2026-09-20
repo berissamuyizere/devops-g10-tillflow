@@ -1,0 +1,32 @@
+{
+  "captured_at": "2026-09-19T09:43:53.000Z",
+  "method": "ecs run-task devops-g10-db-bootstrap with psql as RDS master (container override)",
+  "task_arn": "arn:aws:ecs:eu-central-1:240462142849:task/devops-g10/0d9030eaceea41afb761210c34a625de",
+  "exit_code": 0,
+  "tenant": {
+    "id": "11111111-1111-1111-1111-111111111111",
+    "name": "Demo Café",
+    "status": "active",
+    "mpesa_till": "174379",
+    "default_commission_bps": 500
+  },
+  "user": {
+    "id": "44444444-4444-4444-4444-444444444444",
+    "email": "demo3@tillflow.dev"
+  },
+  "membership": {
+    "tenant_id": "11111111-1111-1111-1111-111111111111",
+    "user_id": "44444444-4444-4444-4444-444444444444",
+    "role": "attendant"
+  },
+  "attendant": {
+    "id": "44444444-4444-4444-4444-444444444444",
+    "tenant_id": "11111111-1111-1111-1111-111111111111",
+    "display_name": "Demo Attendant 3",
+    "payout_msisdn": "254700000000",
+    "commission_bps": 500,
+    "status": "active",
+    "role": "attendant"
+  },
+  "notes": "G2 close evidence: use ATTENDANT_ID=44444444-4444-4444-4444-444444444444. Does not touch existing ledger rows."
+}
