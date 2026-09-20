@@ -183,7 +183,6 @@ data "aws_iam_policy_document" "ci_deploy" {
       "events:*",
       "ecr:*",
       "ecs:*",
-      "application-autoscaling:*",
       "apigateway:*",
       "wafv2:*",
       "codepipeline:*",
@@ -199,6 +198,15 @@ data "aws_iam_policy_document" "ci_deploy" {
       variable = "aws:RequestedRegion"
       values   = [var.region]
     }
+  }
+
+  # Application Auto Scaling does not always send aws:RequestedRegion, so
+  # RegisterScalableTarget never matched WriteNamespacedResources.
+  statement {
+    sid       = "ApplicationAutoScaling"
+    effect    = "Allow"
+    actions   = ["application-autoscaling:*"]
+    resources = ["*"]
   }
 
   statement {
