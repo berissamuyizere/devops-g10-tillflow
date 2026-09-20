@@ -90,12 +90,12 @@ async function writeLog(db, entry) {
 async function handleCallback(
   db,
   pos,
-  { rawBody, headers, secret, now = () => Date.now(), logger }
+  { rawBody, headers, secret, auth = null, now = () => Date.now(), logger }
 ) {
   const log = (outcome, extra = {}) => ({ outcome, ...extra });
 
   const headerValue = headers?.[signature.SIGNATURE_HEADER];
-  const verification = signature.verify(rawBody, headerValue, secret, { now });
+  const verification = auth || signature.verify(rawBody, headerValue, secret, { now });
 
   let parsedBody;
   try {
