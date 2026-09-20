@@ -1,7 +1,12 @@
 {
   "check": "g5-yordanos-preflight",
   "owner": "Yordanos",
-  "checked_eat": "2026-09-21T00:21:00+03:00",
+  "checked_eat": "2026-09-21T01:54:00+03:00",
+  "after": {
+    "saloi_docs": ["#139", "#140"],
+    "main_sha": "0671eec4affda3632b40199a1738ca0c8b4a9e69",
+    "last_release": "https://github.com/berissamuyizere/devops-g10-tillflow/actions/runs/35540672774"
+  },
   "edge": "https://f9nla14lfh.execute-api.eu-central-1.amazonaws.com",
   "smoke": {
     "GET /health": { "http": 200, "body": { "status": "ok", "service": "web" } },
@@ -10,10 +15,10 @@
       "http": 200,
       "body": {
         "service": "web",
-        "commit": "0b1126f3d919bc075d2067aecad1a00ef12c2b1e",
-        "digest": "sha256:ec878d03e98d804359b9d133e99d9f40409b1b20ce48096d4ca8ffa2c869eda0",
+        "commit": "0671eec4affda3632b40199a1738ca0c8b4a9e69",
+        "digest": "sha256:2d26de505d91fb6cce16e8ffa931825a46d91386fa19ccac0267e2b112189def",
         "environment": "prod",
-        "started_at": "2026-09-20T20:58:34.418Z"
+        "started_at": "2026-09-20T22:09:17.917Z"
       }
     },
     "POST /sales": {
@@ -25,25 +30,36 @@
     }
   },
   "ecs": [
-    { "name": "devops-g10-pos", "runningCount": 2, "desiredCount": 2, "taskDefinition": "devops-g10-pos:20", "deployments": 1 },
-    { "name": "devops-g10-web", "runningCount": 2, "desiredCount": 2, "taskDefinition": "devops-g10-web:18", "deployments": 1 },
-    { "name": "devops-g10-payments", "runningCount": 2, "desiredCount": 2, "taskDefinition": "devops-g10-payments:22", "deployments": 1 },
-    { "name": "devops-g10-commission", "runningCount": 1, "desiredCount": 1, "taskDefinition": "devops-g10-commission:11", "deployments": 1 }
+    { "name": "devops-g10-pos", "runningCount": 2, "desiredCount": 2, "taskDefinition": "devops-g10-pos:22", "deployments": 1 },
+    { "name": "devops-g10-web", "runningCount": 2, "desiredCount": 2, "taskDefinition": "devops-g10-web:20", "deployments": 1 },
+    { "name": "devops-g10-payments", "runningCount": 2, "desiredCount": 2, "taskDefinition": "devops-g10-payments:24", "deployments": 1 },
+    { "name": "devops-g10-commission", "runningCount": 1, "desiredCount": 1, "taskDefinition": "devops-g10-commission:13", "deployments": 1 }
   ],
   "rds": [
     { "id": "devops-g10-pg", "status": "available", "deletionProtection": true }
   ],
   "sg_live_matches_state": {
     "cache_from_ecs": "sgr-0f50e811b25ab2ed0",
-    "alb_from_ecs": "sgr-06deea1208cdcbcb4",
-    "terraform_targeted_plan": "No changes"
+    "alb_from_ecs": "sgr-06deea1208cdcbcb4"
+  },
+  "scans_from_last_release": {
+    "sbom": "sbom-web-0671eec4affda3632b40199a1738ca0c8b4a9e69.spdx.json",
+    "trivy": "trivy-web-0671eec4affda3632b40199a1738ca0c8b4a9e69.txt",
+    "trivy_total": "0 (HIGH: 0, CRITICAL: 0)"
+  },
+  "destroy_flags": {
+    "pr": "#141",
+    "on": "develop",
+    "on_main": false,
+    "applied": false,
+    "note": "Merge to main and apply only immediately before destroy. Do not apply before Rob has seen this URL."
   },
   "g4_rollback": {
     "broken": "devops-g10-pos:19",
     "recovered": "devops-g10-pos:18",
     "rto_seconds": 163,
-    "live_now": "devops-g10-pos:20",
-    "note": "Later Release moved healthy POS to :20. Do not roll back to :18 tonight."
+    "live_now": "devops-g10-pos:22",
+    "note": "Later Release moved healthy POS to :22 (web :20 / payments :24 / commission :13) on SHA 0671eec. Do not roll back to :18 on a live demo."
   },
-  "do_not": ["terraform destroy", "terraform apply", "deploy", "flip MPESA_MODE"]
+  "do_not": ["terraform destroy", "terraform apply", "deploy", "flip MPESA_MODE", "merge #141 to main until destroy time"]
 }
