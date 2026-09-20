@@ -1,0 +1,36 @@
+GET /internal/v1/payments/...
+HTTP/2 404 
+date: Sun, 20 Sep 2026 08:36:43 GMT
+content-type: application/json; charset=utf-8
+content-length: 21
+server: awselb/2.0
+apigw-requestid: D_UsUjFnliAEMjQ=
+
+{"error":"not_found"}
+POST /internal/v1/payouts
+HTTP/2 404 
+date: Sun, 20 Sep 2026 08:36:43 GMT
+content-type: application/json; charset=utf-8
+content-length: 21
+server: awselb/2.0
+apigw-requestid: D_Usbj09FiAEMPw=
+
+{"error":"not_found"}
+POST /payments/callback
+HTTP/2 401 
+date: Sun, 20 Sep 2026 08:36:44 GMT
+content-type: application/json; charset=utf-8
+content-length: 62
+etag: W/"3e-3mBdvN7HF5nPbogCAH6EU5ymJ6U"
+apigw-requestid: D_UsiiLVFiAEMhQ=
+
+{"error":"unauthorized","reason":"signature_header_malformed"}
+GET /health
+HTTP/2 200 
+date: Sun, 20 Sep 2026 08:36:45 GMT
+content-type: application/json; charset=utf-8
+content-length: 31
+etag: W/"1f-s2v8oYqxCVKy10WVWkoXUkzlwGc"
+apigw-requestid: D_UssjASFiAEMOw=
+
+{"status":"ok","service":"web"}

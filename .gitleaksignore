@@ -1,3 +1,8 @@
 # False positive: G2 happy-path evidence JSON field charge_idempotency_key
 # is the Idempotency-Key header we sent, not a credential.
 e590a301805b083718022c24c26685b33b9d55a8:evidence/payments-integrity/g2-happy-path-6aaa4fcddaba.json:generic-api-key:12
+# False positive: API Gateway apigw-requestid on public lockdown curls.
+60d1ee61bac04dca902143b7f7d68059f1daf796:evidence/platform-delivery/g2-edge-lockdown.txt:generic-api-key:7
+60d1ee61bac04dca902143b7f7d68059f1daf796:evidence/platform-delivery/g2-edge-lockdown.txt:generic-api-key:16
+60d1ee61bac04dca902143b7f7d68059f1daf796:evidence/platform-delivery/g2-edge-lockdown.txt:generic-api-key:25
+60d1ee61bac04dca902143b7f7d68059f1daf796:evidence/platform-delivery/g2-edge-lockdown.txt:generic-api-key:34

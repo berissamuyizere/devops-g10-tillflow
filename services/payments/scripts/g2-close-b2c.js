@@ -3,7 +3,31 @@ const { randomBytes, randomUUID } = require('node:crypto');
 const fs = require('node:fs');
 const path = require('node:path');
 const { createFakeMpesaClient, TEST_MSISDNS } = require('../../_shared/mpesa');
-const { runDailyClose, eatDate } = require('../../commission/src/close');
+
+function eatDate(value) {
+  const d = value ? new Date(value) : new Date();
+  if (Number.isNaN(d.getTime())) {
+    throw new Error(`invalid timestamp: ${value}`);
+  }
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Africa/Nairobi',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(d);
+}
+
+function loadRunDailyClose() {
+  try {
+    return require('../../commission/src/close').runDailyClose;
+  } catch (err) {
+    throw new Error(
+      'in-process close needs services/commission, which is not in the payments image. ' +
+        'Use CLOSE_TRIGGER=manual or SQS_QUEUE_URL when running inside a payments task. ' +
+        `(${err.message})`
+    );
+  }
+}
 
 const SQS_QUEUE_URL = (process.env.SQS_QUEUE_URL || '').trim();
 const CLOSE_TRIGGER = (process.env.CLOSE_TRIGGER || '').trim();
@@ -202,7 +226,7 @@ async function main() {
     );
   } else {
     console.log('2. run the daily close in-process (set SQS_QUEUE_URL to use the deployed worker)');
-    const close = await runDailyClose({
+    const close = await loadRunDailyClose()({
       posBaseUrl: POS,
       paymentsBaseUrl: PAYMENTS,
       paymentsToken: PAYMENTS_TOKEN,
@@ -243,7 +267,7 @@ async function main() {
     const replayed = await lookupPayout(commissionHeaders, ATTENDANT_ID, period);
     check('replayed close returns the same payout', replayed?.id, ledgerId);
   } else {
-    const closeAgain = await runDailyClose({
+    const closeAgain = await loadRunDailyClose()({
       posBaseUrl: POS,
       paymentsBaseUrl: PAYMENTS,
       paymentsToken: PAYMENTS_TOKEN,
