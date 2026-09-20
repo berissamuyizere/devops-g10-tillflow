@@ -1,0 +1,158 @@
+[
+  {
+    "id": 14,
+    "name": "cloudwatch",
+    "type": "cloudwatch",
+    "uid": "bfyueib39pipsc",
+    "url": "",
+    "jsonData": {
+      "authType": "grafana_assume_role",
+      "defaultRegion": "eu-central-1",
+      "assumeRoleArn": "arn:aws:iam::240462142849:role/devops-g10-grafana-cloud"
+    }
+  },
+  {
+    "id": 6,
+    "name": "grafanacloud-infinity",
+    "type": "yesoreyeram-infinity-datasource",
+    "uid": "grafanacloud-infinity",
+    "url": "",
+    "jsonData": {
+      "authType": null,
+      "defaultRegion": null,
+      "assumeRoleArn": null
+    }
+  },
+  {
+    "id": 7,
+    "name": "grafanacloud-k6",
+    "type": "k6-datasource",
+    "uid": "grafanacloud-k6",
+    "url": "proxy",
+    "jsonData": {
+      "authType": null,
+      "defaultRegion": null,
+      "assumeRoleArn": null
+    }
+  },
+  {
+    "id": 1,
+    "name": "grafanacloud-punywaxwing1700-alert-state-history",
+    "type": "loki",
+    "uid": "grafanacloud-alert-state-history",
+    "url": "https://insight-logs-prod-us-west-0.grafana.net",
+    "jsonData": {
+      "authType": null,
+      "defaultRegion": null,
+      "assumeRoleArn": null
+    }
+  },
+  {
+    "id": 2,
+    "name": "grafanacloud-punywaxwing1700-cardinality-management",
+    "type": "grafanacloud-cardinality-datasource",
+    "uid": "grafanacloud-cardinality-management",
+    "url": "https://insights-prod-us-west-0.grafana.net/usage/v1/metrics/3364062",
+    "jsonData": {
+      "authType": null,
+      "defaultRegion": null,
+      "assumeRoleArn": null
+    }
+  },
+  {
+    "id": 5,
+    "name": "grafanacloud-punywaxwing1700-graphite",
+    "type": "graphite",
+    "uid": "grafanacloud-graphite",
+    "url": "https://graphite-prod-67-prod-us-west-0.grafana.net/graphite",
+    "jsonData": {
+      "authType": null,
+      "defaultRegion": null,
+      "assumeRoleArn": null
+    }
+  },
+  {
+    "id": 4,
+    "name": "grafanacloud-punywaxwing1700-knowledgegraph",
+    "type": "grafana-knowledgegraph-datasource",
+    "uid": "grafanacloud-knowledgegraph",
+    "url": "",
+    "jsonData": {
+      "authType": null,
+      "defaultRegion": null,
+      "assumeRoleArn": null
+    }
+  },
+  {
+    "id": 8,
+    "name": "grafanacloud-punywaxwing1700-logs",
+    "type": "loki",
+    "uid": "grafanacloud-logs",
+    "url": "https://logs-prod-021.grafana.net",
+    "jsonData": {
+      "authType": null,
+      "defaultRegion": null,
+      "assumeRoleArn": null
+    }
+  },
+  {
+    "id": 10,
+    "name": "grafanacloud-punywaxwing1700-profiles",
+    "type": "grafana-pyroscope-datasource",
+    "uid": "grafanacloud-profiles",
+    "url": "https://profiles-prod-008.grafana.net",
+    "jsonData": {
+      "authType": null,
+      "defaultRegion": null,
+      "assumeRoleArn": null
+    }
+  },
+  {
+    "id": 9,
+    "name": "grafanacloud-punywaxwing1700-prom",
+    "type": "prometheus",
+    "uid": "grafanacloud-prom",
+    "url": "https://prometheus-prod-67-prod-us-west-0.grafana.net/api/prom",
+    "jsonData": {
+      "authType": null,
+      "defaultRegion": null,
+      "assumeRoleArn": null
+    }
+  },
+  {
+    "id": 11,
+    "name": "grafanacloud-punywaxwing1700-traces",
+    "type": "tempo",
+    "uid": "grafanacloud-traces",
+    "url": "https://tempo-prod-15-prod-us-west-0.grafana.net/tempo",
+    "jsonData": {
+      "authType": null,
+      "defaultRegion": null,
+      "assumeRoleArn": null
+    }
+  },
+  {
+    "id": 13,
+    "name": "grafanacloud-punywaxwing1700-usage-insights",
+    "type": "loki",
+    "uid": "grafanacloud-usage-insights",
+    "url": "https://insight-logs-prod-us-west-0.grafana.net",
+    "jsonData": {
+      "authType": null,
+      "defaultRegion": null,
+      "assumeRoleArn": null
+    }
+  },
+  {
+    "id": 12,
+    "name": "grafanacloud-usage",
+    "type": "prometheus",
+    "uid": "grafanacloud-usage",
+    "url": "https://billing.grafana.net/api/prom",
+    "jsonData": {
+      "authType": null,
+      "defaultRegion": null,
+      "assumeRoleArn": null
+    }
+  }
+]

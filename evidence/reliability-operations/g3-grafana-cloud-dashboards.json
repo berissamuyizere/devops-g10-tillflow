@@ -1,0 +1,110 @@
+[
+  {
+    "uid": "4_D6mSh4z",
+    "title": "Cloud Logs Export Insights",
+    "folderTitle": "GrafanaCloud",
+    "url": "/d/4_D6mSh4z/cloud-logs-export-insights"
+  },
+  {
+    "uid": "5eeddf3d-2bcf-451b-9139-d9f5a846fecb",
+    "title": "Alert Groups Insights",
+    "folderTitle": null,
+    "url": "/d/5eeddf3d-2bcf-451b-9139-d9f5a846fecb/alert-groups-insights"
+  },
+  {
+    "uid": "6f2903f6-3505-4f68-ad66-62d2677ba21d",
+    "title": "Incident Insights",
+    "folderTitle": null,
+    "url": "/d/6f2903f6-3505-4f68-ad66-62d2677ba21d/incident-insights"
+  },
+  {
+    "uid": "AEbrOO2Mz",
+    "title": "Usage Insights - 2 - Data sources",
+    "folderTitle": "GrafanaCloud",
+    "url": "/d/AEbrOO2Mz/usage-insights-2-data-sources"
+  },
+  {
+    "uid": "MpmkYhRVz",
+    "title": "Usage Insights - 3 - Query Errors",
+    "folderTitle": "GrafanaCloud",
+    "url": "/d/MpmkYhRVz/usage-insights-3-query-errors"
+  },
+  {
+    "uid": "XU8HAD5Gk",
+    "title": "Usage Insights - 1 - Overview",
+    "folderTitle": "GrafanaCloud",
+    "url": "/d/XU8HAD5Gk/usage-insights-1-overview"
+  },
+  {
+    "uid": "ba1d4e53-fbd8-4bc8-bb88-0fcad052cfdd",
+    "title": "Grafana Cloud Billing/Usage",
+    "folderTitle": "GrafanaCloud",
+    "url": "/d/ba1d4e53-fbd8-4bc8-bb88-0fcad052cfdd/grafana-cloud-billing-usage"
+  },
+  {
+    "uid": "cardinality-management",
+    "title": "Cardinality management - 1 - overview",
+    "folderTitle": "GrafanaCloud",
+    "url": "/d/cardinality-management/cardinality-management-1-overview"
+  },
+  {
+    "uid": "cardinality-management-label-detail",
+    "title": "Cardinality management - 3 - labels",
+    "folderTitle": "GrafanaCloud",
+    "url": "/d/cardinality-management-label-detail/cardinality-management-3-labels"
+  },
+  {
+    "uid": "cardinality-management-metrics-detail",
+    "title": "Cardinality management - 2 - metrics",
+    "folderTitle": "GrafanaCloud",
+    "url": "/d/cardinality-management-metrics-detail/cardinality-management-2-metrics"
+  },
+  {
+    "uid": "cdn9jukg55bswb",
+    "title": "Usage Insights - 5 - Metrics Ingestion",
+    "folderTitle": "GrafanaCloud",
+    "url": "/d/cdn9jukg55bswb/usage-insights-5-metrics-ingestion"
+  },
+  {
+    "uid": "cdybdibbio2dcd",
+    "title": "Usage Insights - 6 - Loki Query Fair Usage Drilldown",
+    "folderTitle": "GrafanaCloud",
+    "url": "/d/cdybdibbio2dcd/usage-insights-6-loki-query-fair-usage-drilldown"
+  },
+  {
+    "uid": "ntS5Ujs7z",
+    "title": "Usage Insights - 4 - Alertmanager",
+    "folderTitle": "GrafanaCloud",
+    "url": "/d/ntS5Ujs7z/usage-insights-4-alertmanager"
+  },
+  {
+    "uid": "tillflow-commission",
+    "title": "TillFlow commission",
+    "folderTitle": null,
+    "url": "/d/tillflow-commission/tillflow-commission"
+  },
+  {
+    "uid": "tillflow-overview",
+    "title": "TillFlow overview",
+    "folderTitle": null,
+    "url": "/d/tillflow-overview/tillflow-overview"
+  },
+  {
+    "uid": "tillflow-payments",
+    "title": "TillFlow payments",
+    "folderTitle": null,
+    "url": "/d/tillflow-payments/tillflow-payments"
+  },
+  {
+    "uid": "tillflow-pos",
+    "title": "TillFlow POS",
+    "folderTitle": null,
+    "url": "/d/tillflow-pos/tillflow-pos"
+  },
+  {
+    "uid": "tillflow-web",
+    "title": "TillFlow web",
+    "folderTitle": null,
+    "url": "/d/tillflow-web/tillflow-web"
+  }
+]
