@@ -117,7 +117,6 @@ resource "aws_grafana_workspace" "amg" {
   timeouts {
     create = "30m"
     update = "10m"
-    delete = "10m"
   }
 
   depends_on = [
