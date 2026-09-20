@@ -15,7 +15,7 @@ and the Payments status contract in
 | GET | `/ready` | probe | DB reachable |
 | GET | `/version` | pipeline | `{ commit, digest, … }` |
 | POST | `/sales` | attendant | Create sale (`Idempotency-Key` required) |
-| GET | `/sales/:id` | tenant member | Read sale (404 cross-tenant) |
+| GET | `/sales/:id` | tenant member | Read sale — Valkey cache-aside, fail-open (404 cross-tenant) |
 | POST | `/sales/:id/pay` | tenant member | Start STK via Payments (`Idempotency-Key`, `msisdn` required) |
 | POST | `/sales/:id/cancel` | owner/attendant | Cancel — **only while `created`** (409 once `awaiting_payment`) |
 | GET | `/internal/v1/sales/:id` | Payments | Charge inputs |
@@ -25,6 +25,19 @@ and the Payments status contract in
 
 Identity headers (scaffold until real auth): `X-Tenant-Id`, `X-User-Id`, `X-Role`.  
 Payments: `X-Payments-Token` (= `PAYMENTS_SERVICE_TOKEN`). The env is required — POS fail-closes (`500 misconfigured`) if it is unset. There is no in-process `dev-payments-token` default.
+
+## Cache (G3 B3)
+
+`GET /sales/:id` uses Valkey cache-aside when `CACHE_HOST` is set (ECS via Y1).
+Miss → Postgres → populate; hit → return cached JSON. Valkey errors fail open
+(still return the sale from Postgres, increment `pos_cache_requests_total{result="error"}`).
+Invalidate on **paid** and **cancelled**. Internal `GET /internal/v1/sales/:id` is not cached.
+
+| Env | Purpose |
+|---|---|
+| `CACHE_HOST` | Valkey primary endpoint (unset = cache disabled) |
+| `CACHE_PORT` | Default `6379` |
+| `CACHE_AUTH_TOKEN` | From `devops-g10/cache/auth` |
 
 ## Local run
 

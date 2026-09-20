@@ -6,6 +6,7 @@ let meter;
 let saleWritesTotal;
 let saleWriteLatencyMs;
 let salesPaidTotal;
+let cacheRequestsTotal;
 
 function getMeter() {
   if (!meter) meter = metrics.getMeter(METER_NAME);
@@ -27,6 +28,10 @@ function init() {
   salesPaidTotal = m.createCounter('pos_sales_paid_total', {
     description: 'Sales marked paid (first transition only)',
   });
+
+  cacheRequestsTotal = m.createCounter('pos_cache_requests_total', {
+    description: 'GET /sales/:id cache-aside lookups',
+  });
 }
 
 function ensure() {
@@ -46,16 +51,23 @@ function recordSalePaid() {
   salesPaidTotal.add(1);
 }
 
+function recordCacheRequest(result) {
+  ensure();
+  cacheRequestsTotal.add(1, { result });
+}
+
 function resetForTests() {
   meter = undefined;
   saleWritesTotal = undefined;
   saleWriteLatencyMs = undefined;
   salesPaidTotal = undefined;
+  cacheRequestsTotal = undefined;
 }
 
 module.exports = {
   METER_NAME,
   recordSaleWrite,
   recordSalePaid,
+  recordCacheRequest,
   resetForTests,
 };
