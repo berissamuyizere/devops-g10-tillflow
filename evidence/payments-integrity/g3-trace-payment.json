@@ -1,0 +1,193 @@
+{
+  "captured_at": "2026-09-20T15:37:22.397Z",
+  "purpose": "sale -> pay -> callback on the live stack through the public edge, one trace",
+  "api_url": "https://f9nla14lfh.execute-api.eu-central-1.amazonaws.com",
+  "callback_base_url": "https://f9nla14lfh.execute-api.eu-central-1.amazonaws.com",
+  "mpesa_mode": "fake",
+  "payer_msisdn": "254700000000",
+  "trace_id": "6aaffd71dddccc85e0ff476413b2e31d",
+  "xray_trace_id": "1-6aaffd71-dddccc85e0ff476413b2e31d",
+  "traceparent": "00-6aaffd71dddccc85e0ff476413b2e31d-26535df14cafe238-01",
+  "sale_id": "c9e40945-b4ca-4b58-943a-60f6ef230007",
+  "payment_id": "d8efe04a-6ad9-4f1b-a0b4-db3abdcf6091",
+  "mpesa_receipt": "G3MU9ZB3HX",
+  "trace_services": [
+    "GET",
+    "POST",
+    "SecretsManager",
+    "auth",
+    "client",
+    "connect",
+    "dns.lookup",
+    "get",
+    "info",
+    "middleware - expressInit",
+    "middleware - jsonParser",
+    "middleware - query",
+    "middleware - result",
+    "payments",
+    "pg-pool.connect",
+    "pg.connect",
+    "pg.query:BEGIN tillflow",
+    "pg.query:COMMIT tillflow",
+    "pg.query:INSERT tillflow",
+    "pg.query:SELECT tillflow",
+    "pg.query:UPDATE tillflow",
+    "pos",
+    "request handler - /internal/v1/charges",
+    "request handler - /internal/v1/sales/:id",
+    "request handler - /internal/v1/sales/:id/awaiting-payment",
+    "request handler - /internal/v1/sales/:id/paid",
+    "request handler - /payments/callback",
+    "request handler - /sales",
+    "request handler - /sales/:id",
+    "request handler - /sales/:id/pay",
+    "set",
+    "tcp.connect",
+    "tls.connect"
+  ],
+  "trace_annotations": {
+    "otel.resource.process.command": "/app/server.js",
+    "network.protocol.version": "1.1",
+    "otel.resource.process.command_args": [
+      "/usr/local/bin/node",
+      "--require",
+      "./otel-bootstrap.js",
+      "/app/server.js"
+    ],
+    "otel.resource.process.runtime.description": "Node.js",
+    "network.peer.port": 35628,
+    "otel.resource.host.arch": "arm64",
+    "otel.resource.host.name": "ip-10-20-11-209.eu-central-1.compute.internal",
+    "otel.resource.process.runtime.version": "20.20.2",
+    "otel.resource.deployment.environment": "prod",
+    "otel.resource.service.namespace": "tillflow",
+    "otel.resource.service.name": "pos",
+    "otel.resource.process.executable.path": "/usr/local/bin/node",
+    "otel.resource.process.executable.name": "node",
+    "otel.resource.process.owner": "app",
+    "otel.resource.process.pid": 7,
+    "http.route": "/sales/:id",
+    "otel.resource.group": "g10",
+    "otel.resource.process.runtime.name": "nodejs",
+    "express.name": "/sales/:id",
+    "express.type": "request_handler",
+    "db.system.name": "redis",
+    "db.query.text": "set pos:sale:v1:11111111-1111-1111-1111-111111111111:c9e40945-b4ca-4b58-943a-60f6ef230007 [3 other arguments]",
+    "db.namespace": "tillflow",
+    "db.operation.name": "set",
+    "db.postgresql.idle.timeout.millis": 10000,
+    "peer.ipv4": "10.20.11.149",
+    "tls.certificate.serialNumber": "0D6675B6CD3FC2228DC054AAC630AE81",
+    "tls.cipher.version": "TLSv1.3",
+    "tls.cipher.name": "TLS_AES_128_GCM_SHA256",
+    "tls.certificate.validTo": "Jan 31 23:59:59 2027 GMT",
+    "tls.protocol": "TLSv1.3",
+    "tls.authorized": "true",
+    "tls.certificate.fingerprint": "A8:0D:03:20:FE:98:69:D1:A9:E5:41:ED:5C:96:E0:A2:6C:B4:81:5F",
+    "tls.alpnProtocol": "",
+    "tls.certificate.validFrom": "Jul 18 00:00:00 2026 GMT",
+    "network.local.address": "10.20.10.109",
+    "network.local.port": 54638,
+    "network.transport": "tcp",
+    "peer[1].ipv4": "10.20.10.125",
+    "http.request.method_original": "POST",
+    "aws.secretsmanager.secret.arn": "arn:aws:secretsmanager:eu-central-1:240462142849:secret:devops-g10/db/pos-c5rCpu",
+    "cloud.region": "eu-central-1",
+    "rpc.service": "SecretsManager",
+    "aws.request.id": "fb686dcc-f1bf-4760-9a88-3624e95f915d",
+    "rpc.system": "aws-api",
+    "payment.id": "d8efe04a-6ad9-4f1b-a0b4-db3abdcf6091",
+    "sale.id": "c9e40945-b4ca-4b58-943a-60f6ef230007",
+    "checkout_request_id": "ws_CO-4af913264357",
+    "callback.outcome": "replay_noop"
+  },
+  "trace_segment_count": 120,
+  "checks": [
+    {
+      "check": "sale created",
+      "ok": true,
+      "actual": 201,
+      "expected": 201
+    },
+    {
+      "check": "sale total",
+      "ok": true,
+      "actual": 15000,
+      "expected": 15000
+    },
+    {
+      "check": "charge accepted",
+      "ok": true,
+      "actual": 201,
+      "expected": 201
+    },
+    {
+      "check": "payment pending",
+      "ok": true,
+      "actual": "pending",
+      "expected": "pending"
+    },
+    {
+      "check": "charged the POS amount",
+      "ok": true,
+      "actual": 15000,
+      "expected": 15000
+    },
+    {
+      "check": "replay is 200",
+      "ok": true,
+      "actual": 200,
+      "expected": 200
+    },
+    {
+      "check": "replay is the same payment",
+      "ok": true,
+      "actual": "d8efe04a-6ad9-4f1b-a0b4-db3abdcf6091",
+      "expected": "d8efe04a-6ad9-4f1b-a0b4-db3abdcf6091"
+    },
+    {
+      "check": "callback applied",
+      "ok": true,
+      "actual": 200,
+      "expected": 200
+    },
+    {
+      "check": "payment paid",
+      "ok": true,
+      "actual": "paid",
+      "expected": "paid"
+    },
+    {
+      "check": "callback replay is a no-op",
+      "ok": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "check": "sale is paid",
+      "ok": true,
+      "actual": "paid",
+      "expected": "paid"
+    },
+    {
+      "check": "paid_at set once",
+      "ok": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "check": "trace found in X-Ray",
+      "ok": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "check": "trace covers pos and payments",
+      "ok": true,
+      "actual": true,
+      "expected": true
+    }
+  ],
+  "passed": true
+}
