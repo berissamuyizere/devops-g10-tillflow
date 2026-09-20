@@ -11,6 +11,21 @@ const paymentsService = require('./payments/service');
 const payoutsService = require('./payouts/service');
 const callbacks = require('./payments/callbacks');
 const payoutCallbacks = require('./payouts/callbacks');
+const metrics = require('./metrics');
+
+function callbackOutcomeLabel(outcome) {
+  if (outcome === 'applied') return 'applied';
+  if (outcome === 'replay_noop') return 'replay';
+  return 'rejected';
+}
+
+function ageMs(since, now) {
+  if (!since) return undefined;
+  const started = new Date(since).getTime();
+  if (!Number.isFinite(started)) return undefined;
+  const delta = now - started;
+  return delta >= 0 ? delta : undefined;
+}
 
 function createApp(options = {}) {
   const database = options.db || db;
@@ -26,6 +41,13 @@ function createApp(options = {}) {
     options.callbackSecret || (process.env.DARAJA_CALLBACK_SECRET || '').trim() || null;
   const CALLBACK_URL =
     options.callbackUrl || process.env.DARAJA_CALLBACK_URL || 'https://localhost/payments/callback';
+
+  const metricsRefresh =
+    options.metricsRefresh === false
+      ? null
+      : metrics.startDbRefresh(database, {
+          intervalMs: Number(process.env.METRICS_REFRESH_MS || 15000),
+        });
 
   const logger =
     options.logger ||
@@ -202,6 +224,11 @@ function createApp(options = {}) {
         now,
         logger: req.log,
       });
+      metrics.recordCallback(
+        'stk',
+        callbackOutcomeLabel(result.outcome),
+        ageMs(result.payment?.created_at, Date.now())
+      );
       return res.status(result.status).json(result.body);
     } catch (err) {
       return sendError(req, res, err);
@@ -277,6 +304,11 @@ function createApp(options = {}) {
         now,
         logger: req.log,
       });
+      metrics.recordCallback(
+        'b2c',
+        callbackOutcomeLabel(result.outcome),
+        ageMs(result.ledger?.accepted_at || result.ledger?.created_at, Date.now())
+      );
       return res.status(result.status).json(result.body);
     } catch (err) {
       return sendError(req, res, err);
@@ -320,6 +352,8 @@ function createApp(options = {}) {
       return sendError(req, res, err);
     }
   });
+
+  app.stopMetricsRefresh = () => metricsRefresh?.stop();
 
   app.use((err, req, res, _next) => {
     req.log.error({ err }, 'unhandled_error');

@@ -3,6 +3,8 @@
 
 const { NodeSDK } = require('@opentelemetry/sdk-node');
 const { OTLPTraceExporter } = require('@opentelemetry/exporter-trace-otlp-http');
+const { OTLPMetricExporter } = require('@opentelemetry/exporter-metrics-otlp-http');
+const { PeriodicExportingMetricReader } = require('@opentelemetry/sdk-metrics');
 const { getNodeAutoInstrumentations } = require('@opentelemetry/auto-instrumentations-node');
 const { resourceFromAttributes } = require('@opentelemetry/resources');
 const {
@@ -24,6 +26,12 @@ const sdk = new NodeSDK({
   }),
   traceExporter: new OTLPTraceExporter({
     url: `${otlpEndpoint.replace(/\/+$/, '')}/v1/traces`,
+  }),
+  metricReader: new PeriodicExportingMetricReader({
+    exporter: new OTLPMetricExporter({
+      url: `${otlpEndpoint.replace(/\/+$/, '')}/v1/metrics`,
+    }),
+    exportIntervalMillis: Number(process.env.OTEL_METRIC_EXPORT_INTERVAL || 30000),
   }),
   instrumentations: [
     getNodeAutoInstrumentations({
