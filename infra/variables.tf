@@ -80,17 +80,6 @@ variable "adot_collector_image" {
   default     = "public.ecr.aws/aws-observability/aws-otel-collector:v0.43.1"
 }
 
-variable "waf_rate_limit" {
-  description = "WAFv2 IP rate limit (requests / 5 minutes) except /payments/callback. Default 200. Raise only for a timed k6 window, then set back to 200."
-  type        = number
-  default     = 200
-
-  validation {
-    condition     = var.waf_rate_limit >= 100 && var.waf_rate_limit <= 2000000
-    error_message = "waf_rate_limit must be between 100 and 2000000."
-  }
-}
-
 variable "codeconnections_arn" {
   description = <<-EOT
     ARN of a pre-created AWS CodeStar / CodeConnections connection to GitHub.
@@ -100,4 +89,21 @@ variable "codeconnections_arn" {
   EOT
   type        = string
   default     = null
+}
+
+variable "waf_rate_limit" {
+  description = <<-EOT
+    WAF RateLimitExceptCallback: requests per 5 minutes per IP (not the
+    callback path). Default 200 (~0.66 rps) is the G3/G5 envelope.
+    Raise via GitHub variable WAF_RATE_LIMIT (Release sets
+    TF_VAR_waf_rate_limit) for Saloi's k6 soak, then set it back to 200
+    and workflow_dispatch Release. Do not leave a high limit overnight.
+  EOT
+  type        = number
+  default     = 200
+
+  validation {
+    condition     = var.waf_rate_limit >= 100
+    error_message = "AWS WAF rate-based limits must be at least 100."
+  }
 }

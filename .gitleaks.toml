@@ -12,9 +12,11 @@ description = "G2 evidence: idempotency keys, API GW request IDs, and captured t
 paths = [
   '''(^|/)evidence/payments-integrity/g2-.*''',
   '''(^|/)evidence/product-pos/g2-.*''',
+  '''(^|/)evidence/product-pos/g3-.*''',
   '''(^|/)evidence/platform-delivery/g2-.*''',
 ]
 regexes = [
   '''g2-(sale|charge|timeout|close-paid|close-unpaid|close-charge)[-0-9a-fA-F]+''',
+  '''g3-cache-[0-9a-fA-F-]+''',
   '''apigw-requestid:\s+\S+''',
 ]

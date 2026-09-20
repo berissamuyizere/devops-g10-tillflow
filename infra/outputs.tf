@@ -75,6 +75,24 @@ output "ecs_services" {
   }
 }
 
+output "cpu_autoscale" {
+  description = "Y6 — ECS CPU target tracking 70% (POS and Payments). Min 2, max 4."
+  value = {
+    for k, t in aws_appautoscaling_target.cpu : k => {
+      resource_id  = t.resource_id
+      min_capacity = t.min_capacity
+      max_capacity = t.max_capacity
+      policy       = aws_appautoscaling_policy.cpu[k].name
+      target_value = 70
+    }
+  }
+}
+
+output "waf_rate_limit" {
+  description = "WAF IP rate limit (requests per 5 minutes). Raise via GitHub WAF_RATE_LIMIT for k6, then set back to 200."
+  value       = var.waf_rate_limit
+}
+
 output "commission_close_queue_url" {
   description = "SQS queue the Commission worker long-polls. No public ingress."
   value       = aws_sqs_queue.commission_close.url
@@ -98,11 +116,6 @@ output "g2_base_urls" {
 output "ecs_app_env_parameters" {
   description = "SSM documents release.yml merges into each app container on ECS roll."
   value       = { for svc, p in aws_ssm_parameter.ecs_app_env : svc => p.name }
-}
-
-output "waf_rate_limit" {
-  description = "Current WAF IP rate limit (requests / 5 minutes), excluding /payments/callback."
-  value       = var.waf_rate_limit
 }
 
 output "grafana_url" {

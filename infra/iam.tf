@@ -117,6 +117,7 @@ data "aws_iam_policy_document" "ci_deploy" {
       "ecr:BatchGet*",
       "ecs:Describe*",
       "ecs:List*",
+      "application-autoscaling:Describe*",
       "apigateway:GET",
       "wafv2:List*",
       "wafv2:Get*",
@@ -199,6 +200,15 @@ data "aws_iam_policy_document" "ci_deploy" {
     }
   }
 
+  # Application Auto Scaling does not always send aws:RequestedRegion, so
+  # RegisterScalableTarget never matched WriteNamespacedResources.
+  statement {
+    sid       = "ApplicationAutoScaling"
+    effect    = "Allow"
+    actions   = ["application-autoscaling:*"]
+    resources = ["*"]
+  }
+
   statement {
     sid    = "WriteNamespacedIAM"
     effect = "Allow"
@@ -246,6 +256,7 @@ data "aws_iam_policy_document" "ci_deploy" {
         "elasticache.amazonaws.com",
         "elasticloadbalancing.amazonaws.com",
         "grafana.amazonaws.com",
+        "ecs.application-autoscaling.amazonaws.com",
         "synthetics.amazonaws.com",
         "sso.amazonaws.com",
         "organizations.amazonaws.com",

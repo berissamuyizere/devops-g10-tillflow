@@ -1,0 +1,30 @@
+{
+  "captured_at": "2026-09-20T15:56:33.761Z",
+  "queue_url": "https://sqs.eu-central-1.amazonaws.com/240462142849/devops-g10-commission-close",
+  "message_id": "0f2348c8-2437-4280-85dc-dcebe95c6ac2",
+  "payload": {
+    "type": "commission.daily-close",
+    "scheduled_at": "2026-09-20T15:56:28.694Z"
+  },
+  "trace_id": "ad4cf91299066d9481a41d6b41164cb3",
+  "span_id": "da4da938fe327ef2",
+  "xray_trace_id": "1-ad4cf912-99066d9481a41d6b41164cb3",
+  "traceparent": "00-ad4cf91299066d9481a41d6b41164cb3-da4da938fe327ef2-01",
+  "xray": {
+    "trace_id": "1-ad4cf912-99066d9481a41d6b41164cb3",
+    "duration_seconds": 0.209,
+    "segment_count": 21,
+    "root_span": {
+      "id": "da4da938fe327ef2",
+      "name": "commission.daily_close",
+      "subsegments": 6
+    },
+    "services": [
+      "commission.daily_close",
+      "payments",
+      "pos"
+    ]
+  },
+  "passed": true,
+  "hint": "AWS Console → X-Ray → Traces → paste xray_trace_id; root span commission.daily_close"
+}
