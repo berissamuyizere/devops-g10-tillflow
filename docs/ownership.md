@@ -25,6 +25,7 @@ area's PRs.
 | ADR-002 idempotency + replay | Arsema |
 | ADR-003 platform data services | Yordanos |
 | ADR-004 CI/CD + golden path | Yordanos |
+| ADR-005 observability | Saloi |
 
 ## Minimum personal proof per area
 
