@@ -1,0 +1,91 @@
+{
+  "drill": "callback-replay",
+  "started_at": "2026-09-20T21:06:39.050Z",
+  "completed_at": "2026-09-20T21:06:39.302Z",
+  "trace_id": "6ab04ade62ce0ae5e4d8efd05f4a25a2",
+  "xray_trace_id": "1-6ab04ade-62ce0ae5e4d8efd05f4a25a2",
+  "sale_id": "9291dc8c-0233-48a7-8293-aaef3b9fd77a",
+  "payment_id": "2cbcd14b-7d8c-44a8-a294-ea791099f919",
+  "mpesa_receipt": "G4MUAB3VWP",
+  "ledger_effect": "one transition to paid; replay absorbed; late decline refused",
+  "steps": [
+    {
+      "at": "2026-09-20T21:06:39.049Z",
+      "check": "payment pending before any callback",
+      "ok": true,
+      "actual": "pending",
+      "expected": "pending"
+    },
+    {
+      "at": "2026-09-20T21:06:39.185Z",
+      "check": "first callback applied",
+      "ok": true,
+      "actual": 200,
+      "expected": 200
+    },
+    {
+      "at": "2026-09-20T21:06:39.185Z",
+      "check": "payment paid",
+      "ok": true,
+      "actual": "paid",
+      "expected": "paid"
+    },
+    {
+      "at": "2026-09-20T21:06:39.225Z",
+      "check": "byte-identical replay is a no-op",
+      "ok": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "at": "2026-09-20T21:06:39.225Z",
+      "check": "replay does not error",
+      "ok": true,
+      "actual": 200,
+      "expected": 200
+    },
+    {
+      "at": "2026-09-20T21:06:39.288Z",
+      "check": "out-of-order decline is rejected",
+      "ok": true,
+      "actual": 409,
+      "expected": 409
+    },
+    {
+      "at": "2026-09-20T21:06:39.288Z",
+      "check": "rejected as an illegal transition",
+      "ok": true,
+      "actual": "illegal_transition",
+      "expected": "illegal_transition"
+    },
+    {
+      "at": "2026-09-20T21:06:39.288Z",
+      "check": "and says what it refused",
+      "ok": true,
+      "actual": "paid",
+      "expected": "paid"
+    },
+    {
+      "at": "2026-09-20T21:06:39.302Z",
+      "check": "still paid after replay and reorder",
+      "ok": true,
+      "actual": "paid",
+      "expected": "paid"
+    },
+    {
+      "at": "2026-09-20T21:06:39.302Z",
+      "check": "paid_at did not move",
+      "ok": true,
+      "actual": "2026-09-20T21:06:39.084Z",
+      "expected": "2026-09-20T21:06:39.084Z"
+    },
+    {
+      "at": "2026-09-20T21:06:39.302Z",
+      "check": "one receipt only",
+      "ok": true,
+      "actual": "G4MUAB3VWP",
+      "expected": "G4MUAB3VWP"
+    }
+  ],
+  "passed": true
+}

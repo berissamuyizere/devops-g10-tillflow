@@ -25,7 +25,9 @@ Current-tree G2 files (replace on every clean collect):
 | `tag-audit.json` / `tag-audit.txt` | `capstone=tillflow` + the six required tags. |
 | `outputs.json` | Live ALB DNS + API Gateway URL. |
 | `g4-broken-release.json` | G4: broken POS `/ready` 500, smoke fail, **manual** rollback to previous task def. |
-| `screenshots/g4/` | Baseline dumps + shot list. PNGs go here during the drill. |
+| `g5-preflight.json` / `g5-rehearsal.md` | G5: live smoke + ECS + SG import check, and the 6-minute script. |
+| `screenshots/g4/` | G4 baseline dumps + shot list. |
+| `screenshots/g5/` | G5 walk-through: smoke JSON, SG plan, preflight HTML/PNG. |
 
 ```bash
 export AWS_PROFILE=g10-yordanos AWS_REGION=eu-central-1

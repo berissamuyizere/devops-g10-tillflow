@@ -1,0 +1,26 @@
+
+Warning: Deprecated Parameter
+
+The parameter "dynamodb_table" is deprecated. Use parameter "use_lockfile"
+instead.
+module.vpc.aws_vpc.this[0]: Refreshing state... [id=vpc-0608a01d03195ac0d]
+aws_security_group.cache: Refreshing state... [id=sg-09f5f26c6b661d778]
+aws_security_group.ecs_tasks: Refreshing state... [id=sg-05cc34784cf1ed3e2]
+aws_security_group.alb: Refreshing state... [id=sg-0635ff8540248d2c5]
+aws_vpc_security_group_ingress_rule.cache_from_ecs: Refreshing state... [id=sgr-0f50e811b25ab2ed0]
+aws_vpc_security_group_ingress_rule.alb_from_ecs: Refreshing state... [id=sgr-06deea1208cdcbcb4]
+
+No changes. Your infrastructure matches the configuration.
+
+Terraform has compared your real infrastructure against your configuration
+and found no differences, so no changes are needed.
+
+Warning: Resource targeting is in effect
+
+You are creating a plan with the -target option, which means that the result
+of this plan may not represent all of the changes requested by the current
+configuration.
+
+The -target option is not for routine use, and is provided only for
+exceptional situations such as recovering from errors or mistakes, or when
+Terraform specifically suggests to use it as part of an error message.
