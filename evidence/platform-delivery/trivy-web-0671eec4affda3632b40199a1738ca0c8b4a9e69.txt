@@ -1,0 +1,19 @@
+# Trivy image scan — last main Release
+# Run: https://github.com/berissamuyizere/devops-g10-tillflow/actions/runs/35540672774
+# Job: build + deploy (web) · 2026-09-20 22:08 UTC
+# Image: 240462142849.dkr.ecr.eu-central-1.amazonaws.com/devops-g10/web:0671eec4affda3632b40199a1738ca0c8b4a9e69
+# Tool: aquasec/trivy:0.56.2
+# Flags: --severity HIGH,CRITICAL --ignore-unfixed --scanners vuln --exit-code 1
+#
+# Release does not upload a Trivy artifact (exit-code 1 is the gate).
+# This file is the scan block from that job log.
+
+2026-09-20T22:08:06Z	INFO	[vuln] Vulnerability scanning is enabled
+2026-09-20T22:08:12Z	INFO	Detected OS	family="alpine" version="3.22.4"
+2026-09-20T22:08:12Z	INFO	[alpine] Detecting vulnerabilities...	os_version="3.22" repository="3.22" pkg_num=25
+2026-09-20T22:08:12Z	INFO	Number of language-specific files	num=1
+2026-09-20T22:08:12Z	INFO	[node-pkg] Detecting vulnerabilities...
+
+240462142849.dkr.ecr.eu-central-1.amazonaws.com/devops-g10/web:0671eec4affda3632b40199a1738ca0c8b4a9e69 (alpine 3.22.4)
+=======================================================================================================================
+Total: 0 (HIGH: 0, CRITICAL: 0)

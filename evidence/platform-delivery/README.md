@@ -25,7 +25,9 @@ Current-tree G2 files (replace on every clean collect):
 | `tag-audit.json` / `tag-audit.txt` | `capstone=tillflow` + the six required tags. |
 | `outputs.json` | Live ALB DNS + API Gateway URL. |
 | `g4-broken-release.json` | G4: broken POS `/ready` 500, smoke fail, **manual** rollback to previous task def. |
-| `g5-preflight.json` / `g5-rehearsal.md` | G5: live smoke + ECS + SG import check, and the 6-minute script. |
+| `g5-preflight.json` / `g5-rehearsal.md` | G5: live smoke + ECS after #139/#140, 6-minute script, honest gaps, cross-system answers. |
+| `sbom-web-0671eec4affda3632b40199a1738ca0c8b4a9e69.spdx.json` | SBOM from last main Release ([35540672774](https://github.com/berissamuyizere/devops-g10-tillflow/actions/runs/35540672774)). |
+| `trivy-web-0671eec4affda3632b40199a1738ca0c8b4a9e69.txt` | Trivy HIGH/CRITICAL from that same web job: **0 / 0**. |
 | `screenshots/g4/` | G4 baseline dumps + shot list. |
 | `screenshots/g5/` | G5 walk-through: smoke JSON, SG plan, preflight HTML/PNG. |
 
