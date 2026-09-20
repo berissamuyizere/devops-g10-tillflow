@@ -17,6 +17,7 @@
 
 # Platform + delivery — Yordanos
 /infra/                                     @yordanoshagos
+/infra/grafana/                             @akezasaloi @yordanoshagos
 /.github/workflows/                         @yordanoshagos
 /services/_shared/                          @yordanoshagos
 /evidence/platform-delivery/                @yordanoshagos

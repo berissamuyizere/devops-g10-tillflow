@@ -1,0 +1,24 @@
+{
+  "uid": "tillflow-commission",
+  "title": "TillFlow commission",
+  "tags": ["tillflow", "g3", "commission"],
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "1m",
+  "time": { "from": "now-6h", "to": "now" },
+  "templating": { "list": [] },
+  "annotations": { "list": [] },
+  "panels": [
+    {
+      "id": 1,
+      "type": "text",
+      "title": "Commission RED + saturation",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 0 },
+      "options": {
+        "mode": "markdown",
+        "content": "Placeholder. Saloi replaces this with close-run and payout metrics, DLQ depth, oldest-message age, and ECS CPU/memory. Keep uid `tillflow-commission`."
+      }
+    }
+  ]
+}
