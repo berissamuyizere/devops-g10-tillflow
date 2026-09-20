@@ -277,11 +277,16 @@ data "aws_iam_policy_document" "ci_deploy" {
   }
 
   # CreateKey has no namespaced ARN. Tag the key group=g10 (default_tags)
-  # so this cannot mint keys for other work in the account.
+  # so this cannot mint keys for other work in the account. TagResource
+  # must be on * here: during CreateKey the key ARN does not exist yet,
+  # so ManageNamespacedKMS (key/*) never matches.
   statement {
-    sid       = "CreateNamespacedKMSKeys"
-    effect    = "Allow"
-    actions   = ["kms:CreateKey"]
+    sid    = "CreateNamespacedKMSKeys"
+    effect = "Allow"
+    actions = [
+      "kms:CreateKey",
+      "kms:TagResource",
+    ]
     resources = ["*"]
     condition {
       test     = "StringEquals"
@@ -293,6 +298,44 @@ data "aws_iam_policy_document" "ci_deploy" {
       variable = "aws:RequestTag/group"
       values   = ["g10"]
     }
+  }
+
+  # TagResource on Create* is authorized against a parent ARN (Grafana
+  # /workspaces) or * (KMS). Several of these APIs omit
+  # aws:RequestedRegion, so they miss the regional grafana:* / lambda:*
+  # write statement. Bound by default_tags group=g10.
+  statement {
+    sid    = "TagOnCreateWithoutRegionContext"
+    effect = "Allow"
+    actions = [
+      "grafana:TagResource",
+      "grafana:UntagResource",
+      "kms:TagResource",
+      "lambda:TagResource",
+      "sns:TagResource",
+      "synthetics:TagResource",
+    ]
+    resources = ["*"]
+    condition {
+      test     = "StringEquals"
+      variable = "aws:RequestTag/group"
+      values   = ["g10"]
+    }
+  }
+
+  # Grafana CreateWorkspace tags against this exact parent ARN and may
+  # not pass aws:RequestTag. Matches the AccessDenied we hit on Release.
+  statement {
+    sid    = "GrafanaTagWorkspaces"
+    effect = "Allow"
+    actions = [
+      "grafana:TagResource",
+      "grafana:UntagResource",
+    ]
+    resources = [
+      "arn:${data.aws_partition.current.partition}:grafana:${var.region}:${data.aws_caller_identity.current.account_id}:/workspaces",
+      "arn:${data.aws_partition.current.partition}:grafana:${var.region}:${data.aws_caller_identity.current.account_id}:/workspaces/*",
+    ]
   }
 
   statement {

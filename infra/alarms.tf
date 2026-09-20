@@ -731,6 +731,7 @@ resource "aws_lambda_function" "payout_cutoff" {
   depends_on = [
     aws_iam_role_policy_attachment.payout_cutoff,
     aws_cloudwatch_log_group.payout_cutoff,
+    aws_iam_policy.ci_deploy,
   ]
 }
 

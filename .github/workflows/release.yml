@@ -121,6 +121,9 @@ jobs:
         run: |
           terraform plan -input=false -no-color -lock-timeout=5m -out=plan.bin
           terraform show -no-color plan.bin | tee plan.txt
+      # archive_file writes probe/lambda zips under infra/.build during
+      # plan. Apply is a fresh runner and terraform apply plan.bin still
+      # reads those paths from disk — ship them with the plan.
       - name: Upload saved plan
         uses: actions/upload-artifact@v4
         with:
@@ -128,6 +131,7 @@ jobs:
           path: |
             infra/plan.bin
             infra/plan.txt
+            infra/.build/
           retention-days: 14
 
   apply:
@@ -157,6 +161,19 @@ jobs:
         with:
           name: terraform-plan-${{ github.sha }}
           path: infra
+      - name: Rebuild lambda/canary zips if the plan artifact omitted them
+        run: |
+          set -euo pipefail
+          mkdir -p .build
+          if [ ! -f .build/payout_cutoff.zip ]; then
+            zip -j .build/payout_cutoff.zip lambda/payout_cutoff/index.py
+          fi
+          if [ ! -f .build/slack_notifier.zip ]; then
+            zip -j .build/slack_notifier.zip lambda/slack_notifier/index.py
+          fi
+          if [ ! -f .build/probe.zip ]; then
+            zip -j .build/probe.zip canaries/probe/index.js
+          fi
       - name: terraform init
         run: |
           terraform init \
