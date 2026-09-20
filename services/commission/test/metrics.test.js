@@ -1,6 +1,6 @@
 const { describe, it, beforeEach } = require('node:test');
 const assert = require('node:assert/strict');
-const { metrics: otelMetrics, trace } = require('@opentelemetry/api');
+const { metrics: otelMetrics } = require('@opentelemetry/api');
 const {
   MeterProvider,
   InMemoryMetricExporter,
@@ -49,7 +49,7 @@ describe('commission metrics', () => {
   });
 
   it('records a successful close run and payout outcomes', async () => {
-    const fetchImpl = async (url, init = {}) => {
+    const fetchImpl = async (url, _init = {}) => {
       if (String(url).includes('/commission/eligible')) {
         return {
           ok: true,
