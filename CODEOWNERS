@@ -27,6 +27,7 @@
 
 # Reliability + operations — Saloi
 /docs/slo-error-budgets.md                  @akezasaloi
+/docs/alerts.md                             @akezasaloi
 /docs/runbook.md                            @akezasaloi
 /docs/adrs/ADR-005-observability.md         @akezasaloi
 /evidence/reliability-operations/           @akezasaloi
