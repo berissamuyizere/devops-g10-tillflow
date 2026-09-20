@@ -1,0 +1,5 @@
+{
+    "taskArns": [
+        "arn:aws:ecs:eu-central-1:240462142849:task/devops-g10/553f78ac814c4627b8a18eaac8b7dfc8"
+    ]
+}
