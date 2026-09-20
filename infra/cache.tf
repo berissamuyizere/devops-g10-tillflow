@@ -15,8 +15,9 @@ resource "random_password" "cache_auth" {
 }
 
 resource "aws_secretsmanager_secret" "cache_auth" {
-  name        = "${var.name_prefix}/cache/auth"
-  description = "Valkey AUTH token."
+  name                    = "${var.name_prefix}/cache/auth"
+  description             = "Valkey AUTH token."
+  recovery_window_in_days = 0 # G5 rebuild: same name must be free immediately
 
   tags = {
     service = "cache"
