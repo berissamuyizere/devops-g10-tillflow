@@ -2,6 +2,7 @@ const { hashPayoutRequest } = require('../hash');
 const { LEDGER_STATUSES, evaluate, statusForB2cResultCode } = require('./state');
 const { MpesaTimeoutError, MpesaRejectedError } = require('../../../_shared/mpesa');
 const metrics = require('../metrics');
+const tracing = require('../tracing');
 
 const UNIQUE_VIOLATION = '23505';
 
@@ -231,6 +232,8 @@ async function disburse(db, mpesa, ledgerId, { shortcode } = {}) {
 
   const row = claimed.ledger;
   const period = row.period;
+
+  tracing.annotateLedger(row);
 
   try {
     const result = await mpesa.b2c({

@@ -12,6 +12,7 @@ const payoutsService = require('./payouts/service');
 const callbacks = require('./payments/callbacks');
 const payoutCallbacks = require('./payouts/callbacks');
 const metrics = require('./metrics');
+const tracing = require('./tracing');
 
 function callbackOutcomeLabel(outcome) {
   if (outcome === 'applied') return 'applied';
@@ -138,6 +139,8 @@ function createApp(options = {}) {
         return res.status(409).json({ error: 'sale_not_chargeable', sale_status: sale.status });
       }
 
+      tracing.annotate({ [tracing.ATTR.SALE_ID]: saleId });
+
       const reserved = await paymentsService.reservePayment(database, {
         tenantId: sale.tenant_id,
         saleId,
@@ -224,6 +227,8 @@ function createApp(options = {}) {
         now,
         logger: req.log,
       });
+      tracing.annotatePayment(result.payment);
+      tracing.annotateCallbackOutcome(result.outcome);
       metrics.recordCallback(
         'stk',
         callbackOutcomeLabel(result.outcome),
@@ -304,6 +309,8 @@ function createApp(options = {}) {
         now,
         logger: req.log,
       });
+      tracing.annotateLedger(result.ledger);
+      tracing.annotateCallbackOutcome(result.outcome);
       metrics.recordCallback(
         'b2c',
         callbackOutcomeLabel(result.outcome),
