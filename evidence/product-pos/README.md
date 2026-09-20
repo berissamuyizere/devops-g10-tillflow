@@ -8,6 +8,7 @@ Runtime proof for the POS sale path and commission eligibility.
 | `g2-seed-attendant2.json` | Second demo attendant **3333…** (rows read back from RDS after seed) |
 | `g2-seed-44444444.json` | Third demo attendant **4444…**, used for the SQS-triggered close evidence |
 | `g2-close-eligible-YYYY-MM-DD.json` | Paid sales for an EAT business day appear in `GET /internal/v1/commission/eligible` with `payout_msisdn` and `commission_bps`; unpaid sales excluded |
+| `g3-commission-close-trace.json` | SQS-triggered close with `commission.daily_close` trace_id for X-Ray export (G3) |
 
 ## Reproduce close eligibility (G2)
 
@@ -73,3 +74,18 @@ NOTHING`, so re-running is safe.
 A payout ledger row is unique per `agent_id + period`, so **each live close
 proof needs an attendant that has no payout for that EAT day** — either a new
 attendant or the next business day.
+
+## G3 commission close trace (after first Release)
+
+```bash
+aws sso login --profile g10
+export AWS_PROFILE=g10 AWS_REGION=eu-central-1
+
+cd services/commission
+node scripts/g3-close-trace.js
+# optional: BUSINESS_DAY=2026-09-19 node scripts/g3-close-trace.js
+```
+
+Writes `g3-commission-close-trace.json` with `trace_id` / `xray_trace_id` for
+the `commission.daily_close` root span. Open X-Ray in the console and paste
+`xray_trace_id`.
