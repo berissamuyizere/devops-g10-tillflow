@@ -8,7 +8,8 @@ Runtime proof for the POS sale path and commission eligibility.
 | `g2-seed-attendant2.json` | Second demo attendant **3333…** (rows read back from RDS after seed) |
 | `g2-seed-44444444.json` | Third demo attendant **4444…**, used for the SQS-triggered close evidence |
 | `g2-close-eligible-YYYY-MM-DD.json` | Paid sales for an EAT business day appear in `GET /internal/v1/commission/eligible` with `payout_msisdn` and `commission_bps`; unpaid sales excluded |
-| `g3-commission-close-trace.json` | SQS-triggered close with `commission.daily_close` trace_id for X-Ray export (G3) |
+| `g3-cache-valkey.json` | Public GET /sales/:id twice — Valkey miss then hit (G3 B3) |
+| `g3-commission-close-trace.json` | SQS-triggered close with `commission.daily_close` X-Ray trace (G3) |
 
 ## Reproduce close eligibility (G2)
 
@@ -74,6 +75,24 @@ NOTHING`, so re-running is safe.
 A payout ledger row is unique per `agent_id + period`, so **each live close
 proof needs an attendant that has no payout for that EAT day** — either a new
 attendant or the next business day.
+
+## G3 Valkey cache proof (after first Release)
+
+```bash
+export API_URL=https://f9nla14lfh.execute-api.eu-central-1.amazonaws.com
+export TENANT_ID=11111111-1111-1111-1111-111111111111
+export ATTENDANT_ID=22222222-2222-2222-2222-222222222222
+node services/pos/scripts/g3-cache-proof.js
+```
+
+Optional in-VPC (confirms Valkey key via `CACHE_HOST` on the POS task):
+
+```bash
+aws sso login --profile g10 && export AWS_PROFILE=g10
+evidence/run-in-vpc.sh pos scripts/g3-cache-proof.js
+```
+
+Writes `g3-cache-valkey.json`.
 
 ## G3 commission close trace (after first Release)
 
