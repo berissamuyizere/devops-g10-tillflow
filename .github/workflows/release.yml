@@ -94,7 +94,7 @@ jobs:
     needs: changes
     if: needs.changes.outputs.infra == 'true'
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 35
     defaults:
       run:
         working-directory: infra
@@ -117,6 +117,8 @@ jobs:
             -backend-config="dynamodb_table=devops-g10-tflock" \
             -backend-config="region=eu-central-1" \
             -backend-config="key=platform/terraform.tfstate"
+      - name: Adopt Grafana workspace from a failed apply
+        run: bash scripts/adopt-grafana-workspace.sh
       - name: terraform plan
         run: |
           terraform plan -input=false -no-color -lock-timeout=5m -out=plan.bin
