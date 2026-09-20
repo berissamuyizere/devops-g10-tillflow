@@ -1,0 +1,24 @@
+{
+  "uid": "tillflow-web",
+  "title": "TillFlow web",
+  "tags": ["tillflow", "g3", "web"],
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "1m",
+  "time": { "from": "now-6h", "to": "now" },
+  "templating": { "list": [] },
+  "annotations": { "list": [] },
+  "panels": [
+    {
+      "id": 1,
+      "type": "text",
+      "title": "Web RED + saturation",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 0 },
+      "options": {
+        "mode": "markdown",
+        "content": "Placeholder. Saloi replaces this with ALB requests/errors/latency for web, plus ECS CPU/memory. Keep uid `tillflow-web`."
+      }
+    }
+  ]
+}

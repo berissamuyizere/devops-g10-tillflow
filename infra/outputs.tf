@@ -94,3 +94,22 @@ output "g2_base_urls" {
     pos_internal = "http://${aws_lb.app.dns_name}"
   }
 }
+
+output "grafana_url" {
+  description = "Amazon Managed Grafana workspace. SSO login; dashboards from infra/grafana/*.json."
+  value       = "https://${aws_grafana_workspace.amg.endpoint}"
+}
+
+output "probe_canary_name" {
+  description = "CloudWatch Synthetics canary hitting public /health and / every minute."
+  value       = aws_synthetics_canary.probe.name
+}
+
+output "alerts_topic_arn" {
+  description = "SNS topic CloudWatch alarms (Y5) publish to. Lambda posts Slack firing and recovered."
+  value       = aws_sns_topic.alerts.arn
+}
+
+output "slack_notifier_function_name" {
+  value = aws_lambda_function.slack_notifier.function_name
+}

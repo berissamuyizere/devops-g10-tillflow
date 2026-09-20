@@ -24,3 +24,8 @@ Thumbs.db
 # Runtime scratch.
 tmp/
 *.log
+__pycache__/
+*.pyc
+
+# Terraform archive_file output (probe zip + Slack Lambda zip).
+infra/.build/

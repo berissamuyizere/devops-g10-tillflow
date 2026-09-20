@@ -1,0 +1,24 @@
+{
+  "uid": "tillflow-pos",
+  "title": "TillFlow POS",
+  "tags": ["tillflow", "g3", "pos"],
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "1m",
+  "time": { "from": "now-6h", "to": "now" },
+  "templating": { "list": [] },
+  "annotations": { "list": [] },
+  "panels": [
+    {
+      "id": 1,
+      "type": "text",
+      "title": "POS RED + saturation",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 0 },
+      "options": {
+        "mode": "markdown",
+        "content": "Placeholder. Saloi replaces this with POS RED (ALB + `pos_sale_writes_total`), cache hit/miss, and ECS/RDS saturation. Keep uid `tillflow-pos`."
+      }
+    }
+  ]
+}

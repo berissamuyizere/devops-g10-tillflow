@@ -134,6 +134,15 @@ data "aws_iam_policy_document" "ci_deploy" {
       "ssm:Describe*",
       "ssm:List*",
       "sts:GetCallerIdentity",
+      "grafana:Describe*",
+      "grafana:List*",
+      "synthetics:Describe*",
+      "synthetics:Get*",
+      "synthetics:List*",
+      "lambda:Get*",
+      "lambda:List*",
+      "sns:Get*",
+      "sns:List*",
     ]
     resources = ["*"]
   }
@@ -177,6 +186,10 @@ data "aws_iam_policy_document" "ci_deploy" {
       "wafv2:*",
       "codepipeline:*",
       "codebuild:*",
+      "grafana:*",
+      "synthetics:*",
+      "lambda:*",
+      "sns:*",
     ]
     resources = ["*"]
     condition {
@@ -232,6 +245,8 @@ data "aws_iam_policy_document" "ci_deploy" {
         "rds.amazonaws.com",
         "elasticache.amazonaws.com",
         "elasticloadbalancing.amazonaws.com",
+        "grafana.amazonaws.com",
+        "synthetics.amazonaws.com",
       ]
     }
   }
@@ -290,6 +305,26 @@ data "aws_iam_policy_document" "ci_deploy" {
       test     = "StringEquals"
       variable = "iam:PassedToService"
       values   = ["ecs-tasks.amazonaws.com"]
+    }
+  }
+
+  statement {
+    sid     = "PassRolesToGrafanaLambdaSynthetics"
+    effect  = "Allow"
+    actions = ["iam:PassRole"]
+    resources = [
+      "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/${var.name_prefix}-grafana",
+      "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/${var.name_prefix}-probe",
+      "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/${var.name_prefix}-slack-notifier",
+    ]
+    condition {
+      test     = "StringEquals"
+      variable = "iam:PassedToService"
+      values = [
+        "grafana.amazonaws.com",
+        "lambda.amazonaws.com",
+        "synthetics.amazonaws.com",
+      ]
     }
   }
 }

@@ -1,0 +1,120 @@
+{
+  "uid": "tillflow-overview",
+  "title": "TillFlow overview",
+  "tags": ["tillflow", "g3", "overview"],
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "1m",
+  "time": { "from": "now-6h", "to": "now" },
+  "templating": { "list": [] },
+  "annotations": { "list": [] },
+  "panels": [
+    {
+      "id": 1,
+      "type": "stat",
+      "title": "Uptime 5m (probe)",
+      "gridPos": { "h": 6, "w": 8, "x": 0, "y": 0 },
+      "timeFrom": "5m",
+      "datasource": { "type": "cloudwatch" },
+      "fieldConfig": {
+        "defaults": { "unit": "percent", "min": 0, "max": 100, "decimals": 2 },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "namespace": "CloudWatchSynthetics",
+          "metricName": "SuccessPercent",
+          "dimensions": { "CanaryName": ["devops-g10-probe"] },
+          "statistic": "Average",
+          "period": "300",
+          "region": "default",
+          "queryMode": "Metrics"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "Uptime 1h (probe)",
+      "gridPos": { "h": 6, "w": 8, "x": 8, "y": 0 },
+      "timeFrom": "1h",
+      "datasource": { "type": "cloudwatch" },
+      "fieldConfig": {
+        "defaults": { "unit": "percent", "min": 0, "max": 100, "decimals": 2 },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": { "calcs": ["mean"], "fields": "", "values": false },
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "namespace": "CloudWatchSynthetics",
+          "metricName": "SuccessPercent",
+          "dimensions": { "CanaryName": ["devops-g10-probe"] },
+          "statistic": "Average",
+          "period": "300",
+          "region": "default",
+          "queryMode": "Metrics"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "type": "stat",
+      "title": "Uptime 28d (probe)",
+      "gridPos": { "h": 6, "w": 8, "x": 16, "y": 0 },
+      "timeFrom": "28d",
+      "datasource": { "type": "cloudwatch" },
+      "fieldConfig": {
+        "defaults": { "unit": "percent", "min": 0, "max": 100, "decimals": 2 },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": { "calcs": ["mean"], "fields": "", "values": false },
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "namespace": "CloudWatchSynthetics",
+          "metricName": "SuccessPercent",
+          "dimensions": { "CanaryName": ["devops-g10-probe"] },
+          "statistic": "Average",
+          "period": "3600",
+          "region": "default",
+          "queryMode": "Metrics"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "type": "text",
+      "title": "SLO / burn / business signals",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 6 },
+      "options": {
+        "mode": "markdown",
+        "content": "Placeholder for Saloi's SLO target, budget remaining, burn rate, and business-signal panels (sales paid, payouts). Terraform loads every `infra/grafana/*.json` file; replace this dashboard in place and keep uid `tillflow-overview`."
+      }
+    }
+  ]
+}
