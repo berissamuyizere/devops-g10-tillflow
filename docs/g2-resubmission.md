@@ -67,7 +67,7 @@ Everything from Rob's first review, so this is one page for all of G2.
 |---|---|
 | POS: sale insert race, fail-open token, `payment_id` on paid | [#51](https://github.com/berissamuyizere/devops-g10-tillflow/pull/51) |
 | Payments: B2C timeout is not a decline, B2C result callback, atomic STK callback | [#52](https://github.com/berissamuyizere/devops-g10-tillflow/pull/52) |
-| Commission worker on ECS | [#53](https://github.com/berissamuyizere/devops-g10-tillflow/pull/53) + [`g2-commission-worker-logs.json`](../evidence/payments-integrity/g2-commission-worker-logs.json) |
+| Commission worker on ECS | [#53](https://github.com/berissamuyizere/devops-g10-tillflow/pull/53) + [`g2-commission-worker-logs.json`](../evidence/payments-integrity/g2-commission-worker-logs.json); re-proved after the lockdown in [§3](#3-commission-worker-received-both-sqs-messages) |
 | Payments: service tokens fail closed, stranded `pending` payouts resumed | [#63](https://github.com/berissamuyizere/devops-g10-tillflow/pull/63) |
 | Close cutoff and a single Commission owner | [#62](https://github.com/berissamuyizere/devops-g10-tillflow/pull/62), [#65](https://github.com/berissamuyizere/devops-g10-tillflow/pull/65) |
 
