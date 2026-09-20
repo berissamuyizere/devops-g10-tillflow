@@ -42,6 +42,6 @@ Scar log: [`docs/scar-log.md`](scar-log.md).
 | Saloi | Reliability | 2026-09-20 23:10 EAT |
 | Yordanos | Platform | 2026-09-20 23:34 EAT |
 | Arsema | Payments | |
-| Berissa | Product + POS | |
+| Berissa | Product + POS | 2026-09-20 23:55 EAT |
 
 Arsema’s payment-drill JSON is still the open row. SG rule ids were imported onto the live Terraform state (`cache_from_ecs` `sgr-0f50e811b25ab2ed0`, `alb_from_ecs` `sgr-06deea1208cdcbcb4`) so the next apply does not recreate them.
