@@ -3,15 +3,18 @@ title = "TillFlow"
 [extend]
 useDefault = true
 
-# G2 evidence JSON records client-generated Idempotency-Key headers
-# (g2-sale-… / g2-charge-… / g2-close-…). The generic-api-key rule
-# matches the field name `*_key` plus a hex suffix. Not credentials.
+# G2 evidence records client-generated Idempotency-Key headers
+# (g2-sale-… / g2-charge-… / g2-close-…) and curl -i API Gateway
+# request IDs. The generic-api-key rule matches `*_key` / `*id`
+# plus a high-entropy suffix. Not credentials.
 [allowlist]
-description = "G2 evidence: idempotency keys and captured traces, not secrets"
+description = "G2 evidence: idempotency keys, API GW request IDs, and captured traces, not secrets"
 paths = [
   '''(^|/)evidence/payments-integrity/g2-.*''',
   '''(^|/)evidence/product-pos/g2-.*''',
+  '''(^|/)evidence/platform-delivery/g2-.*''',
 ]
 regexes = [
   '''g2-(sale|charge|timeout|close-paid|close-unpaid|close-charge)[-0-9a-fA-F]+''',
+  '''apigw-requestid:\s+\S+''',
 ]
