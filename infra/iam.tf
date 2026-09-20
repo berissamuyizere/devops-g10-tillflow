@@ -310,8 +310,6 @@ data "aws_iam_policy_document" "ci_deploy" {
     sid    = "TagOnCreateWithoutRegionContext"
     effect = "Allow"
     actions = [
-      "grafana:TagResource",
-      "grafana:UntagResource",
       "kms:TagResource",
       "lambda:TagResource",
       "sns:TagResource",
@@ -325,112 +323,12 @@ data "aws_iam_policy_document" "ci_deploy" {
     }
   }
 
-  # Grafana CreateWorkspace tags against this exact parent ARN and may
-  # not pass aws:RequestTag. Matches the AccessDenied we hit on Release.
-  statement {
-    sid    = "GrafanaTagWorkspaces"
-    effect = "Allow"
-    actions = [
-      "grafana:TagResource",
-      "grafana:UntagResource",
-    ]
-    resources = [
-      "arn:${data.aws_partition.current.partition}:grafana:${var.region}:${data.aws_caller_identity.current.account_id}:/workspaces",
-      "arn:${data.aws_partition.current.partition}:grafana:${var.region}:${data.aws_caller_identity.current.account_id}:/workspaces/*",
-    ]
-  }
-
-  # AWS_SSO workspaces call IAM Identity Center in us-east-1. That misses
-  # the regional grafana:* write statement (aws:RequestedRegion).
-  statement {
-    sid    = "GrafanaIdentityCenter"
-    effect = "Allow"
-    actions = [
-      "sso:DescribeRegisteredRegions",
-      "sso:ListInstances",
-      "sso:GetSharedSsoConfiguration",
-      "sso:ListDirectoryAssociations",
-      "sso:GetManagedApplicationInstance",
-      "sso:CreateManagedApplicationInstance",
-      "sso:DeleteManagedApplicationInstance",
-      "sso:UpdateManagedApplicationInstanceStatus",
-      "sso:GetProfile",
-      "sso:ListProfiles",
-      "sso:AssociateProfile",
-      "sso:DisassociateProfile",
-      "sso:ListProfileAssociations",
-      "sso-directory:DescribeDirectory",
-    ]
-    resources = ["*"]
-  }
-
-  # CreateWorkspace with AWS_SSO decrypts Identity Center ciphertext as
-  # the calling principal. The request sets kms:ViaService=sso.*.amazonaws.com
-  # and encryption context aws:sso:instance-arn. An unconstrained
-  # kms:Decrypt was not enough (Release still 403 from AWSSingleSignOn).
-  # These conditions match AWSSSOMasterAccountAdministrator.
-  statement {
-    sid    = "DecryptViaSsoService"
-    effect = "Allow"
-    actions = [
-      "kms:Decrypt",
-      "kms:Encrypt",
-      "kms:GenerateDataKeyWithoutPlaintext",
-    ]
-    resources = ["*"]
-    condition {
-      test     = "StringLike"
-      variable = "kms:ViaService"
-      values   = ["sso.*.amazonaws.com"]
-    }
-    condition {
-      test     = "StringLike"
-      variable = "kms:EncryptionContext:aws:sso:instance-arn"
-      values   = ["*"]
-    }
-  }
-
-  # Same ViaService without encryption context — some SSO decrypts omit it.
-  statement {
-    sid    = "DecryptViaSsoServiceNoContext"
-    effect = "Allow"
-    actions = [
-      "kms:Decrypt",
-      "kms:DescribeKey",
-      "kms:CreateGrant",
-    ]
-    resources = ["*"]
-    condition {
-      test     = "StringLike"
-      variable = "kms:ViaService"
-      values = [
-        "sso.*.amazonaws.com",
-        "sso-directory.*.amazonaws.com",
-        "identitystore.*.amazonaws.com",
-      ]
-    }
-  }
-
-  statement {
-    sid    = "DecryptViaIdentityStoreService"
-    effect = "Allow"
-    actions = [
-      "kms:Decrypt",
-      "kms:Encrypt",
-      "kms:GenerateDataKeyWithoutPlaintext",
-    ]
-    resources = ["*"]
-    condition {
-      test     = "StringLike"
-      variable = "kms:ViaService"
-      values   = ["identitystore.*.amazonaws.com"]
-    }
-    condition {
-      test     = "StringLike"
-      variable = "kms:EncryptionContext:aws:identitystore:identitystore-arn"
-      values   = ["*"]
-    }
-  }
+  # Grafana + IAM Identity Center + SSO KMS decrypt are NOT in this
+  # document. Customer managed policies cap at 6144 bytes; stuffing SSO
+  # statements here failed CreatePolicyVersion. Those permissions live on
+  # AWS managed policies attached to this role:
+  # AWSGrafanaAccountAdministrator, AWSSSOMasterAccountAdministrator,
+  # AWSSSODirectoryAdministrator.
 
   statement {
     sid    = "ManageNamespacedKMS"
