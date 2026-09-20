@@ -57,6 +57,35 @@ double charge, a double payout, or a sale wrongly marked failed.
 - Commission depends on the Payments API for disbursement, making Payments
   the only service holding Daraja credentials.
 
+## Addendum — real Daraja does not sign callbacks (2026-09-20)
+
+The G3 sandbox contract test confirmed the adapter speaks to the real Safaricom
+sandbox: OAuth, STK push accepted, STK query answered, and the UTC timestamp our
+adapter builds was accepted (Safaricom's own examples use EAT, so this was worth
+checking). Evidence:
+[`evidence/payments-integrity/g3-daraja-contract.json`](../../evidence/payments-integrity/g3-daraja-contract.json).
+
+**The deployed service nevertheless stays on `MPESA_MODE=fake`.** Safaricom does
+not sign its callbacks — no HMAC, no mTLS, no signed payload. Our callback
+handler authenticates with an HMAC over the raw body, which the fake adapter
+produces, so a real Daraja callback would be rejected with
+`signature_header_malformed`. Switching the deployed service to `daraja` without
+first replacing that mechanism would mean either dropping every real callback or
+removing the check that stops forged ones marking a sale paid.
+
+Neither is acceptable, so the switch waits on an explicit decision about
+callback authenticity — an unguessable per-payment callback path, an IP
+allowlist at WAF, or a signing shim at our own edge. See the "Callback
+authenticity" section of [docs/threat-model.md](../threat-model.md).
+
+B2C is also not exercised against the sandbox: it needs a public `ResultURL` and
+`QueueTimeOutURL` registered with Safaricom, which is the same unsolved problem
+in another shape.
+
+The query in the contract run returned result code **1037**, "DS timeout user
+cannot be reached" — the exact case this ADR is about, now observed from real
+Daraja rather than the fake.
+
 ## Proof
 
 - Invariant tests required at **G2**: replayed sale creation yields one

@@ -2,7 +2,7 @@
   "name": "@tillflow/payments",
   "version": "0.1.0",
   "private": true,
-  "description": "TillFlow Payments API — Daraja STK/B2C, payment state machine, callbacks, payouts.",
+  "description": "TillFlow Payments API \u2014 Daraja STK/B2C, payment state machine, callbacks, payouts.",
   "main": "server.js",
   "scripts": {
     "start": "node --require ./otel-bootstrap.js server.js",
@@ -13,7 +13,8 @@
     "test:contract": "node --test --test-concurrency=1 test/*.contract.js",
     "evidence:g2": "node scripts/g2-happy-path.js",
     "evidence:timeout": "node scripts/g2-timeout.js",
-    "evidence:close": "node scripts/g2-close-b2c.js"
+    "evidence:close": "node scripts/g2-close-b2c.js",
+    "daraja:contract": "node scripts/daraja-contract.js"
   },
   "engines": {
     "node": ">=20.17.0"
