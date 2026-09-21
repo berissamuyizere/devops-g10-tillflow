@@ -79,6 +79,13 @@ resource "random_password" "daraja_callback_secret" {
   special = false
 }
 
+# URL path segment for POST /callbacks/mpesa/:secret (#144). URL-safe.
+# Live secret is ignore_changes — first write is out-of-band put-secret-value.
+resource "random_password" "daraja_callback_path_secret" {
+  length  = 48
+  special = false
+}
+
 resource "aws_secretsmanager_secret" "service_tokens" {
   name        = "${var.name_prefix}/service-tokens"
   description = "POS ↔ Payments ↔ Commission shared tokens + Daraja callback HMAC (G2)."
@@ -93,8 +100,9 @@ resource "aws_secretsmanager_secret_version" "service_tokens" {
   secret_string = jsonencode({
     payments_service_token   = random_password.payments_service_token.result
     pos_service_token        = random_password.pos_service_token.result
-    commission_service_token = random_password.commission_service_token.result
-    daraja_callback_secret   = random_password.daraja_callback_secret.result
+    commission_service_token     = random_password.commission_service_token.result
+    daraja_callback_secret       = random_password.daraja_callback_secret.result
+    daraja_callback_path_secret  = random_password.daraja_callback_path_secret.result
   })
 
   lifecycle {
