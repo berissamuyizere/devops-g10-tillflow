@@ -1,0 +1,29 @@
+{
+  "framework": "vite",
+  "installCommand": "bun install",
+  "buildCommand": "bun run build",
+  "outputDirectory": "dist/client",
+  "rewrites": [
+    {
+      "source": "/sales",
+      "destination": "https://f9nla14lfh.execute-api.eu-central-1.amazonaws.com/sales"
+    },
+    {
+      "source": "/sales/:path*",
+      "destination": "https://f9nla14lfh.execute-api.eu-central-1.amazonaws.com/sales/:path*"
+    },
+    {
+      "source": "/health",
+      "destination": "https://f9nla14lfh.execute-api.eu-central-1.amazonaws.com/health"
+    },
+    {
+      "source": "/ready",
+      "destination": "https://f9nla14lfh.execute-api.eu-central-1.amazonaws.com/ready"
+    },
+    {
+      "source": "/version",
+      "destination": "https://f9nla14lfh.execute-api.eu-central-1.amazonaws.com/version"
+    },
+    { "source": "/((?!assets/).*)", "destination": "/index.html" }
+  ]
+}
