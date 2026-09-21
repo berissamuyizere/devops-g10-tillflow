@@ -86,6 +86,68 @@ The query in the contract run returned result code **1037**, "DS timeout user
 cannot be reached" — the exact case this ADR is about, now observed from real
 Daraja rather than the fake.
 
+## Addendum — closing the two gaps this design left open (2026-09-21)
+
+The G4 drill and a comparison against another team's implementation made two
+gaps concrete. Both are now closed in code, and neither changes the position
+this ADR takes.
+
+### 1. A callback path that real Daraja can actually authenticate
+
+The HMAC scheme in this ADR only works because our own scripts sign the
+callbacks. Safaricom does not sign, so switching `MPESA_MODE` to `daraja`
+would have made every inbound callback 401. That was recorded as an accepted
+residual; it is now fixed rather than accepted.
+
+`POST /payments/callbacks/:secret` authenticates on a secret path segment
+compared in constant time, with an optional source-IP allowlist
+(`DARAJA_CALLBACK_IP_ALLOWLIST`, e.g. `196.201.212.0/24`). The HMAC route
+stays as it is, so nothing that works today changes. It lives under
+`/payments/` deliberately: the ALB forwards only `/payments/*` and
+`/internal/*` here, so mounting it there means this needs no edge rule and no
+change in the platform area.
+
+Everything that does not depend on the transport still applies to both routes:
+the `CheckoutRequestID` must match a push we initiated, the amount must match,
+the state machine still refuses illegal transitions, and every rejection is
+still written to `callback_log`.
+
+A secret in a URL is weaker than a signature in a header — it appears in
+access logs, proxies and tunnel inspectors, where an HMAC header does not.
+It is the right answer only because the provider gives us no alternative.
+Operationally that means the path secret must be scrubbed from ALB access
+logs and rotated like any other credential.
+
+### 2. Reconciliation that runs without a human
+
+Reconciliation existed but only ran when somebody called the endpoint by
+hand. The G4 drill is exactly where that showed: reconcile answered
+`still_processing` and nothing ever asked again, so the payment stayed
+uncertain indefinitely and `payments-oldest-pending` could never recover.
+
+`reconcile-sweep.js` periodically reconciles `pending` payments older than
+`RECONCILE_MIN_AGE_MS`, in batches, off `RECONCILE_SWEEP_ENABLED`. It queries
+the provider and never re-sends a push, so it cannot double-charge. It does
+not use an advisory lock: `pg_try_advisory_lock` is session-scoped and our
+queries run on a pooled connection, so a lock and its unlock can land on
+different connections. Safety comes instead from `reconcilePayment`, which
+locks the payment row and re-checks its status inside a transaction. Two
+tasks sweeping concurrently may both ask the provider, but only one can
+transition the payment — asserted in `reconcile-sweep.test.js`.
+
+This does not weaken the central claim. Silence is still not a decline: the
+sweep leaves an unanswered payment `pending`, with no `failure_reason` and no
+`timed_out_at`. It only means we now keep asking instead of waiting to be
+told.
+
+### Not done here
+
+Deploying either of these needs environment variables added to the task
+definitions (`DARAJA_CALLBACK_PATH_SECRET`, `DARAJA_CALLBACK_IP_ALLOWLIST`,
+`RECONCILE_SWEEP_ENABLED`), which lives in the platform area. Until that
+happens the sweep stays off and the secret path stays unconfigured, and an
+unconfigured path secret fails closed with a 500, never an accidental 200.
+
 ## Proof
 
 - Invariant tests required at **G2**: replayed sale creation yields one

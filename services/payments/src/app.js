@@ -13,6 +13,8 @@ const callbacks = require('./payments/callbacks');
 const payoutCallbacks = require('./payouts/callbacks');
 const metrics = require('./metrics');
 const tracing = require('./tracing');
+const pathAuth = require('./payments/path-auth');
+const { createReconcileSweep } = require('./payments/reconcile-sweep');
 
 function callbackOutcomeLabel(outcome) {
   if (outcome === 'applied') return 'applied';
@@ -42,6 +44,13 @@ function createApp(options = {}) {
     options.callbackSecret || (process.env.DARAJA_CALLBACK_SECRET || '').trim() || null;
   const CALLBACK_URL =
     options.callbackUrl || process.env.DARAJA_CALLBACK_URL || 'https://localhost/payments/callback';
+  const CALLBACK_PATH_SECRET =
+    options.callbackPathSecret ||
+    (process.env.DARAJA_CALLBACK_PATH_SECRET || '').trim() ||
+    null;
+  const CALLBACK_IP_ALLOWLIST = pathAuth.parseAllowlist(
+    options.callbackIpAllowlist ?? process.env.DARAJA_CALLBACK_IP_ALLOWLIST ?? ''
+  );
 
   const metricsRefresh =
     options.metricsRefresh === false
@@ -240,6 +249,50 @@ function createApp(options = {}) {
     }
   });
 
+  app.post(['/payments/callbacks/:secret', '/callbacks/mpesa/:secret'], async (req, res) => {
+    const ip = pathAuth.sourceIp(req);
+    const verdict = pathAuth.verifyPath({
+      presented: req.params.secret,
+      configured: CALLBACK_PATH_SECRET,
+      ip,
+      allowlist: CALLBACK_IP_ALLOWLIST,
+    });
+
+    if (!verdict.configured) {
+      req.log.error({ env: 'DARAJA_CALLBACK_PATH_SECRET' }, 'callback_path_secret_not_configured');
+      return res.status(500).json({
+        error: 'misconfigured',
+        hint: 'DARAJA_CALLBACK_PATH_SECRET is not set',
+      });
+    }
+
+    try {
+      const result = await callbacks.handleCallback(database, pos, {
+        rawBody: req.rawBody ?? JSON.stringify(req.body ?? {}),
+        headers: req.headers,
+        secret: null,
+        auth: verdict.valid
+          ? { valid: true, reason: verdict.reason }
+          : { valid: false, reason: verdict.reason },
+        now,
+        logger: req.log,
+      });
+      tracing.annotatePayment(result.payment);
+      tracing.annotateCallbackOutcome(result.outcome);
+      metrics.recordCallback(
+        'stk',
+        callbackOutcomeLabel(result.outcome),
+        ageMs(result.payment?.created_at, Date.now())
+      );
+      if (!verdict.valid) {
+        req.log.warn({ reason: verdict.reason, ip }, 'callback_path_rejected');
+      }
+      return res.status(result.status).json(result.body);
+    } catch (err) {
+      return sendError(req, res, err);
+    }
+  });
+
   app.post('/internal/v1/payouts', requireCommissionService, async (req, res) => {
     try {
       const body = req.body || {};
@@ -360,7 +413,19 @@ function createApp(options = {}) {
     }
   });
 
+  const reconcileSweep =
+    options.reconcileSweep === false
+      ? null
+      : createReconcileSweep(database, mpesa, pos, {
+          ...(options.reconcileSweepOptions || {}),
+          logger: options.logger || null,
+        });
+  if (reconcileSweep && process.env.RECONCILE_SWEEP_ENABLED === 'true') {
+    reconcileSweep.start();
+  }
+  app.reconcileSweep = reconcileSweep;
   app.stopMetricsRefresh = () => metricsRefresh?.stop();
+  app.stopReconcileSweep = () => reconcileSweep?.stop();
 
   app.use((err, req, res, _next) => {
     req.log.error({ err }, 'unhandled_error');

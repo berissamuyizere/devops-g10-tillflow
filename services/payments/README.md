@@ -44,7 +44,8 @@ See [`src/payments/state.js`](src/payments/state.js).
 | `GET` | `/internal/v1/sales/:saleId/payment` | POS | `X-Pos-Token` |
 | `POST` | `/internal/v1/payments/:id/reconcile` | POS / scheduler | `X-Pos-Token` |
 | `POST` | `/internal/v1/pos-sync/sweep` | scheduler / runbook | `X-Pos-Token` |
-| `POST` | `/payments/callback` | Daraja | HMAC signature |
+| `POST` | `/payments/callback` | Daraja (fake mode) | HMAC signature |
+| `POST` | `/payments/callbacks/:secret` | real Daraja | secret path segment + optional IP allowlist |
 | `POST` | `/internal/v1/payouts` | Commission | `X-Commission-Token` |
 | `POST` | `/internal/v1/payouts/:id/reconcile` | scheduler / runbook | `X-Commission-Token` |
 | `POST` | `/payments/b2c/callback` | Daraja | HMAC signature |
@@ -61,6 +62,47 @@ already has a live payment → `409`, enforced by the DB, not by application cod
 
 The amount is always read from the POS sale. Nothing in a request body or a
 callback payload can change what we charge.
+
+### Two callback routes, on purpose
+
+Safaricom does not sign its callbacks, so the HMAC route only works for
+callbacks we generate ourselves. `/callbacks/mpesa/:secret` is the route a
+real Daraja can authenticate against: the segment is compared in constant
+time and, when `DARAJA_CALLBACK_IP_ALLOWLIST` is set, the source address must
+fall inside it. It is mounted under `/payments/` because the ALB only forwards
+`/payments/*` and `/internal/*` to this service; `/callbacks/mpesa/:secret` is
+kept as an alias for the conventional shape, but it needs an edge rule before
+it is reachable. Both routes share the same body handling, so the
+`CheckoutRequestID` must still match a push we initiated, the amount must
+still match, illegal transitions are still refused, and every rejection is
+still written to `callback_log`.
+
+A secret in a path is weaker than a signature in a header — it shows up in
+access logs and proxies. Scrub it from ALB logs and rotate it like a
+credential.
+
+### Reconciliation sweep
+
+Reconciliation used to run only when somebody called the endpoint. The sweep
+reconciles `pending` payments older than `RECONCILE_MIN_AGE_MS` on an
+interval, so a payment settles even if its callback is never delivered. It
+queries the provider and never re-sends a push.
+
+| Variable | Default | Meaning |
+|---|---|---|
+| `RECONCILE_SWEEP_ENABLED` | unset (off) | `true` starts the sweep |
+| `RECONCILE_SWEEP_INTERVAL_MS` | `60000` | how often it runs |
+| `RECONCILE_MIN_AGE_MS` | `120000` | how old a pending payment must be |
+| `RECONCILE_BATCH_SIZE` | `25` | payments examined per pass |
+| `DARAJA_CALLBACK_PATH_SECRET` | unset | secret path segment; unset fails closed with 500 |
+| `DARAJA_CALLBACK_IP_ALLOWLIST` | unset | comma-separated IPs/CIDRs, e.g. `196.201.212.0/24` |
+
+The sweep deliberately takes no advisory lock. `pg_try_advisory_lock` is
+session-scoped and queries run on a pooled connection, so a lock and its
+unlock can land on different connections. Safety comes from
+`reconcilePayment`, which locks the payment row and re-checks status in a
+transaction: two tasks may both ask the provider, but only one can
+transition the payment.
 
 ## Schema
 
