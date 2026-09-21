@@ -98,11 +98,11 @@ resource "aws_secretsmanager_secret" "service_tokens" {
 resource "aws_secretsmanager_secret_version" "service_tokens" {
   secret_id = aws_secretsmanager_secret.service_tokens.id
   secret_string = jsonencode({
-    payments_service_token   = random_password.payments_service_token.result
-    pos_service_token        = random_password.pos_service_token.result
-    commission_service_token     = random_password.commission_service_token.result
-    daraja_callback_secret       = random_password.daraja_callback_secret.result
-    daraja_callback_path_secret  = random_password.daraja_callback_path_secret.result
+    payments_service_token      = random_password.payments_service_token.result
+    pos_service_token           = random_password.pos_service_token.result
+    commission_service_token    = random_password.commission_service_token.result
+    daraja_callback_secret      = random_password.daraja_callback_secret.result
+    daraja_callback_path_secret = random_password.daraja_callback_path_secret.result
   })
 
   lifecycle {
