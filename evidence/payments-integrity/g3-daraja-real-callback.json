@@ -1,0 +1,76 @@
+{
+  "captured_at": "2026-09-21T16:46:05Z",
+  "purpose": "receive a real Safaricom callback on the secret path and prove a real 1037 does not fail the payment",
+  "method": "payments run locally with MPESA_MODE=daraja behind an ngrok HTTPS tunnel used as CallBackURL, charging through POST /internal/v1/charges against a stub POS. Sandbox credentials only, nothing deployed, no AWS change.",
+  "environment": "sandbox",
+  "shortcode": "174379",
+  "payer_msisdn": "254708374149",
+  "amount_minor": 100,
+  "callback_route": "/payments/callbacks/:secret",
+  "callback_url": "https://<ngrok-host>/payments/callbacks/<redacted>",
+  "payment_id": "694df664-b906-4225-9641-5324cdf018fa",
+  "checkout_request_id": "ws_CO_210920261945392708374149",
+  "merchant_request_id": "4e7d-425c-aa3e-9b62f1dcf8a2740759",
+  "stk_push_at": "2026-09-21T16:45:39Z",
+  "callback_received_at": "2026-09-21T16:46:05Z",
+  "latency_seconds": 26,
+  "inbound": {
+    "source_ip": "196.201.212.69",
+    "x_forwarded_for": "196.201.212.69",
+    "user_agent": "ReactorNetty/1.2.9",
+    "result_code": 1037,
+    "result_desc": "No response from user.",
+    "body": {
+      "Body": {
+        "stkCallback": {
+          "MerchantRequestID": "4e7d-425c-aa3e-9b62f1dcf8a2740759",
+          "CheckoutRequestID": "ws_CO_210920261945392708374149",
+          "ResultCode": 1037,
+          "ResultDesc": "No response from user."
+        }
+      }
+    }
+  },
+  "our_response": {
+    "http": 200,
+    "body": {
+      "status": "pending",
+      "applied": false
+    }
+  },
+  "payment_after": {
+    "status": "pending",
+    "result_code": null,
+    "failure_reason": null,
+    "timed_out_at": null,
+    "mpesa_receipt": null
+  },
+  "callback_log_row": {
+    "outcome": "replay_noop",
+    "signature_valid": true,
+    "signature_reason": null,
+    "result_code": 1037
+  },
+  "auth_checks_through_the_same_tunnel": [
+    {
+      "path": "/payments/callbacks/<wrong>",
+      "http": 401,
+      "logged_as": "rejected_bad_signature",
+      "reason": "path_secret_mismatch"
+    },
+    {
+      "path": "/payments/callbacks/<secret>",
+      "payload": "unknown CheckoutRequestID",
+      "http": 404,
+      "logged_as": "rejected_unknown_payment"
+    }
+  ],
+  "findings": [
+    "Safaricom does post callbacks, from 196.201.212.69, 26s after the push. An earlier probe of ours saw none in 372s; that probe's conclusion was wrong and its file is removed.",
+    "The secret path segment authenticates a real Daraja callback. The HMAC route could not have: Safaricom sends no signature, so every real callback would have been 401.",
+    "A real 1037 callback did not fail the payment. It stayed pending with no failure_reason and no timed_out_at, exactly as ADR-002 requires. The provider saying 'no response from user' is not the provider saying 'declined'.",
+    "The callback is logged either way. A wrong secret is refused 401 and recorded as rejected_bad_signature with reason path_secret_mismatch."
+  ],
+  "limits": "One push, one shortcode, one unanswered payer, in the sandbox. The deployed service still runs MPESA_MODE=fake; enabling this path in production needs task-definition environment variables that live in the platform area.",
+  "passed": true
+}
