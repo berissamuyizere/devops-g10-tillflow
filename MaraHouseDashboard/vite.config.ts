@@ -9,9 +9,13 @@ import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 const LIVE_API = "https://f9nla14lfh.execute-api.eu-central-1.amazonaws.com";
 
 export default defineConfig({
+  // Skip Nitro so Vite emits dist/client (Vercel static). SPA still
+  // prerenders; pin concurrency because os.cpus().length is 0 in some CI.
+  nitro: false,
   tanstackStart: {
     spa: { enabled: true },
     server: { entry: "server" },
+    prerender: { concurrency: 1 },
   },
   vite: {
     server: {
