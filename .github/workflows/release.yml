@@ -79,11 +79,9 @@ jobs:
           echo "payments=true" >> "$GITHUB_OUTPUT"
           echo "commission=true" >> "$GITHUB_OUTPUT"
           echo "backend=true" >> "$GITHUB_OUTPUT"
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "infra=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "infra=${{ steps.filter.outputs.infra }}" >> "$GITHUB_OUTPUT"
-          fi
+          # Images always rebuild. Terraform stays path-filtered so a
+          # leftover AMG refresh cannot block an images-only dispatch.
+          echo "infra=${{ steps.filter.outputs.infra }}" >> "$GITHUB_OUTPUT"
 
   plan:
     name: terraform plan
