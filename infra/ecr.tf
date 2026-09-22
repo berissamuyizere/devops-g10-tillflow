@@ -17,7 +17,7 @@ resource "aws_ecr_repository" "service" {
   for_each             = toset(local.services)
   name                 = "${var.name_prefix}/${each.value}"
   image_tag_mutability = "IMMUTABLE"
-  force_delete         = false
+  force_delete         = true # G5 destroy: repos still hold images
 
   encryption_configuration {
     encryption_type = "AES256"
