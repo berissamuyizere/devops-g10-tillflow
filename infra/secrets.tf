@@ -8,8 +8,9 @@
 # put-secret-value` after G1 apply.
 # ---------------------------------------------------------------------
 resource "aws_secretsmanager_secret" "daraja" {
-  name        = "${var.name_prefix}/daraja"
-  description = "Daraja 3.0 SANDBOX credentials (consumer key/secret, shortcode, passkey). SANDBOX ONLY."
+  name                    = "${var.name_prefix}/daraja"
+  description             = "Daraja 3.0 SANDBOX credentials (consumer key/secret, shortcode, passkey). SANDBOX ONLY."
+  recovery_window_in_days = 0 # G5 rebuild: same name must be free immediately
 
   tags = {
     service      = "payments"
@@ -36,8 +37,9 @@ resource "aws_secretsmanager_secret_version" "daraja_placeholder" {
 # Slack webhook — Saloi populates. Same pattern.
 # ---------------------------------------------------------------------
 resource "aws_secretsmanager_secret" "slack" {
-  name        = "${var.name_prefix}/slack-webhook"
-  description = "Slack incoming-webhook URL for alerts."
+  name                    = "${var.name_prefix}/slack-webhook"
+  description             = "Slack incoming-webhook URL for alerts."
+  recovery_window_in_days = 0 # G5 rebuild: same name must be free immediately
 
   tags = {
     service      = "reliability"
@@ -87,8 +89,9 @@ resource "random_password" "daraja_callback_path_secret" {
 }
 
 resource "aws_secretsmanager_secret" "service_tokens" {
-  name        = "${var.name_prefix}/service-tokens"
-  description = "POS ↔ Payments ↔ Commission shared tokens + Daraja callback HMAC (G2)."
+  name                    = "${var.name_prefix}/service-tokens"
+  description             = "POS ↔ Payments ↔ Commission shared tokens + Daraja callback HMAC (G2)."
+  recovery_window_in_days = 0 # G5 rebuild: same name must be free immediately
 
   tags = {
     service = "platform"
@@ -127,8 +130,9 @@ resource "random_password" "db_payments" {
 }
 
 resource "aws_secretsmanager_secret" "db_pos" {
-  name        = "${var.name_prefix}/db/pos"
-  description = "RDS credentials for the devops_g10_pos role (schema pos)."
+  name                    = "${var.name_prefix}/db/pos"
+  description             = "RDS credentials for the devops_g10_pos role (schema pos)."
+  recovery_window_in_days = 0 # G5 rebuild: same name must be free immediately
 
   tags = {
     service = "pos"
@@ -153,8 +157,9 @@ resource "aws_secretsmanager_secret_version" "db_pos" {
 }
 
 resource "aws_secretsmanager_secret" "db_payments" {
-  name        = "${var.name_prefix}/db/payments"
-  description = "RDS credentials for the devops_g10_payments role (schema payments)."
+  name                    = "${var.name_prefix}/db/payments"
+  description             = "RDS credentials for the devops_g10_payments role (schema payments)."
+  recovery_window_in_days = 0 # G5 rebuild: same name must be free immediately
 
   tags = {
     service = "payments"

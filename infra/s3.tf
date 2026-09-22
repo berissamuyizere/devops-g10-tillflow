@@ -4,8 +4,9 @@
 # Artifacts — CodeBuild input/output, SBOMs, plan artifacts.
 # ---------------------------------------------------------------------
 resource "aws_s3_bucket" "artifacts" {
-  bucket = "${var.name_prefix}-artifacts-${local.account_id}"
-  tags   = { service = "artifacts" }
+  bucket        = "${var.name_prefix}-artifacts-${local.account_id}"
+  force_destroy = true # G5: CI objects would otherwise block destroy
+  tags          = { service = "artifacts" }
 }
 
 resource "aws_s3_bucket_versioning" "artifacts" {
@@ -49,8 +50,9 @@ resource "aws_s3_bucket_lifecycle_configuration" "artifacts" {
 # Logs — ALB access logs + VPC flow logs sink.
 # ---------------------------------------------------------------------
 resource "aws_s3_bucket" "logs" {
-  bucket = "${var.name_prefix}-logs-${local.account_id}"
-  tags   = { service = "logs" }
+  bucket        = "${var.name_prefix}-logs-${local.account_id}"
+  force_destroy = true # G5: ALB access logs guarantee this is not empty
+  tags          = { service = "logs" }
 }
 
 resource "aws_s3_bucket_versioning" "logs" {
@@ -143,8 +145,9 @@ resource "aws_s3_bucket_policy" "logs" {
 # Backups + evidence.
 # ---------------------------------------------------------------------
 resource "aws_s3_bucket" "backups" {
-  bucket = "${var.name_prefix}-backups-${local.account_id}"
-  tags   = { service = "backups" }
+  bucket        = "${var.name_prefix}-backups-${local.account_id}"
+  force_destroy = true # G5: leftover objects would otherwise block destroy
+  tags          = { service = "backups" }
 }
 
 resource "aws_s3_bucket_versioning" "backups" {
