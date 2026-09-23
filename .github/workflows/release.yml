@@ -498,15 +498,29 @@ jobs:
               echo "payments smoke ok (${DIGEST})"
               ;;
             commission)
+              # SQS worker, no ALB. ECS reports UNKNOWN through startPeriod
+              # (20s) + first checks. A single read right after services-stable
+              # races and skips migrate. Poll; fail only on UNHEALTHY.
               DIGEST=$(aws ecs describe-task-definition --task-definition "${{ matrix.ecs_family }}" \
                 --query 'taskDefinition.containerDefinitions[?name==`app`].image' --output text)
               echo "${DIGEST}" | grep -q '@sha256:'
               TASK=$(aws ecs list-tasks --cluster devops-g10 --service-name devops-g10-commission \
                 --desired-status RUNNING --query 'taskArns[0]' --output text)
-              test -n "${TASK}"
-              HEALTH=$(aws ecs describe-tasks --cluster devops-g10 --tasks "${TASK}" \
-                --query 'tasks[0].containers[?name==`app`].healthStatus | [0]' --output text)
-              echo "commission app health=${HEALTH} image=${DIGEST}"
+              test -n "${TASK}" && test "${TASK}" != "None"
+              HEALTH="UNKNOWN"
+              for i in $(seq 1 18); do
+                HEALTH=$(aws ecs describe-tasks --cluster devops-g10 --tasks "${TASK}" \
+                  --query 'tasks[0].containers[?name==`app`].healthStatus | [0]' --output text)
+                echo "commission app health=${HEALTH} attempt=${i}/18 image=${DIGEST}"
+                if [ "${HEALTH}" = "HEALTHY" ]; then
+                  break
+                fi
+                if [ "${HEALTH}" = "UNHEALTHY" ]; then
+                  echo "commission app is UNHEALTHY"
+                  exit 1
+                fi
+                sleep 10
+              done
               test "${HEALTH}" = "HEALTHY"
               echo "commission smoke ok (no ALB, SQS worker)"
               ;;
