@@ -50,9 +50,9 @@ for i in $(seq 1 "${ATTEMPTS}"); do
       terraform import -input=false -lock-timeout=5m aws_grafana_workspace.amg "${id}"
       exit 0
       ;;
-    FAILED)
-      echo "deleting FAILED workspace ${id}; waiting for it to disappear"
-      aws grafana delete-workspace --region "${REGION}" --workspace-id "${id}"
+    FAILED|DELETION_FAILED)
+      echo "deleting ${status} workspace ${id}; waiting for it to disappear"
+      aws grafana delete-workspace --region "${REGION}" --workspace-id "${id}" || true
       sleep 15
       ;;
     DELETING)
@@ -67,7 +67,14 @@ for i in $(seq 1 "${ATTEMPTS}"); do
 done
 
 if [[ -n "${seen}" ]]; then
-  echo "timed out waiting for leftover ${NAME} (${seen}) to become ACTIVE or disappear"
+  last_status="$(aws grafana describe-workspace --region "${REGION}" --workspace-id "${seen}" \
+    --query 'workspace.status' --output text 2>/dev/null || echo unknown)"
+  echo "timed out waiting for leftover ${NAME} (${seen}) last_status=${last_status}"
+  if [[ "${last_status}" == "DELETION_FAILED" || "${last_status}" == "FAILED" ]]; then
+    echo "Grafana workspace is stuck in ${last_status}; re-run delete manually or open AWS support"
+    echo "continuing so terraform plan can still run (import skipped)"
+    exit 0
+  fi
   exit 1
 fi
 echo "no Grafana workspace named ${NAME}; apply will create it"
