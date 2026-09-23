@@ -11,7 +11,9 @@
     "test": "node --test --test-concurrency=1 test/*.test.js",
     "lint": "eslint .",
     "g2:close-seed": "node scripts/g2-close-seed.js",
-    "g2:seed-attendant2": "bash scripts/g2-seed-attendant2.sh"
+    "g2:seed-attendant2": "bash scripts/g2-seed-attendant2.sh",
+    "g2:seed-demo-tenant": "bash scripts/g2-seed-demo-tenant.sh",
+    "g5:post-rebuild-seed": "bash scripts/g5-post-rebuild-seed.sh"
   },
   "engines": {
     "node": ">=20.17.0"
