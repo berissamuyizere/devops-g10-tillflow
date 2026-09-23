@@ -55,7 +55,7 @@ CODEOWNERS
 
 **Base URL (API Gateway, public edge only):**
 
-`https://f9nla14lfh.execute-api.eu-central-1.amazonaws.com`
+`https://mww3x8g0k2.execute-api.eu-central-1.amazonaws.com`
 
 | Check | Command |
 |---|---|
@@ -78,7 +78,7 @@ Public path only (`POST /sales` → `POST /sales/:id/pay` → signed `POST /paym
 aws sso login --profile g10
 export AWS_PROFILE=g10 AWS_REGION=eu-central-1
 
-export API_URL=https://f9nla14lfh.execute-api.eu-central-1.amazonaws.com
+export API_URL=https://mww3x8g0k2.execute-api.eu-central-1.amazonaws.com
 export TENANT_ID=11111111-1111-1111-1111-111111111111
 export ATTENDANT_ID=22222222-2222-2222-2222-222222222222
 TOKENS=$(aws secretsmanager get-secret-value \

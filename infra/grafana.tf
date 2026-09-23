@@ -102,58 +102,46 @@ resource "aws_iam_role_policy_attachment" "grafana" {
   policy_arn = aws_iam_policy.grafana.arn
 }
 
-resource "aws_grafana_workspace" "amg" {
-  name                     = "${var.name_prefix}-grafana"
-  description              = "TillFlow SLO / burn / RED / traces. ADR-005."
-  account_access_type      = "CURRENT_ACCOUNT"
-  authentication_providers = ["AWS_SSO"]
-  permission_type          = "CUSTOMER_MANAGED"
-  role_arn                 = aws_iam_role.grafana.arn
-  data_sources             = ["CLOUDWATCH", "XRAY"]
-  grafana_version          = "10.4"
+# G5 scar: workspace g-ede3f6a694 is DELETION_FAILED. Cohort SSO
+# explicitly denies sso:DeleteManagedApplicationInstance. Refreshing
+# this resource 404s DescribeWorkspaceConfiguration and blocks Release.
+# Human login is Grafana Cloud (ADR-005). JSON files stay the contract.
+removed {
+  from = aws_grafana_workspace.amg
 
-  tags = { service = "grafana" }
-
-  timeouts {
-    create = "30m"
-    update = "10m"
+  lifecycle {
+    destroy = false
   }
-
-  depends_on = [
-    aws_iam_role_policy_attachment.grafana,
-    aws_iam_policy.ci_deploy,
-    aws_iam_role_policy_attachment.ci_grafana_account,
-    aws_iam_role_policy_attachment.ci_sso_master,
-    aws_iam_role_policy_attachment.ci_sso_directory,
-    time_sleep.ci_iam_propagate,
-  ]
 }
 
-# Terraform publishes dashboards through the Grafana HTTP API. SSO user
-# assignment is out of band (console). If this account cannot assign SSO
-# users, switch to Grafana Cloud the same day (ADR-005) — the JSON files
-# stay the contract.
-resource "aws_grafana_workspace_service_account" "terraform" {
-  name         = "terraform"
-  grafana_role = "ADMIN"
-  workspace_id = aws_grafana_workspace.amg.id
+removed {
+  from = aws_grafana_workspace_service_account.terraform
+
+  lifecycle {
+    destroy = false
+  }
 }
 
-resource "aws_grafana_workspace_service_account_token" "terraform" {
-  name               = "terraform"
-  service_account_id = aws_grafana_workspace_service_account.terraform.service_account_id
-  workspace_id       = aws_grafana_workspace.amg.id
-  seconds_to_live    = 2592000 # AMG max; capstone apply cadence refreshes it
+removed {
+  from = aws_grafana_workspace_service_account_token.terraform
+
+  lifecycle {
+    destroy = false
+  }
 }
 
-resource "grafana_folder" "tillflow" {
-  uid   = "tillflow"
-  title = "TillFlow"
+removed {
+  from = grafana_folder.tillflow
+
+  lifecycle {
+    destroy = false
+  }
 }
 
-resource "grafana_dashboard" "json" {
-  for_each    = fileset("${path.module}/grafana", "*.json")
-  folder      = grafana_folder.tillflow.uid
-  overwrite   = true
-  config_json = file("${path.module}/grafana/${each.value}")
+removed {
+  from = grafana_dashboard.json
+
+  lifecycle {
+    destroy = false
+  }
 }

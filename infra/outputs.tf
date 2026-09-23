@@ -119,8 +119,8 @@ output "ecs_app_env_parameters" {
 }
 
 output "grafana_url" {
-  description = "Amazon Managed Grafana workspace. SSO login; dashboards from infra/grafana/*.json."
-  value       = "https://${aws_grafana_workspace.amg.endpoint}"
+  description = "Grafana Cloud (ADR-005). AMG g-ede3f6a694 is DELETION_FAILED; do not open it."
+  value       = "https://punywaxwing1700.grafana.net"
 }
 
 output "probe_canary_name" {

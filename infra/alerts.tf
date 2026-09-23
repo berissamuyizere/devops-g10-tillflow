@@ -92,7 +92,7 @@ resource "aws_lambda_function" "slack_notifier" {
     variables = {
       SLACK_SECRET_ID = aws_secretsmanager_secret.slack.name
       ENVIRONMENT     = var.environment
-      GRAFANA_URL     = "https://${aws_grafana_workspace.amg.endpoint}"
+      GRAFANA_URL     = "https://punywaxwing1700.grafana.net"
       RUNBOOK_BASE    = "https://github.com/${var.github_org}/${var.github_repo}/blob/main/docs/runbook.md"
     }
   }

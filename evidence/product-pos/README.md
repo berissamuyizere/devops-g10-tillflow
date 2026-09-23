@@ -13,6 +13,19 @@ Runtime proof for the POS sale path and commission eligibility.
 | `g4-cache-break.json` | G4 — revoke ECS→Valkey SG; fail-open 200s, `pos_cache_requests_total{result=error}` +8 (113s) |
 | `g4-dlq-recovery.json` | G4 — poison close → DLQ → `devops-g10-commission-dlq` ALARM + Slack → `start-message-move-task` → OK (241s) |
 
+## G5 post-rebuild seed
+
+Wait until `https://mww3x8g0k2.execute-api.eu-central-1.amazonaws.com/health` is **200** (not 503), then:
+
+```bash
+aws sso login --profile g10
+export AWS_PROFILE=g10 AWS_REGION=eu-central-1
+cd services/pos
+npm run g5:post-rebuild-seed
+```
+
+Writes `g2-seed.json` (tenant **1111…** + attendant **2222…**). Optional paid sale: `RUN_CLOSE_SEED=1 npm run g5:post-rebuild-seed`.
+
 ## Reproduce close eligibility (G2)
 
 After Release is green and `devops-g10-commission` is running:
@@ -22,7 +35,7 @@ After Release is green and `devops-g10-commission` is running:
 aws sso login --profile g10
 export AWS_PROFILE=g10
 
-export API_URL=https://f9nla14lfh.execute-api.eu-central-1.amazonaws.com
+export API_URL=https://mww3x8g0k2.execute-api.eu-central-1.amazonaws.com
 TOKENS=$(aws secretsmanager get-secret-value --secret-id devops-g10/service-tokens --region eu-central-1 --query SecretString --output text)
 export PAYMENTS_SERVICE_TOKEN=$(echo "$TOKENS" | jq -r .payments_service_token)
 export POS_SERVICE_TOKEN=$(echo "$TOKENS" | jq -r .pos_service_token)
@@ -81,7 +94,7 @@ attendant or the next business day.
 ## G3 Valkey cache proof (after first Release)
 
 ```bash
-export API_URL=https://f9nla14lfh.execute-api.eu-central-1.amazonaws.com
+export API_URL=https://mww3x8g0k2.execute-api.eu-central-1.amazonaws.com
 export TENANT_ID=11111111-1111-1111-1111-111111111111
 export ATTENDANT_ID=22222222-2222-2222-2222-222222222222
 node services/pos/scripts/g3-cache-proof.js
@@ -116,7 +129,7 @@ the `commission.daily_close` root span. Open X-Ray in the console and paste
 ```bash
 aws sso login --profile g10
 export AWS_PROFILE=g10 AWS_REGION=eu-central-1
-export API_URL=https://f9nla14lfh.execute-api.eu-central-1.amazonaws.com
+export API_URL=https://mww3x8g0k2.execute-api.eu-central-1.amazonaws.com
 node services/pos/scripts/g4-cache-break.js
 ```
 
