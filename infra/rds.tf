@@ -7,8 +7,9 @@ resource "random_password" "rds_master" {
 }
 
 resource "aws_secretsmanager_secret" "rds_master" {
-  name        = "${var.name_prefix}/db/master"
-  description = "RDS master credentials for TillFlow — used only for schema bootstrap."
+  name                    = "${var.name_prefix}/db/master"
+  description             = "RDS master credentials for TillFlow — used only for schema bootstrap."
+  recovery_window_in_days = 0 # G5 rebuild: same name must be free immediately
   # KMS: AWS-managed default.
 
   tags = {

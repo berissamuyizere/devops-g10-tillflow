@@ -1,0 +1,49 @@
+{
+  "check": "g5-yordanos-preflight",
+  "owner": "Yordanos",
+  "checked_eat": "2026-09-21T00:21:00+03:00",
+  "edge": "https://f9nla14lfh.execute-api.eu-central-1.amazonaws.com",
+  "smoke": {
+    "GET /health": { "http": 200, "body": { "status": "ok", "service": "web" } },
+    "GET /ready": { "http": 200, "body": { "status": "ready", "service": "web", "dependencies": {} } },
+    "GET /version": {
+      "http": 200,
+      "body": {
+        "service": "web",
+        "commit": "0b1126f3d919bc075d2067aecad1a00ef12c2b1e",
+        "digest": "sha256:ec878d03e98d804359b9d133e99d9f40409b1b20ce48096d4ca8ffa2c869eda0",
+        "environment": "prod",
+        "started_at": "2026-09-20T20:58:34.418Z"
+      }
+    },
+    "POST /sales": {
+      "http": 401,
+      "body": {
+        "error": "unauthorized",
+        "hint": "X-Tenant-Id, X-User-Id, and X-Role are required"
+      }
+    }
+  },
+  "ecs": [
+    { "name": "devops-g10-pos", "runningCount": 2, "desiredCount": 2, "taskDefinition": "devops-g10-pos:20", "deployments": 1 },
+    { "name": "devops-g10-web", "runningCount": 2, "desiredCount": 2, "taskDefinition": "devops-g10-web:18", "deployments": 1 },
+    { "name": "devops-g10-payments", "runningCount": 2, "desiredCount": 2, "taskDefinition": "devops-g10-payments:22", "deployments": 1 },
+    { "name": "devops-g10-commission", "runningCount": 1, "desiredCount": 1, "taskDefinition": "devops-g10-commission:11", "deployments": 1 }
+  ],
+  "rds": [
+    { "id": "devops-g10-pg", "status": "available", "deletionProtection": true }
+  ],
+  "sg_live_matches_state": {
+    "cache_from_ecs": "sgr-0f50e811b25ab2ed0",
+    "alb_from_ecs": "sgr-06deea1208cdcbcb4",
+    "terraform_targeted_plan": "No changes"
+  },
+  "g4_rollback": {
+    "broken": "devops-g10-pos:19",
+    "recovered": "devops-g10-pos:18",
+    "rto_seconds": 163,
+    "live_now": "devops-g10-pos:20",
+    "note": "Later Release moved healthy POS to :20. Do not roll back to :18 tonight."
+  },
+  "do_not": ["terraform destroy", "terraform apply", "deploy", "flip MPESA_MODE"]
+}
