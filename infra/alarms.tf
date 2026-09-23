@@ -2,7 +2,7 @@
 # Every alarm pages or tickets through SNS devops-g10-alerts on ALARM and OK.
 
 locals {
-  grafana_base  = "https://${aws_grafana_workspace.amg.endpoint}"
+  grafana_base  = "https://punywaxwing1700.grafana.net"
   runbook_base  = "https://github.com/${var.github_org}/${var.github_repo}/blob/main/docs/runbook.md"
   alert_actions = [aws_sns_topic.alerts.arn]
 }
