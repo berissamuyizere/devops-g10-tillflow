@@ -8,7 +8,7 @@ ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 OUT="$ROOT/evidence/platform-delivery"
 PREFIX=devops-g10
 REGION="${AWS_REGION:-eu-central-1}"
-API_URL="${API_URL:-https://f9nla14lfh.execute-api.eu-central-1.amazonaws.com}"
+API_URL="${API_URL:-https://mww3x8g0k2.execute-api.eu-central-1.amazonaws.com}"
 SERVICES=(web pos payments commission)
 
 mkdir -p "$OUT"
@@ -55,6 +55,8 @@ print("pos smoke ok")
 PY
 
 echo "== smoke (payments path routing) =="
+# Public edge stamps x-tillflow-edge=public. ALB returns 404 for /internal/*.
+# 401 would mean the block missed and Payments auth still ran.
 PAY_CODE=$(curl -sS -o "$OUT/smoke-payments.json" -w "%{http_code}" \
   "${API_URL}/internal/v1/payments/00000000-0000-0000-0000-000000000001")
 echo "GET /internal/v1/payments/:id -> ${PAY_CODE}"
@@ -63,8 +65,8 @@ python3 - <<PY
 import json, sys
 code = int("${PAY_CODE}")
 body = json.load(open("$OUT/smoke-payments.json"))
-if code != 401:
-    sys.exit(f"payments smoke expected 401, got {code}")
+if code != 404:
+    sys.exit(f"payments smoke expected 404 (edge lockdown), got {code}")
 print("payments smoke ok")
 PY
 

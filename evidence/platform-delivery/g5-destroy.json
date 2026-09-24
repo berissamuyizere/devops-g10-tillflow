@@ -1,0 +1,27 @@
+{
+  "started_at": "2026-09-22T21:48:21Z",
+  "ended_at": "2026-09-22T22:02:52Z",
+  "commit": "0fd4313",
+  "operator": "yordanoshagos",
+  "transcript": "g5-destroy.log",
+  "unlock": {
+    "rds_deletion_protection_before": true,
+    "rds_deletion_protection_after": false,
+    "confirmed_aws": false
+  },
+  "destroy": {
+    "plan": "0 to add, 0 to change, 264 to destroy",
+    "bootstrap_state_bucket": "kept",
+    "rds": "deleted",
+    "ecs_cluster": "INACTIVE then gone",
+    "api_gateway": "deleted (f9nla14lfh)",
+    "alb": "deleted",
+    "valkey": "deleted",
+    "vpc": "deleted (vpc-0608a01d03195ac0d)"
+  },
+  "residual": {
+    "aws_grafana_workspace": "g-ede3f6a694",
+    "status": "DELETION_FAILED",
+    "reason": "SSO deny: sso:DeleteManagedApplicationInstance / sso:DeleteApplication. Same class as G3 AMG SSO assign deny. Grafana Cloud remains the human login."
+  }
+}

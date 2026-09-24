@@ -1,0 +1,34 @@
+{
+  "note": "Create times taken from the terraform apply transcript (g5-rebuild.log), not a later describe-* (SSO expired while assembling this pack). Resource ids are in that log.",
+  "operator": "yordanoshagos",
+  "rebuild_apply": {
+    "started_at": "2026-09-22T22:05:27Z",
+    "ended_at": "2026-09-22T22:15:06Z",
+    "plan": "228 to add, 0 to change, 0 to destroy"
+  },
+  "new_resources": {
+    "api_gateway": {
+      "id": "mww3x8g0k2",
+      "url": "https://mww3x8g0k2.execute-api.eu-central-1.amazonaws.com",
+      "created_in_log": "2026-09-22T22:05:43Z (Creation complete after 2s)"
+    },
+    "rds": {
+      "id": "db-Z547QCUTXYC7YCEGBSATUKW4HY",
+      "endpoint": "devops-g10-pg.cxiicgm8iuvj.eu-central-1.rds.amazonaws.com",
+      "created_in_log": "2026-09-22T22:15:04Z (Creation complete after 8m37s)",
+      "deletion_protection_on_rebuild": true
+    },
+    "valkey": {
+      "id": "devops-g10-valkey",
+      "created_in_log": "2026-09-22T22:14:23Z (Creation complete after 7m56s)"
+    },
+    "ecs_cluster": {
+      "name": "devops-g10",
+      "created_in_log": "2026-09-22T22:05:55Z (Creation complete after 12s)"
+    },
+    "alb": {
+      "dns": "internal-devops-g10-alb-88894723.eu-central-1.elb.amazonaws.com"
+    }
+  },
+  "destroyed_edge": "https://f9nla14lfh.execute-api.eu-central-1.amazonaws.com"
+}

@@ -9,7 +9,7 @@ G1 (web on ECS) stays. G2 is the same golden path for **POS**, **Payments**, and
 - ECS services `devops-g10-pos` and `devops-g10-payments` (app + ADOT, digest tag, no `latest`) behind ALB path rules.
 - ECS service `devops-g10-commission`: SQS consumer, **no ALB**. EventBridge 23:45 EAT → `devops-g10-commission-close`. Image must not mention Daraja.
 - `release.yml` matrix build/scan/push/roll + one-off `db-bootstrap` then `node bin/migrate.js up` for POS/Payments.
-- Public smoke: unauthenticated `GET /sales/:id` and `GET /internal/v1/payments/:id` both return **401**. Commission smoke is ECS `HEALTHY` + digest.
+- Public smoke: unauthenticated `GET /sales/:id` returns **401**. `GET /internal/v1/payments/:id` returns **404** (edge lockdown). Commission smoke is ECS `HEALTHY` + digest.
 
 Sale → pay → callback JSON lives under `evidence/payments-integrity/` (Arsema) and the POS seed under `evidence/product-pos/` (Berissa). This folder is the **platform** proof those runs stood on.
 
@@ -18,14 +18,19 @@ Current-tree G2 files (replace on every clean collect):
 | File | What it shows |
 |---|---|
 | `smoke-health.json` / `smoke-ready.json` / `smoke-version.json` | Web catch-all through API Gateway. |
-| `smoke-pos.json` / `smoke-payments.json` / `smoke-summary.json` | Path routing: POS and Payments 401s. |
+| `smoke-pos.json` / `smoke-payments.json` / `smoke-summary.json` | Path routing: POS **401**, public `/internal` **404**. |
 | `ecs-{web,pos,payments,commission}-tasks.json` / `ecs-{web,pos,payments,commission}-task-detail.json` | One RUNNING task per service. |
 | `ecs-containers.txt` | All four: `app` + `adot` RUNNING; app image is `@sha256` (busybox placeholder allowed until first commission digest swap). |
 | `ecr-tags.json` | No `latest` tag on web/pos/payments/commission repos. |
 | `tag-audit.json` / `tag-audit.txt` | `capstone=tillflow` + the six required tags. |
 | `outputs.json` | Live ALB DNS + API Gateway URL. |
 | `g4-broken-release.json` | G4: broken POS `/ready` 500, smoke fail, **manual** rollback to previous task def. |
-| `g5-preflight.json` / `g5-rehearsal.md` | G5: live smoke + ECS + SG import check, and the 6-minute script. |
+| `g5-preflight.json` | Pre-destroy walk-through on **destroyed** edge `f9nla14lfh` (historical). |
+| `g5-destroy-preflight.json` / `.txt` | Last 200s on `f9nla14lfh` before teardown. |
+| `g5-destroy.log` / `g5-destroy.json` | Executed `terraform destroy` (264 resources). AMG DELETION_FAILED. |
+| `g5-rebuild.log` / `g5-rebuild.json` / `g5-rebuild-aws.json` | Executed rebuild apply + new resource ids. |
+| `g5-destroy-rebuild.md` | Timeline destroy → 200. |
+| `g5-rehearsal.md` | Post-destroy defence script (new edge). |
 | `screenshots/g4/` | G4 baseline dumps + shot list. |
 | `screenshots/g5/` | G5 walk-through: smoke JSON, SG plan, preflight HTML/PNG. |
 

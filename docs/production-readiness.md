@@ -1,15 +1,15 @@
 # Production readiness — TillFlow
 
 **From:** Saloi (Reliability + operations), for Group 10
-**Date:** 2026-09-21
+**Date:** 2026-09-24
 **Region:** `eu-central-1` · **Prefix:** `devops-g10-`
-**Verdict:** **GO for the G5 walk-through.** Not a claim of 24/7
+**Verdict:** **G5 destroy → rebuild executed.** Not a claim of 24/7
 production forever.
 
 Public edge only. `MPESA_MODE` is **fake** on purpose. Did **not**
 merge [#12](https://github.com/berissamuyizere/devops-g10-tillflow/pull/12).
-Did **not** flip Daraja. Did **not** overwrite live RDS. Do **not**
-`terraform destroy` until they say the demo is over.
+Did **not** flip Daraja. Destroy → rebuild ran 2026-09-22/23. Do **not**
+destroy again. Proof: [g5-evidence.md](g5-evidence.md).
 
 ## Gates
 
@@ -21,7 +21,7 @@ Did **not** flip Daraja. Did **not** overwrite live RDS. Do **not**
 | k6 | Public Gateway only. 22 min envelope, **2 paid-sale flows/s × 15 min** soak. Checks 99.97%, p95 **253 ms**, failures **0.01%**. WAF **200** again. | [k6-analysis.md](../evidence/reliability-operations/k6-analysis.md) |
 | Slack ALARM + OK | Real pending STK, not `SetAlarmState`. 18:57 → 19:07 EAT. | [g3-slack-drill.json](../evidence/reliability-operations/g3-slack-drill.json) |
 | Game day | All five failure classes timed. G4 signed by all four. RPO miss on PITR is written. | [g4-evidence.md](g4-evidence.md), [scar-log.md](scar-log.md) |
-| Destroy order | Live RDS `deletion_protection=true`. Destroy fails until that flag is off. | README G5 teardown; `var.rds_deletion_protection` |
+| Destroy → rebuild | Executed. Old edge `f9nla14lfh` gone. Live `mww3x8g0k2` `/health` 200. | [g5-evidence.md](g5-evidence.md) |
 | Residuals | Listed below. Honest over tidy. | this file |
 
 ## Live surface
@@ -40,9 +40,8 @@ Did **not** flip Daraja. Did **not** overwrite live RDS. Do **not**
 | Cache | Valkey `devops-g10-valkey`. POS `GET /sales/:id` fail-opens to Postgres. |
 | Grafana (defence) | https://punywaxwing1700.grafana.net — Admin Saloi `akezasaloi@gmail.com`. AMG `g-ede3f6a694` exists; SSO assign denied. Do **not** open AMG. |
 
-Imported SG ids (Berissa’s restore, so the next apply does not
-recreate them): `cache_from_ecs` `sgr-0f50e811b25ab2ed0`,
-`alb_from_ecs` `sgr-06deea1208cdcbcb4`.
+G4 imported SG ids died with the destroyed VPC. Do not quote
+`sgr-0f50e811b25ab2ed0` / `sgr-06deea1208cdcbcb4` as live.
 
 ## SLOs and freeze
 
@@ -113,8 +112,9 @@ These stay true at defence. Do not paper them.
 4. **No Slack for cache errors.** Detection is the EMF counter, not
    an alarm. That is why Berissa’s SG drill has no Slack and the
    reboot drill used POS logs + CloudWatch.
-5. **AMG human login is blocked.** Workspace exists; this role cannot
-   assign SSO users. Cloud is the defence login.
+5. **AMG is DELETION_FAILED.** Destroy could not delete
+   `g-ede3f6a694` (SSO deny on `sso:DeleteManagedApplicationInstance`).
+   Terraform no longer manages it. Cloud is the defence login.
 6. **Standing cost is more than app compute.** k6 soak did not add
    tasks. App Fargate now is **~$0.16 / hour** (7 × 0.5 vCPU / 1 GB
    ARM in `eu-central-1`). RDS, Valkey, NAT, ALB, API Gateway sit
@@ -135,7 +135,10 @@ From the 22 min k6 envelope
 
 Soak incremental Fargate was ~$0. Do not leave WAF at 2000.
 
-## Teardown (Yordanos only, after they say the demo is over)
+## Teardown (already executed 2026-09-22)
+
+See [g5-evidence.md](g5-evidence.md). Do not destroy again. Historical
+order (if we ever rebuild a second time):
 
 Live `devops-g10-pg` has `deletion_protection = true`
 (`var.rds_deletion_protection` defaults **true**). A bare

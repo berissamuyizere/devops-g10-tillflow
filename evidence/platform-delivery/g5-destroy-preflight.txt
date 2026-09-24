@@ -1,0 +1,24 @@
+captured_at=2026-09-22T21:22:46Z
+edge=https://f9nla14lfh.execute-api.eu-central-1.amazonaws.com
+--- /health ---
+HTTP/2 200 
+date: Tue, 22 Sep 2026 21:22:46 GMT
+content-type: application/json; charset=utf-8
+content-length: 31
+etag: W/"1f-s2v8oYqxCVKy10WVWkoXUkzlwGc"
+apigw-requestid: EHqyIiCJFiAEJ5A=
+
+http_code=200
+
+{"status":"ok","service":"web"}
+--- /ready ---
+HTTP/2 200 
+date: Tue, 22 Sep 2026 21:22:48 GMT
+content-type: application/json; charset=utf-8
+content-length: 52
+etag: W/"34-2GjJsXRidbrveOLGEXIf1TAprjE"
+apigw-requestid: EHqybiIEFiAEJFQ=
+
+http_code=200
+
+{"status":"ready","service":"web","dependencies":{}}

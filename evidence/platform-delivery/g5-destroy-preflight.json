@@ -1,0 +1,8 @@
+{
+  "captured_at": "2026-09-22T21:22:46Z",
+  "commit": "0fd4313",
+  "note": "Before G5 destroy. Flags from #150 already applied. RDS still deletion_protected until the unlock apply. This edge (f9nla14lfh) no longer exists.",
+  "edge": "https://f9nla14lfh.execute-api.eu-central-1.amazonaws.com",
+  "health": { "status": 200, "body": { "status": "ok", "service": "web" } },
+  "ready": { "status": 200, "body": { "status": "ready", "service": "web", "dependencies": {} } }
+}
