@@ -94,3 +94,7 @@ the proof (`docs/runbook.md#rds-pitr`, `#bad-ecs-release`,
 - Added `#bad-ecs-release`: smoke is the detector; circuit breaker
   only watches `/health`; rollback is `update-service` to the previous
   revision.
+
+## G5 rebuild (2026-09-24)
+
+- AMG stays the known **DELETION_FAILED** workspace (did not open it). Public edge is now `https://mww3x8g0k2.execute-api.eu-central-1.amazonaws.com`; `f9nla14lfh` does not resolve. Probe `devops-g10-probe` `API_URL` is the new gateway, and Y5 alarms are all **OK** (none `INSUFFICIENT_DATA`). Grafana Cloud `punywaxwing1700` CloudWatch datasource Default Region is **eu-central-1** (Assume Role `devops-g10-grafana-cloud`). The `us-west-2` string on that page is the field’s example, not the selected region. Proof: [`g5-post-rebuild-obs.json`](../evidence/reliability-operations/g5-post-rebuild-obs.json).

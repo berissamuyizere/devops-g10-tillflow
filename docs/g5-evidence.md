@@ -27,7 +27,7 @@ Narrative: [`../evidence/platform-delivery/g5-destroy-rebuild.md`](../evidence/p
 | Demo tenant on the new RDS | [`g2-seed.json`](../evidence/product-pos/g2-seed.json) | Berissa, 16:42Z 23 Sep, exit 0 |
 | Dashboard / Vercel on the new URL | #156 `6e13f0d` | merged |
 | Sale → pay → signed callback → paid | `evidence/product-pos/g5-post-rebuild-e2e.json` | **Berissa — not in this PR** |
-| Probe + alarms + Grafana after rebuild | Saloi file + `docs/scar-log.md` line | **Saloi — not in this PR** |
+| Probe + alarms + Grafana after rebuild | [`g5-post-rebuild-obs.json`](../evidence/reliability-operations/g5-post-rebuild-obs.json) · [`scar-log.md`](scar-log.md) | Saloi, 23:53 EAT 24 Sep. Probe on `mww3x8g0k2`. Y5 all OK. Grafana CloudWatch `eu-central-1` |
 
 ## What we do not claim
 
@@ -41,6 +41,6 @@ Narrative: [`../evidence/platform-delivery/g5-destroy-rebuild.md`](../evidence/p
 | Name | Role | Signed |
 |---|---|---|
 | Yordanos | Platform | 2026-09-24 22:30 EAT |
-| Saloi | Reliability | (after probe/alarms file) |
+| Saloi | Reliability | 2026-09-24 23:53 EAT |
 | Arsema | Payments | (secrets already re-put; sign when you agree) |
 | Berissa | Product + POS | (after `g5-post-rebuild-e2e.json`) |

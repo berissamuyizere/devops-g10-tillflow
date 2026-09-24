@@ -1,0 +1,90 @@
+{
+  "check": "g5-post-rebuild-obs",
+  "captured_at": "2026-09-24T20:38:54Z",
+  "captured_eat": "2026-09-24 23:38:54 EAT",
+  "region": "eu-central-1",
+  "account": "240462142849",
+  "set_alarm_state": false,
+  "opened_amg": false,
+  "probe": {
+    "function": "devops-g10-probe",
+    "state": "Active",
+    "last_modified": "2026-09-22T22:05:58.431+0000",
+    "canary_name": "devops-g10-probe",
+    "api_url": "https://mww3x8g0k2.execute-api.eu-central-1.amazonaws.com",
+    "hits_old_gateway_f9nla14lfh": false,
+    "only_http_api": {
+      "name": "devops-g10-api",
+      "api_id": "mww3x8g0k2",
+      "created": "2026-09-22T22:05:38+00:00"
+    },
+    "health": {
+      "url": "https://mww3x8g0k2.execute-api.eu-central-1.amazonaws.com/health",
+      "http": 200,
+      "body": {"status": "ok", "service": "web"}
+    },
+    "old_edge": {
+      "host": "f9nla14lfh.execute-api.eu-central-1.amazonaws.com",
+      "result": "dns_fail"
+    },
+    "success_percent_last_3h": {
+      "points": 180,
+      "min": 100.0,
+      "max": 100.0,
+      "first": "2026-09-24T17:37:00Z",
+      "last": "2026-09-24T20:36:00Z"
+    },
+    "lambda_last_3h": {
+      "invocations": 180,
+      "errors": 0
+    }
+  },
+  "y5_alarms": {
+    "prefix": "devops-g10",
+    "count": 15,
+    "insufficient_data": [],
+    "state_counts": {"OK": 15},
+    "note": "None are INSUFFICIENT_DATA. probe-down is OK on live SuccessPercent 100 (treat_missing_data=breaching). The burn, DLQ, and oldest-pending alarms last transitioned to OK just after the 22 Sep rebuild because missing datapoints are treated as NonBreaching. TillFlow series exist again; those alarms have not changed state since that transition.",
+    "alarms": [
+      {"name": "devops-g10-commission-dlq", "state": "OK", "treat_missing": "notBreaching", "updated": "2026-09-23T01:07:21+03:00", "reason": "no datapoints; missing treated as NonBreaching"},
+      {"name": "devops-g10-commission-fast-burn", "state": "OK", "treat_missing": "notBreaching", "updated": "2026-09-23T01:07:52+03:00", "reason": "no datapoints; missing treated as NonBreaching"},
+      {"name": "devops-g10-commission-slow-burn", "state": "OK", "treat_missing": "notBreaching", "updated": "2026-09-23T01:08:17+03:00", "reason": "no datapoints; missing treated as NonBreaching"},
+      {"name": "devops-g10-ecs-cpu-high", "state": "OK", "treat_missing": "notBreaching", "updated": "2026-09-23T01:16:08+03:00", "reason": "datapoint 0.78 at 22 Sep 21:54 UTC was not > 70"},
+      {"name": "devops-g10-payments-callbacks-dlq", "state": "OK", "treat_missing": "notBreaching", "updated": "2026-09-23T01:07:51+03:00", "reason": "no datapoints; missing treated as NonBreaching"},
+      {"name": "devops-g10-payments-fast-burn", "state": "OK", "treat_missing": "notBreaching", "updated": "2026-09-23T01:08:09+03:00", "reason": "no datapoints; missing treated as NonBreaching"},
+      {"name": "devops-g10-payments-oldest-pending", "state": "OK", "treat_missing": "notBreaching", "updated": "2026-09-23T01:07:27+03:00", "reason": "no datapoints; missing treated as NonBreaching"},
+      {"name": "devops-g10-payments-slow-burn", "state": "OK", "treat_missing": "notBreaching", "updated": "2026-09-23T01:07:02+03:00", "reason": "no datapoints; missing treated as NonBreaching"},
+      {"name": "devops-g10-payout-not-settled", "state": "OK", "treat_missing": "notBreaching", "updated": "2026-09-23T01:07:19+03:00", "reason": "datapoint 0.0 was not > 0"},
+      {"name": "devops-g10-pos-fast-burn", "state": "OK", "treat_missing": "notBreaching", "updated": "2026-09-23T01:06:54+03:00", "reason": "no datapoints; missing treated as NonBreaching"},
+      {"name": "devops-g10-pos-slow-burn", "state": "OK", "treat_missing": "notBreaching", "updated": "2026-09-23T01:07:33+03:00", "reason": "no datapoints; missing treated as NonBreaching"},
+      {"name": "devops-g10-probe-down", "state": "OK", "treat_missing": "breaching", "updated": "2026-09-23T10:06:38+03:00", "reason": "SuccessPercent 100 was not < 100; still publishing 100 through 24 Sep 20:36 UTC"},
+      {"name": "devops-g10-rds-cpu-high", "state": "OK", "treat_missing": "notBreaching", "updated": "2026-09-23T01:15:45+03:00", "reason": "CPU 15.98 and 29.89 were not > 70"},
+      {"name": "devops-g10-web-fast-burn", "state": "OK", "treat_missing": "notBreaching", "updated": "2026-09-23T01:09:50+03:00", "reason": "no datapoints; missing treated as NonBreaching"},
+      {"name": "devops-g10-web-slow-burn", "state": "OK", "treat_missing": "notBreaching", "updated": "2026-09-23T01:10:04+03:00", "reason": "no datapoints; missing treated as NonBreaching"}
+    ]
+  },
+  "grafana_cloud": {
+    "stack": "punywaxwing1700",
+    "url": "https://punywaxwing1700.grafana.net",
+    "health_http": 200,
+    "health_at": "2026-09-24T20:38:54Z",
+    "version": "13.3.0-35221835068",
+    "login_page": "https://grafana.com/auth/sign-in for punywaxwing1700",
+    "datasource_reconfirmed_live": true,
+    "read_at_eat": "2026-09-24 23:50 EAT",
+    "datasource_page": "https://punywaxwing1700.grafana.net/connections/datasources/edit/bfyueib39pipsc",
+    "type": "cloudwatch",
+    "default_region": "eu-central-1",
+    "default_region_note": "The field help text uses us-west-2 only as an example (US West Oregon). The selected value under Default Region is eu-central-1.",
+    "assume_role_arn": "arn:aws:iam::240462142849:role/devops-g10-grafana-cloud",
+    "custom_metrics_namespace": "TillFlow",
+    "iam_role": {
+      "arn": "arn:aws:iam::240462142849:role/devops-g10-grafana-cloud",
+      "created": "2026-09-20T17:24:24+00:00",
+      "description": "Grafana Cloud punywaxwing1700 Assume Role for CloudWatch Logs and X-Ray",
+      "trust_principal": "arn:aws:iam::008923505280:root",
+      "note": "Role was not recreated by the 22 Sep rebuild."
+    },
+    "opened_amg": false
+  }
+}
