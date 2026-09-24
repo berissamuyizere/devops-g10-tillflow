@@ -13,7 +13,8 @@
     "g2:close-seed": "node scripts/g2-close-seed.js",
     "g2:seed-attendant2": "bash scripts/g2-seed-attendant2.sh",
     "g2:seed-demo-tenant": "bash scripts/g2-seed-demo-tenant.sh",
-    "g5:post-rebuild-seed": "bash scripts/g5-post-rebuild-seed.sh"
+    "g5:post-rebuild-seed": "bash scripts/g5-post-rebuild-seed.sh",
+    "g5:post-rebuild-e2e": "node scripts/g5-post-rebuild-e2e.js"
   },
   "engines": {
     "node": ">=20.17.0"
