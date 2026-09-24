@@ -1,0 +1,766 @@
+# G5 terraform destroy transcript
+# Operator: yordanoshagos
+# Host: local worktree devops-g10-tillflow.worktrees/g5-destroy/infra
+# Commit: 0fd4313 (main after #150)
+# Command: terraform apply destroy.bin
+# Window: 2026-09-22T21:48:21Z → 2026-09-22T22:02:52Z
+# Plan: 0 add, 0 change, 264 destroy
+# Bootstrap state bucket devops-g10-tfstate-240462142849 was NOT destroyed.
+# ANSI stripped. Ended with Grafana DeleteWorkspace 403 SSO explicit deny.
+
+destroy_started=2026-09-22T21:48:21Z
+╷
+│ Warning: Deprecated Parameter
+│ 
+│ The parameter "dynamodb_table" is deprecated. Use parameter "use_lockfile"
+│ instead.
+╵
+Acquiring state lock. This may take a few moments...
+aws_iam_role_policy_attachment.task_common["commission"]: Destroying... [id=devops-g10-commission-task-2026091121202836940000000f]
+aws_iam_role_policy_attachment.pos_task: Destroying... [id=devops-g10-pos-task-20260915085600271400000008]
+aws_iam_role_policy_attachment.task_common["web"]: Destroying... [id=devops-g10-web-task-2026091121202735980000000c]
+aws_s3_bucket_ownership_controls.logs: Destroying... [id=devops-g10-logs-240462142849]
+aws_ssm_parameter.ecs_app_env["pos"]: Destroying... [id=/devops-g10/pos/env]
+aws_iam_role_policy.pipeline: Destroying... [id=devops-g10-pipeline:terraform-20260911212033149700000014]
+aws_sns_topic_subscription.slack: Destroying... [id=arn:aws:sns:eu-central-1:240462142849:devops-g10-alerts:43a60ec3-c949-41fe-864a-5674541805ec]
+aws_vpc_security_group_ingress_rule.cache_from_ecs: Destroying... [id=sgr-0f50e811b25ab2ed0]
+aws_s3_bucket_versioning.artifacts: Destroying... [id=devops-g10-artifacts-240462142849]
+aws_lb_listener_rule.payments_pos_sync: Destroying... [id=arn:aws:elasticloadbalancing:eu-central-1:240462142849:listener-rule/app/devops-g10-alb/fbc75d83f8f153af/7f52ae32ff10aed2/7152c7a956d9d884]
+aws_lb_listener_rule.payments_pos_sync: Destruction complete after 1s
+aws_s3_bucket_ownership_controls.artifacts: Destroying... [id=devops-g10-artifacts-240462142849]
+aws_s3_bucket_versioning.artifacts: Destruction complete after 1s
+aws_ssm_parameter.ecs_app_env["pos"]: Destruction complete after 1s
+module.vpc.aws_default_route_table.default[0]: Destroying... [id=rtb-002e56bf3947f45e9]
+aws_cloudwatch_event_target.probe: Destroying... [id=devops-g10-probe-terraform-20260920130436180900000002]
+module.vpc.aws_default_route_table.default[0]: Destruction complete after 0s
+module.vpc_endpoints.aws_vpc_endpoint.this["ssm"]: Destroying... [id=vpce-02faf878e320b3560]
+aws_iam_role_policy.pipeline: Destruction complete after 1s
+aws_apigatewayv2_route.proxy: Destroying... [id=x73k3t7]
+aws_iam_role_policy_attachment.task_common["commission"]: Destruction complete after 1s
+aws_secretsmanager_secret_version.rds_master: Destroying... [id=arn:aws:secretsmanager:eu-central-1:240462142849:secret:devops-g10/db/master-LOAkpy|terraform-2026091121352586380000000b]
+aws_iam_role_policy_attachment.pos_task: Destruction complete after 1s
+aws_ecr_lifecycle_policy.service["payments"]: Destroying... [id=devops-g10/payments]
+aws_iam_role_policy_attachment.task_common["web"]: Destruction complete after 1s
+aws_lb_listener_rule.pos_commission: Destroying... [id=arn:aws:elasticloadbalancing:eu-central-1:240462142849:listener-rule/app/devops-g10-alb/fbc75d83f8f153af/7f52ae32ff10aed2/916276c593aaee6a]
+aws_sns_topic_subscription.slack: Destruction complete after 1s
+module.vpc.aws_route.public_internet_gateway[0]: Destroying... [id=r-rtb-021a23ea27b741ebd1080289494]
+aws_vpc_security_group_ingress_rule.cache_from_ecs: Destruction complete after 1s
+aws_iam_role_policy_attachment.commission_task: Destroying... [id=devops-g10-commission-task-2026091121211768270000001b]
+aws_s3_bucket_ownership_controls.logs: Destruction complete after 1s
+aws_s3_bucket_versioning.backups: Destroying... [id=devops-g10-backups-240462142849]
+aws_lb_listener_rule.pos_commission: Destruction complete after 0s
+aws_s3_bucket_versioning.logs: Destroying... [id=devops-g10-logs-240462142849]
+aws_iam_role_policy_attachment.commission_task: Destruction complete after 0s
+aws_cloudwatch_event_target.commission_daily_sqs: Destroying... [id=devops-g10-commission-daily-close-commission-close-queue]
+aws_s3_bucket_ownership_controls.artifacts: Destruction complete after 1s
+aws_vpc_security_group_ingress_rule.rds_from_ecs: Destroying... [id=sgr-0009908447a16b5db]
+aws_secretsmanager_secret_version.rds_master: Destruction complete after 1s
+aws_secretsmanager_secret_version.cache_auth: Destroying... [id=arn:aws:secretsmanager:eu-central-1:240462142849:secret:devops-g10/cache/auth-LOAkpy|terraform-2026091121344391550000000a]
+aws_s3_bucket_versioning.logs: Destruction complete after 1s
+aws_cloudwatch_metric_alarm.web_slow_burn: Destroying... [id=devops-g10-web-slow-burn]
+aws_apigatewayv2_route.proxy: Destruction complete after 1s
+aws_iam_role_policy.vpc_flow: Destroying... [id=devops-g10-vpc-flow-logs:devops-g10-vpc-flow-logs]
+aws_cloudwatch_event_target.probe: Destruction complete after 1s
+aws_lb_listener_rule.payments_sale_payment: Destroying... [id=arn:aws:elasticloadbalancing:eu-central-1:240462142849:listener-rule/app/devops-g10-alb/fbc75d83f8f153af/7f52ae32ff10aed2/b19b13b288486e40]
+aws_s3_bucket_versioning.backups: Destruction complete after 1s
+aws_cloudwatch_metric_alarm.payout_not_settled: Destroying... [id=devops-g10-payout-not-settled]
+aws_secretsmanager_secret_version.cache_auth: Destruction complete after 0s
+aws_ssm_parameter.ecs_app_env["payments"]: Destroying... [id=/devops-g10/payments/env]
+aws_ecr_lifecycle_policy.service["payments"]: Destruction complete after 1s
+aws_iam_role_policy_attachment.task_exec_default["web"]: Destroying... [id=devops-g10-web-exec-2026091121202677800000000a]
+aws_cloudwatch_event_target.commission_daily_sqs: Destruction complete after 1s
+aws_ecr_registry_scanning_configuration.enhanced: Destroying... [id=240462142849]
+aws_vpc_security_group_ingress_rule.rds_from_ecs: Destruction complete after 0s
+aws_lb_listener_rule.web: Destroying... [id=arn:aws:elasticloadbalancing:eu-central-1:240462142849:listener-rule/app/devops-g10-alb/fbc75d83f8f153af/7f52ae32ff10aed2/580d2badd07b003d]
+aws_lb_listener_rule.payments_sale_payment: Destruction complete after 0s
+aws_appautoscaling_policy.cpu["pos"]: Destroying... [id=devops-g10-pos-cpu-70]
+aws_iam_role_policy.vpc_flow: Destruction complete after 0s
+aws_s3_bucket_public_access_block.artifacts: Destroying... [id=devops-g10-artifacts-240462142849]
+aws_ssm_parameter.ecs_app_env["payments"]: Destruction complete after 0s
+aws_vpc_security_group_ingress_rule.ecs_from_alb: Destroying... [id=sgr-02ee64794c7847452]
+aws_iam_role_policy_attachment.task_exec_default["web"]: Destruction complete after 0s
+aws_cloudwatch_metric_alarm.rds_cpu_high: Destroying... [id=devops-g10-rds-cpu-high]
+aws_lb_listener_rule.web: Destruction complete after 0s
+aws_secretsmanager_secret_version.daraja_placeholder: Destroying... [id=arn:aws:secretsmanager:eu-central-1:240462142849:secret:devops-g10/daraja-s3gGMt|terraform-20260911212025045000000007]
+module.vpc.aws_route.public_internet_gateway[0]: Destruction complete after 1s
+aws_lambda_permission.probe: Destroying... [id=AllowEventBridge]
+aws_ecr_registry_scanning_configuration.enhanced: Destruction complete after 0s
+aws_ssm_parameter.ecs_app_env["web"]: Destroying... [id=/devops-g10/web/env]
+aws_secretsmanager_secret_version.daraja_placeholder: Destruction complete after 1s
+aws_vpc_security_group_egress_rule.vpclink_to_alb: Destroying... [id=sgr-02d6b5059eafd5eba]
+aws_ssm_parameter.ecs_app_env["web"]: Destruction complete after 1s
+aws_iam_role_policy_attachment.task_exec_secrets["payments"]: Destroying... [id=devops-g10-payments-exec-20260911212032828400000012]
+aws_s3_bucket_public_access_block.artifacts: Destruction complete after 1s
+aws_sns_topic_policy.alerts: Destroying... [id=arn:aws:sns:eu-central-1:240462142849:devops-g10-alerts]
+aws_vpc_security_group_ingress_rule.ecs_from_alb: Destruction complete after 1s
+aws_iam_role_policy.codebuild: Destroying... [id=devops-g10-codebuild:terraform-20260911212033150000000015]
+aws_cloudwatch_metric_alarm.web_slow_burn: Destruction complete after 1s
+aws_iam_role_policy_attachment.task_exec_default["commission"]: Destroying... [id=devops-g10-commission-exec-2026091121202713460000000b]
+aws_cloudwatch_metric_alarm.payout_not_settled: Destruction complete after 1s
+aws_secretsmanager_secret_version.db_pos: Destroying... [id=arn:aws:secretsmanager:eu-central-1:240462142849:secret:devops-g10/db/pos-c5rCpu|terraform-20260915085559793500000006]
+aws_sns_topic_policy.alerts: Destruction complete after 0s
+aws_iam_role_policy_attachment.task_common["payments"]: Destroying... [id=devops-g10-payments-task-2026091121202782670000000d]
+aws_cloudwatch_metric_alarm.rds_cpu_high: Destruction complete after 1s
+aws_secretsmanager_secret_version.db_pos: Destruction complete after 0s
+aws_iam_role_policy_attachment.task_exec_secrets["payments"]: Destruction complete after 0s
+aws_ecr_lifecycle_policy.service["pos"]: Destroying... [id=devops-g10/pos]
+module.vpc.aws_route_table_association.public[1]: Destroying... [id=rtbassoc-0ded9a80b411c6bbe]
+aws_vpc_security_group_egress_rule.ecs_all: Destroying... [id=sgr-0cccdd63bbd2c693b]
+aws_iam_role_policy.codebuild: Destruction complete after 0s
+module.vpc_endpoints.aws_vpc_endpoint.this["secretsmanager"]: Destroying... [id=vpce-0235d6cb813bd77f2]
+aws_vpc_security_group_egress_rule.vpclink_to_alb: Destruction complete after 0s
+aws_iam_role_policy_attachment.task_exec_secrets["web"]: Destroying... [id=devops-g10-web-exec-20260911212032420200000011]
+aws_iam_role_policy_attachment.task_exec_default["commission"]: Destruction complete after 0s
+aws_appautoscaling_policy.cpu["pos"]: Destruction complete after 1s
+module.vpc.aws_route_table_association.database[1]: Destroying... [id=rtbassoc-07c3160aaa7aa9d1b]
+aws_cloudwatch_event_target.payout_cutoff: Destroying... [id=devops-g10-payout-cutoff-terraform-20260920125546914100000002]
+aws_ecr_lifecycle_policy.service["pos"]: Destruction complete after 0s
+aws_vpc_security_group_ingress_rule.alb_from_vpclink: Destroying... [id=sgr-05d8f38a64ee49a99]
+aws_iam_role_policy_attachment.task_common["payments"]: Destruction complete after 0s
+aws_cloudwatch_event_target.payout_cutoff: Destruction complete after 0s
+aws_iam_role_policy_attachment.task_exec_secrets["commission"]: Destroying... [id=devops-g10-commission-exec-20260911212033069300000013]
+aws_iam_role_policy_attachment.ci_deploy: Destroying... [id=devops-g10-ci-deploy-20260911212651509800000002]
+aws_lambda_permission.probe: Destruction complete after 1s
+module.vpc.aws_route_table_association.private[0]: Destroying... [id=rtbassoc-0171ee0de5733ecff]
+aws_iam_role_policy_attachment.task_exec_secrets["web"]: Destruction complete after 0s
+aws_secretsmanager_secret_version.db_payments: Destroying... [id=arn:aws:secretsmanager:eu-central-1:240462142849:secret:devops-g10/db/payments-CZFAxr|terraform-20260915085559854600000007]
+aws_vpc_security_group_egress_rule.ecs_all: Destruction complete after 0s
+module.vpc.aws_route_table_association.database[0]: Destroying... [id=rtbassoc-08914e280c26a839c]
+aws_iam_role_policy_attachment.ci_deploy: Destruction complete after 0s
+module.vpc_endpoints.aws_vpc_endpoint.this["s3"]: Destroying... [id=vpce-0267e5ebbfa4dc1a9]
+aws_iam_role_policy_attachment.task_exec_secrets["commission"]: Destruction complete after 1s
+aws_cloudwatch_log_group.adot_metrics: Destroying... [id=/devops-g10/adot/metrics]
+aws_secretsmanager_secret_version.db_payments: Destruction complete after 1s
+aws_apigatewayv2_stage.default: Destroying... [id=$default]
+module.vpc.aws_route_table_association.public[1]: Destruction complete after 1s
+aws_iam_role_policy_attachment.task_common["pos"]: Destroying... [id=devops-g10-pos-task-2026091121202795020000000e]
+aws_vpc_security_group_ingress_rule.alb_from_vpclink: Destruction complete after 1s
+aws_cloudwatch_metric_alarm.payments_callbacks_dlq: Destroying... [id=devops-g10-payments-callbacks-dlq]
+aws_apigatewayv2_stage.default: Destruction complete after 0s
+aws_secretsmanager_secret_version.service_tokens: Destroying... [id=arn:aws:secretsmanager:eu-central-1:240462142849:secret:devops-g10/service-tokens-UMhS7k|terraform-20260915085559612400000004]
+module.vpc.aws_route_table_association.database[1]: Destruction complete after 1s
+module.vpc.aws_route_table_association.private[0]: Destruction complete after 1s
+aws_kms_alias.alerts: Destroying... [id=alias/devops-g10-alerts]
+module.vpc.aws_route_table_association.public[0]: Destroying... [id=rtbassoc-08a41820694863b86]
+aws_iam_role_policy_attachment.task_common["pos"]: Destruction complete after 0s
+aws_cloudwatch_metric_alarm.pos_fast_burn: Destroying... [id=devops-g10-pos-fast-burn]
+module.vpc.aws_route_table_association.database[0]: Destruction complete after 1s
+aws_s3_bucket_ownership_controls.backups: Destroying... [id=devops-g10-backups-240462142849]
+aws_cloudwatch_metric_alarm.payments_callbacks_dlq: Destruction complete after 0s
+aws_ecr_lifecycle_policy.service["commission"]: Destroying... [id=devops-g10/commission]
+aws_cloudwatch_metric_alarm.pos_fast_burn: Destruction complete after 0s
+aws_ssm_parameter.ecs_app_env["commission"]: Destroying... [id=/devops-g10/commission/env]
+aws_cloudwatch_log_group.adot_metrics: Destruction complete after 0s
+aws_iam_role_policy_attachment.task_exec_secrets["pos"]: Destroying... [id=devops-g10-pos-exec-20260911212032211300000010]
+aws_secretsmanager_secret_version.service_tokens: Destruction complete after 0s
+aws_iam_role_policy_attachment.payments_task: Destroying... [id=devops-g10-payments-task-2026091121211763960000001a]
+aws_ecr_lifecycle_policy.service["commission"]: Destruction complete after 1s
+aws_lb_listener_rule.payments_payouts: Destroying... [id=arn:aws:elasticloadbalancing:eu-central-1:240462142849:listener-rule/app/devops-g10-alb/fbc75d83f8f153af/7f52ae32ff10aed2/a60137530ae3200a]
+aws_ssm_parameter.ecs_app_env["commission"]: Destruction complete after 1s
+aws_cloudwatch_metric_alarm.pos_slow_burn: Destroying... [id=devops-g10-pos-slow-burn]
+module.vpc.aws_route_table_association.public[0]: Destruction complete after 1s
+aws_cloudwatch_metric_alarm.ecs_cpu_high: Destroying... [id=devops-g10-ecs-cpu-high]
+aws_iam_role_policy_attachment.task_exec_secrets["pos"]: Destruction complete after 1s
+aws_cloudwatch_metric_alarm.payments_fast_burn: Destroying... [id=devops-g10-payments-fast-burn]
+aws_kms_alias.alerts: Destruction complete after 1s
+aws_ecs_task_definition.db_bootstrap: Destroying... [id=devops-g10-db-bootstrap]
+aws_lb_listener_rule.payments_payouts: Destruction complete after 0s
+aws_iam_role_policy_attachment.db_migrate_exec_default: Destroying... [id=devops-g10-db-migrate-exec-20260915085559663300000005]
+aws_iam_role_policy_attachment.payments_task: Destruction complete after 1s
+aws_cloudwatch_metric_alarm.commission_dlq: Destroying... [id=devops-g10-commission-dlq]
+aws_cloudwatch_metric_alarm.pos_slow_burn: Destruction complete after 0s
+aws_iam_role_policy_attachment.task_exec_default["payments"]: Destroying... [id=devops-g10-payments-exec-20260911212026082700000008]
+aws_cloudwatch_metric_alarm.ecs_cpu_high: Destruction complete after 0s
+aws_iam_role_policy.db_migrate_exec: Destroying... [id=devops-g10-db-migrate-exec:devops-g10-db-migrate-exec]
+aws_cloudwatch_metric_alarm.payments_fast_burn: Destruction complete after 0s
+aws_appautoscaling_policy.cpu["payments"]: Destroying... [id=devops-g10-payments-cpu-70]
+aws_iam_role_policy_attachment.db_migrate_exec_default: Destruction complete after 0s
+module.vpc.aws_default_security_group.this[0]: Destroying... [id=sg-0b0624dcf45526dd4]
+module.vpc.aws_default_security_group.this[0]: Destruction complete after 0s
+module.vpc.aws_route_table_association.private[1]: Destroying... [id=rtbassoc-012426ceed907799d]
+aws_cloudwatch_metric_alarm.commission_dlq: Destruction complete after 0s
+aws_vpc_security_group_ingress_rule.vpce_https_from_ecs: Destroying... [id=sgr-028a90bfc4cfeaa44]
+aws_iam_role_policy_attachment.task_exec_default["payments"]: Destruction complete after 0s
+aws_s3_bucket_public_access_block.logs: Destroying... [id=devops-g10-logs-240462142849]
+aws_iam_role_policy.db_migrate_exec: Destruction complete after 0s
+module.vpc.aws_default_network_acl.this[0]: Destroying... [id=acl-097970eb3240064a6]
+module.vpc.aws_default_network_acl.this[0]: Destruction complete after 0s
+module.vpc_endpoints.aws_vpc_endpoint.this["ecr_api"]: Destroying... [id=vpce-0dce38fa1988b858a]
+aws_appautoscaling_policy.cpu["payments"]: Destruction complete after 0s
+aws_cloudwatch_metric_alarm.web_fast_burn: Destroying... [id=devops-g10-web-fast-burn]
+aws_ecs_task_definition.db_bootstrap: Destruction complete after 1s
+aws_s3_bucket_lifecycle_configuration.backups: Destroying... [id=devops-g10-backups-240462142849]
+aws_vpc_security_group_ingress_rule.vpce_https_from_ecs: Destruction complete after 1s
+aws_cloudwatch_metric_alarm.web_fast_burn: Destruction complete after 1s
+aws_s3_bucket_lifecycle_configuration.logs: Destroying... [id=devops-g10-logs-240462142849]
+aws_cloudwatch_metric_alarm.payments_oldest_pending: Destroying... [id=devops-g10-payments-oldest-pending]
+module.vpc.aws_route_table_association.private[1]: Destruction complete after 1s
+aws_cloudwatch_metric_alarm.payments_slow_burn: Destroying... [id=devops-g10-payments-slow-burn]
+aws_s3_bucket_public_access_block.logs: Destruction complete after 1s
+aws_s3_bucket_public_access_block.backups: Destroying... [id=devops-g10-backups-240462142849]
+aws_cloudwatch_metric_alarm.payments_oldest_pending: Destruction complete after 0s
+aws_s3_bucket_server_side_encryption_configuration.artifacts: Destroying... [id=devops-g10-artifacts-240462142849]
+aws_cloudwatch_metric_alarm.payments_slow_burn: Destruction complete after 0s
+aws_s3_bucket_lifecycle_configuration.artifacts: Destroying... [id=devops-g10-artifacts-240462142849]
+aws_s3_bucket_server_side_encryption_configuration.artifacts: Destruction complete after 0s
+module.vpc_endpoints.aws_vpc_endpoint.this["logs"]: Destroying... [id=vpce-0898000b22171b1db]
+aws_s3_bucket_ownership_controls.backups: Destruction complete after 2s
+aws_s3_bucket_server_side_encryption_configuration.logs: Destroying... [id=devops-g10-logs-240462142849]
+aws_s3_bucket_lifecycle_configuration.logs: Destruction complete after 0s
+aws_wafv2_web_acl_association.app: Destroying... [id=arn:aws:wafv2:eu-central-1:240462142849:regional/webacl/devops-g10-waf/c3161d06-8c94-41f8-a55a-404a94326b01,arn:aws:elasticloadbalancing:eu-central-1:240462142849:loadbalancer/app/devops-g10-alb/fbc75d83f8f153af]
+aws_s3_bucket_lifecycle_configuration.artifacts: Destruction complete after 1s
+aws_lb_listener_rule.payments_payments: Destroying... [id=arn:aws:elasticloadbalancing:eu-central-1:240462142849:listener-rule/app/devops-g10-alb/fbc75d83f8f153af/7f52ae32ff10aed2/a0a958c28c8c966f]
+aws_s3_bucket_public_access_block.backups: Destruction complete after 1s
+module.vpc.aws_flow_log.this[0]: Destroying... [id=fl-0edc06fe408c5c3d4]
+aws_s3_bucket_server_side_encryption_configuration.logs: Destruction complete after 1s
+aws_apigatewayv2_route.root: Destroying... [id=rqe5yvh]
+aws_lb_listener_rule.payments_payments: Destruction complete after 0s
+aws_s3_bucket_server_side_encryption_configuration.backups: Destroying... [id=devops-g10-backups-240462142849]
+module.vpc.aws_flow_log.this[0]: Destruction complete after 0s
+aws_cloudwatch_metric_alarm.commission_slow_burn: Destroying... [id=devops-g10-commission-slow-burn]
+aws_s3_bucket_lifecycle_configuration.backups: Destruction complete after 1s
+aws_vpc_security_group_egress_rule.alb_to_ecs: Destroying... [id=sgr-00367ca7a6943a0be]
+aws_cloudwatch_metric_alarm.commission_slow_burn: Destruction complete after 0s
+module.vpc_endpoints.aws_vpc_endpoint.this["ecr_dkr"]: Destroying... [id=vpce-0e8c8fc920e215e12]
+aws_s3_bucket_server_side_encryption_configuration.backups: Destruction complete after 0s
+aws_cloudwatch_metric_alarm.commission_fast_burn: Destroying... [id=devops-g10-commission-fast-burn]
+aws_apigatewayv2_route.root: Destruction complete after 0s
+aws_ecs_cluster_capacity_providers.app: Destroying... [id=devops-g10]
+aws_vpc_security_group_egress_rule.alb_to_ecs: Destruction complete after 1s
+aws_vpc_security_group_ingress_rule.alb_from_ecs: Destroying... [id=sgr-06deea1208cdcbcb4]
+aws_cloudwatch_metric_alarm.commission_fast_burn: Destruction complete after 1s
+aws_cloudwatch_metric_alarm.probe_down: Destroying... [id=devops-g10-probe-down]
+aws_cloudwatch_metric_alarm.probe_down: Destruction complete after 0s
+aws_secretsmanager_secret_version.slack_placeholder: Destroying... [id=arn:aws:secretsmanager:eu-central-1:240462142849:secret:devops-g10/slack-webhook-NR4QlQ|terraform-20260911212024712000000006]
+aws_vpc_security_group_ingress_rule.alb_from_ecs: Destruction complete after 0s
+aws_lambda_permission.payout_cutoff: Destroying... [id=AllowEventBridge]
+aws_secretsmanager_secret_version.slack_placeholder: Destruction complete after 0s
+aws_lb_listener_rule.block_internal_from_edge: Destroying... [id=arn:aws:elasticloadbalancing:eu-central-1:240462142849:listener-rule/app/devops-g10-alb/fbc75d83f8f153af/7f52ae32ff10aed2/afd14c431f8b9be6]
+aws_lambda_permission.payout_cutoff: Destruction complete after 0s
+aws_iam_role_policy_attachment.task_exec_default["pos"]: Destroying... [id=devops-g10-pos-exec-20260911212026402000000009]
+aws_lb_listener_rule.block_internal_from_edge: Destruction complete after 0s
+module.vpc.aws_route.private_nat_gateway[0]: Destroying... [id=r-rtb-020132f05decd03231080289494]
+aws_iam_role_policy_attachment.task_exec_default["pos"]: Destruction complete after 1s
+aws_ecr_lifecycle_policy.service["web"]: Destroying... [id=devops-g10/web]
+aws_ecr_lifecycle_policy.service["web"]: Destruction complete after 0s
+aws_iam_role.pipeline: Destroying... [id=devops-g10-pipeline]
+aws_wafv2_web_acl_association.app: Destruction complete after 3s
+aws_codebuild_project.web: Destroying... [id=arn:aws:codebuild:eu-central-1:240462142849:project/devops-g10-web-build]
+module.vpc.aws_route.private_nat_gateway[0]: Destruction complete after 1s
+aws_iam_policy.pos_task: Destroying... [id=arn:aws:iam::240462142849:policy/devops-g10-pos-task]
+module.vpc_endpoints.aws_vpc_endpoint.this["s3"]: Destruction complete after 6s
+aws_lambda_permission.alerts_sns: Destroying... [id=AllowSNS]
+aws_iam_role.pipeline: Destruction complete after 1s
+aws_iam_policy.commission_task: Destroying... [id=arn:aws:iam::240462142849:policy/devops-g10-commission-task]
+aws_lambda_permission.alerts_sns: Destruction complete after 1s
+random_password.db_pos: Destroying... [id=none]
+random_password.db_pos: Destruction complete after 0s
+aws_cloudwatch_event_rule.probe: Destroying... [id=devops-g10-probe]
+aws_codebuild_project.web: Destruction complete after 1s
+aws_db_instance.pg: Destroying... [id=db-7TE3BA4ZMAZ6NATSBQ73WYQNY4]
+aws_iam_policy.pos_task: Destruction complete after 1s
+random_password.db_payments: Destroying... [id=none]
+random_password.db_payments: Destruction complete after 0s
+aws_cloudwatch_log_group.apigw: Destroying... [id=/devops-g10/api-gateway]
+aws_cloudwatch_event_rule.probe: Destruction complete after 0s
+aws_iam_policy.task_common: Destroying... [id=arn:aws:iam::240462142849:policy/devops-g10-task-common]
+aws_cloudwatch_log_group.apigw: Destruction complete after 0s
+random_password.payments_service_token: Destroying... [id=none]
+random_password.payments_service_token: Destruction complete after 0s
+random_password.daraja_callback_path_secret: Destroying... [id=none]
+random_password.daraja_callback_path_secret: Destruction complete after 0s
+random_password.commission_service_token: Destroying... [id=none]
+random_password.commission_service_token: Destruction complete after 0s
+random_password.pos_service_token: Destroying... [id=none]
+random_password.pos_service_token: Destruction complete after 0s
+random_password.daraja_callback_secret: Destroying... [id=none]
+random_password.daraja_callback_secret: Destruction complete after 0s
+module.vpc.aws_route_table.public[0]: Destroying... [id=rtb-021a23ea27b741ebd]
+aws_iam_policy.commission_task: Destruction complete after 0s
+aws_iam_policy.task_exec_secrets: Destroying... [id=arn:aws:iam::240462142849:policy/devops-g10-task-exec-secrets]
+aws_iam_policy.task_common: Destruction complete after 1s
+aws_iam_policy.payments_task: Destroying... [id=arn:aws:iam::240462142849:policy/devops-g10-payments-task]
+module.vpc_endpoints.aws_vpc_endpoint.this["ssm"]: Still destroying... [id=vpce-02faf878e320b3560, 00m10s elapsed]
+aws_iam_policy.task_exec_secrets: Destruction complete after 1s
+aws_ecs_service.commission: Destroying... [id=arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-commission]
+module.vpc.aws_route_table.public[0]: Destruction complete after 1s
+aws_ecs_service.web: Destroying... [id=arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-web]
+aws_iam_policy.payments_task: Destruction complete after 1s
+aws_appautoscaling_target.cpu["payments"]: Destroying... [id=service/devops-g10/devops-g10-payments]
+aws_appautoscaling_target.cpu["payments"]: Destruction complete after 1s
+aws_appautoscaling_target.cpu["pos"]: Destroying... [id=service/devops-g10/devops-g10-pos]
+module.vpc_endpoints.aws_vpc_endpoint.this["secretsmanager"]: Still destroying... [id=vpce-0235d6cb813bd77f2, 00m10s elapsed]
+aws_appautoscaling_target.cpu["pos"]: Destruction complete after 0s
+aws_cloudwatch_log_group.db_migrate: Destroying... [id=/devops-g10/db-migrate]
+aws_cloudwatch_log_group.db_migrate: Destruction complete after 1s
+aws_iam_role.db_migrate_exec: Destroying... [id=devops-g10-db-migrate-exec]
+aws_iam_role.db_migrate_exec: Destruction complete after 1s
+aws_s3_bucket.artifacts: Destroying... [id=devops-g10-artifacts-240462142849]
+module.vpc_endpoints.aws_vpc_endpoint.this["ecr_api"]: Still destroying... [id=vpce-0dce38fa1988b858a, 00m10s elapsed]
+aws_s3_bucket.artifacts: Destruction complete after 1s
+aws_iam_role.vpc_flow: Destroying... [id=devops-g10-vpc-flow-logs]
+module.vpc_endpoints.aws_vpc_endpoint.this["logs"]: Still destroying... [id=vpce-0898000b22171b1db, 00m10s elapsed]
+aws_iam_role.vpc_flow: Destruction complete after 1s
+module.vpc.aws_cloudwatch_log_group.flow_log[0]: Destroying... [id=/aws/vpc-flow-log/vpc-0608a01d03195ac0d]
+module.vpc.aws_cloudwatch_log_group.flow_log[0]: Destruction complete after 0s
+aws_apigatewayv2_integration.alb: Destroying... [id=m3j8x6s]
+aws_apigatewayv2_integration.alb: Destruction complete after 0s
+aws_lambda_function.probe: Destroying... [id=devops-g10-probe]
+module.vpc_endpoints.aws_vpc_endpoint.this["ecr_dkr"]: Still destroying... [id=vpce-0e8c8fc920e215e12, 00m10s elapsed]
+aws_ecs_cluster_capacity_providers.app: Still destroying... [id=devops-g10, 00m10s elapsed]
+aws_lambda_function.probe: Destruction complete after 1s
+aws_db_instance.pg: Still destroying... [id=db-7TE3BA4ZMAZ6NATSBQ73WYQNY4, 00m10s elapsed]
+aws_ecs_cluster_capacity_providers.app: Destruction complete after 13s
+aws_cloudwatch_event_rule.payout_cutoff: Destroying... [id=devops-g10-payout-cutoff]
+aws_lambda_function.payout_cutoff: Destroying... [id=devops-g10-payout-cutoff]
+aws_lambda_function.payout_cutoff: Destruction complete after 1s
+module.vpc_endpoints.aws_vpc_endpoint.this["ssm"]: Still destroying... [id=vpce-02faf878e320b3560, 00m20s elapsed]
+aws_ecs_service.commission: Still destroying... [id=arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-commission, 00m10s elapsed]
+aws_wafv2_web_acl.app: Destroying... [id=c3161d06-8c94-41f8-a55a-404a94326b01]
+aws_cloudwatch_event_rule.payout_cutoff: Destruction complete after 1s
+module.vpc.aws_nat_gateway.this[0]: Destroying... [id=nat-05b1be440be9bfb67]
+aws_ecs_service.web: Still destroying... [id=arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-web, 00m10s elapsed]
+aws_wafv2_web_acl.app: Destruction complete after 1s
+aws_lambda_function.slack_notifier: Destroying... [id=devops-g10-slack-notifier]
+aws_lambda_function.slack_notifier: Destruction complete after 1s
+aws_sns_topic.alerts: Destroying... [id=arn:aws:sns:eu-central-1:240462142849:devops-g10-alerts]
+module.vpc_endpoints.aws_vpc_endpoint.this["secretsmanager"]: Still destroying... [id=vpce-0235d6cb813bd77f2, 00m20s elapsed]
+aws_sns_topic.alerts: Destruction complete after 1s
+aws_iam_role.codebuild: Destroying... [id=devops-g10-codebuild]
+aws_iam_role.codebuild: Destruction complete after 0s
+aws_ecr_repository.service["pos"]: Destroying... [id=devops-g10/pos]
+aws_ecr_repository.service["pos"]: Destruction complete after 1s
+aws_ecr_repository.service["commission"]: Destroying... [id=devops-g10/commission]
+module.vpc_endpoints.aws_vpc_endpoint.this["ecr_api"]: Still destroying... [id=vpce-0dce38fa1988b858a, 00m20s elapsed]
+aws_ecr_repository.service["commission"]: Destruction complete after 0s
+aws_ecr_repository.service["payments"]: Destroying... [id=devops-g10/payments]
+aws_ecr_repository.service["payments"]: Destruction complete after 1s
+aws_ecr_repository.service["web"]: Destroying... [id=devops-g10/web]
+aws_ecr_repository.service["web"]: Destruction complete after 0s
+aws_cloudwatch_log_group.codebuild_web: Destroying... [id=/aws/codebuild/devops-g10-web-build]
+module.vpc_endpoints.aws_vpc_endpoint.this["logs"]: Still destroying... [id=vpce-0898000b22171b1db, 00m20s elapsed]
+aws_cloudwatch_log_group.codebuild_web: Destruction complete after 1s
+aws_s3_bucket.backups: Destroying... [id=devops-g10-backups-240462142849]
+module.vpc_endpoints.aws_vpc_endpoint.this["ecr_dkr"]: Still destroying... [id=vpce-0e8c8fc920e215e12, 00m20s elapsed]
+aws_s3_bucket.backups: Destruction complete after 1s
+aws_secretsmanager_secret.rds_master: Destroying... [id=arn:aws:secretsmanager:eu-central-1:240462142849:secret:devops-g10/db/master-LOAkpy]
+aws_secretsmanager_secret.rds_master: Destruction complete after 1s
+aws_sqs_queue.payments_callbacks: Destroying... [id=https://sqs.eu-central-1.amazonaws.com/240462142849/devops-g10-payments-callbacks]
+aws_db_instance.pg: Still destroying... [id=db-7TE3BA4ZMAZ6NATSBQ73WYQNY4, 00m20s elapsed]
+module.vpc_endpoints.aws_vpc_endpoint.this["ssm"]: Still destroying... [id=vpce-02faf878e320b3560, 00m30s elapsed]
+aws_ecs_service.commission: Still destroying... [id=arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-commission, 00m20s elapsed]
+module.vpc.aws_nat_gateway.this[0]: Still destroying... [id=nat-05b1be440be9bfb67, 00m10s elapsed]
+aws_ecs_service.web: Still destroying... [id=arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-web, 00m20s elapsed]
+module.vpc_endpoints.aws_vpc_endpoint.this["secretsmanager"]: Still destroying... [id=vpce-0235d6cb813bd77f2, 00m30s elapsed]
+aws_sqs_queue.payments_callbacks: Destruction complete after 5s
+aws_secretsmanager_secret.daraja: Destroying... [id=arn:aws:secretsmanager:eu-central-1:240462142849:secret:devops-g10/daraja-s3gGMt]
+aws_secretsmanager_secret.daraja: Destruction complete after 0s
+aws_apigatewayv2_vpc_link.app: Destroying... [id=qd6h34]
+module.vpc_endpoints.aws_vpc_endpoint.this["ecr_api"]: Still destroying... [id=vpce-0dce38fa1988b858a, 00m30s elapsed]
+module.vpc_endpoints.aws_vpc_endpoint.this["logs"]: Still destroying... [id=vpce-0898000b22171b1db, 00m30s elapsed]
+module.vpc_endpoints.aws_vpc_endpoint.this["ecr_dkr"]: Still destroying... [id=vpce-0e8c8fc920e215e12, 00m30s elapsed]
+aws_db_instance.pg: Still destroying... [id=db-7TE3BA4ZMAZ6NATSBQ73WYQNY4, 00m30s elapsed]
+module.vpc_endpoints.aws_vpc_endpoint.this["ssm"]: Still destroying... [id=vpce-02faf878e320b3560, 00m40s elapsed]
+aws_ecs_service.commission: Still destroying... [id=arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-commission, 00m30s elapsed]
+module.vpc.aws_nat_gateway.this[0]: Still destroying... [id=nat-05b1be440be9bfb67, 00m20s elapsed]
+aws_ecs_service.web: Still destroying... [id=arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-web, 00m30s elapsed]
+aws_apigatewayv2_vpc_link.app: Destruction complete after 9s
+module.vpc_endpoints.aws_vpc_endpoint.this["secretsmanager"]: Still destroying... [id=vpce-0235d6cb813bd77f2, 00m40s elapsed]
+aws_iam_role_policy_attachment.probe: Destroying... [id=devops-g10-probe-20260920123539150800000002]
+aws_iam_role_policy_attachment.probe: Destruction complete after 0s
+aws_iam_role_policy_attachment.payout_cutoff: Destroying... [id=devops-g10-payout-cutoff-20260920123540103000000005]
+module.vpc_endpoints.aws_vpc_endpoint.this["ecr_api"]: Still destroying... [id=vpce-0dce38fa1988b858a, 00m40s elapsed]
+aws_iam_role_policy_attachment.payout_cutoff: Destruction complete after 1s
+grafana_dashboard.json["web.json"]: Destroying... [id=0:tillflow-web]
+module.vpc_endpoints.aws_vpc_endpoint.this["logs"]: Still destroying... [id=vpce-0898000b22171b1db, 00m40s elapsed]
+grafana_dashboard.json["web.json"]: Destruction complete after 1s
+grafana_dashboard.json["payments.json"]: Destroying... [id=0:tillflow-payments]
+grafana_dashboard.json["payments.json"]: Destruction complete after 0s
+grafana_dashboard.json["overview.json"]: Destroying... [id=0:tillflow-overview]
+grafana_dashboard.json["overview.json"]: Destruction complete after 0s
+grafana_dashboard.json["commission.json"]: Destroying... [id=0:tillflow-commission]
+module.vpc_endpoints.aws_vpc_endpoint.this["ecr_dkr"]: Still destroying... [id=vpce-0e8c8fc920e215e12, 00m40s elapsed]
+grafana_dashboard.json["commission.json"]: Destruction complete after 0s
+grafana_dashboard.json["pos.json"]: Destroying... [id=0:tillflow-pos]
+grafana_dashboard.json["pos.json"]: Destruction complete after 1s
+aws_iam_role_policy_attachment.slack_notifier: Destroying... [id=devops-g10-slack-notifier-20260920123540023500000004]
+aws_iam_role_policy_attachment.slack_notifier: Destruction complete after 0s
+aws_kms_key.alerts: Destroying... [id=f61a3868-7a04-43f1-af04-ea3506464013]
+aws_kms_key.alerts: Destruction complete after 1s
+aws_sqs_queue.payments_callbacks_dlq: Destroying... [id=https://sqs.eu-central-1.amazonaws.com/240462142849/devops-g10-payments-callbacks-dlq]
+aws_db_instance.pg: Still destroying... [id=db-7TE3BA4ZMAZ6NATSBQ73WYQNY4, 00m40s elapsed]
+module.vpc_endpoints.aws_vpc_endpoint.this["ssm"]: Still destroying... [id=vpce-02faf878e320b3560, 00m50s elapsed]
+aws_ecs_service.commission: Still destroying... [id=arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-commission, 00m40s elapsed]
+module.vpc.aws_nat_gateway.this[0]: Still destroying... [id=nat-05b1be440be9bfb67, 00m30s elapsed]
+aws_ecs_service.web: Still destroying... [id=arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-web, 00m40s elapsed]
+module.vpc_endpoints.aws_vpc_endpoint.this["secretsmanager"]: Still destroying... [id=vpce-0235d6cb813bd77f2, 00m50s elapsed]
+aws_sqs_queue.payments_callbacks_dlq: Destruction complete after 5s
+aws_security_group.vpclink: Destroying... [id=sg-08be70a5a27e8ec81]
+aws_security_group.vpclink: Destruction complete after 1s
+aws_iam_role.probe: Destroying... [id=devops-g10-probe]
+module.vpc_endpoints.aws_vpc_endpoint.this["ecr_api"]: Still destroying... [id=vpce-0dce38fa1988b858a, 00m50s elapsed]
+aws_iam_role.probe: Destruction complete after 1s
+aws_iam_policy.probe: Destroying... [id=arn:aws:iam::240462142849:policy/devops-g10-probe]
+module.vpc_endpoints.aws_vpc_endpoint.this["logs"]: Still destroying... [id=vpce-0898000b22171b1db, 00m50s elapsed]
+aws_iam_policy.probe: Destruction complete after 0s
+aws_iam_policy.payout_cutoff: Destroying... [id=arn:aws:iam::240462142849:policy/devops-g10-payout-cutoff]
+aws_iam_policy.payout_cutoff: Destruction complete after 1s
+aws_iam_role.payout_cutoff: Destroying... [id=devops-g10-payout-cutoff]
+module.vpc_endpoints.aws_vpc_endpoint.this["ecr_dkr"]: Still destroying... [id=vpce-0e8c8fc920e215e12, 00m50s elapsed]
+aws_iam_role.payout_cutoff: Destruction complete after 1s
+grafana_folder.tillflow: Destroying... [id=0:tillflow]
+grafana_folder.tillflow: Destruction complete after 0s
+aws_iam_role.slack_notifier: Destroying... [id=devops-g10-slack-notifier]
+aws_iam_role.slack_notifier: Destruction complete after 1s
+aws_iam_policy.slack_notifier: Destroying... [id=arn:aws:iam::240462142849:policy/devops-g10-slack-notifier]
+aws_iam_policy.slack_notifier: Destruction complete after 1s
+aws_cloudwatch_log_group.probe: Destroying... [id=/aws/lambda/devops-g10-probe]
+aws_db_instance.pg: Still destroying... [id=db-7TE3BA4ZMAZ6NATSBQ73WYQNY4, 00m50s elapsed]
+aws_cloudwatch_log_group.probe: Destruction complete after 0s
+aws_cloudwatch_log_group.payout_cutoff: Destroying... [id=/aws/lambda/devops-g10-payout-cutoff]
+aws_cloudwatch_log_group.payout_cutoff: Destruction complete after 1s
+aws_grafana_workspace_service_account_token.terraform: Destroying... [id=g-ede3f6a694,2,1]
+module.vpc_endpoints.aws_vpc_endpoint.this["ssm"]: Still destroying... [id=vpce-02faf878e320b3560, 01m00s elapsed]
+aws_ecs_service.commission: Still destroying... [id=arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-commission, 00m50s elapsed]
+module.vpc.aws_nat_gateway.this[0]: Still destroying... [id=nat-05b1be440be9bfb67, 00m40s elapsed]
+aws_ecs_service.web: Still destroying... [id=arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-web, 00m50s elapsed]
+aws_grafana_workspace_service_account_token.terraform: Destruction complete after 1s
+aws_secretsmanager_secret.slack: Destroying... [id=arn:aws:secretsmanager:eu-central-1:240462142849:secret:devops-g10/slack-webhook-NR4QlQ]
+aws_secretsmanager_secret.slack: Destruction complete after 0s
+aws_cloudwatch_log_group.slack_notifier: Destroying... [id=/aws/lambda/devops-g10-slack-notifier]
+aws_cloudwatch_log_group.slack_notifier: Destruction complete after 0s
+aws_grafana_workspace_service_account.terraform: Destroying... [id=g-ede3f6a694,2]
+aws_grafana_workspace_service_account.terraform: Destruction complete after 1s
+aws_grafana_workspace.amg: Destroying... [id=g-ede3f6a694]
+module.vpc_endpoints.aws_vpc_endpoint.this["secretsmanager"]: Still destroying... [id=vpce-0235d6cb813bd77f2, 01m00s elapsed]
+module.vpc_endpoints.aws_vpc_endpoint.this["ecr_api"]: Still destroying... [id=vpce-0dce38fa1988b858a, 01m00s elapsed]
+module.vpc_endpoints.aws_vpc_endpoint.this["logs"]: Still destroying... [id=vpce-0898000b22171b1db, 01m00s elapsed]
+module.vpc_endpoints.aws_vpc_endpoint.this["ecr_dkr"]: Still destroying... [id=vpce-0e8c8fc920e215e12, 01m00s elapsed]
+aws_db_instance.pg: Still destroying... [id=db-7TE3BA4ZMAZ6NATSBQ73WYQNY4, 01m00s elapsed]
+module.vpc_endpoints.aws_vpc_endpoint.this["ssm"]: Still destroying... [id=vpce-02faf878e320b3560, 01m10s elapsed]
+aws_ecs_service.commission: Still destroying... [id=arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-commission, 01m00s elapsed]
+module.vpc.aws_nat_gateway.this[0]: Still destroying... [id=nat-05b1be440be9bfb67, 00m50s elapsed]
+aws_ecs_service.web: Still destroying... [id=arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-web, 01m00s elapsed]
+module.vpc_endpoints.aws_vpc_endpoint.this["secretsmanager"]: Still destroying... [id=vpce-0235d6cb813bd77f2, 01m10s elapsed]
+module.vpc_endpoints.aws_vpc_endpoint.this["ecr_api"]: Still destroying... [id=vpce-0dce38fa1988b858a, 01m10s elapsed]
+module.vpc_endpoints.aws_vpc_endpoint.this["logs"]: Still destroying... [id=vpce-0898000b22171b1db, 01m10s elapsed]
+module.vpc_endpoints.aws_vpc_endpoint.this["ecr_dkr"]: Still destroying... [id=vpce-0e8c8fc920e215e12, 01m10s elapsed]
+aws_db_instance.pg: Still destroying... [id=db-7TE3BA4ZMAZ6NATSBQ73WYQNY4, 01m10s elapsed]
+module.vpc_endpoints.aws_vpc_endpoint.this["ssm"]: Still destroying... [id=vpce-02faf878e320b3560, 01m20s elapsed]
+aws_ecs_service.commission: Still destroying... [id=arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-commission, 01m10s elapsed]
+module.vpc.aws_nat_gateway.this[0]: Still destroying... [id=nat-05b1be440be9bfb67, 01m00s elapsed]
+aws_ecs_service.web: Still destroying... [id=arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-web, 01m10s elapsed]
+module.vpc_endpoints.aws_vpc_endpoint.this["secretsmanager"]: Still destroying... [id=vpce-0235d6cb813bd77f2, 01m20s elapsed]
+module.vpc.aws_nat_gateway.this[0]: Destruction complete after 1m2s
+module.vpc.aws_eip.nat[0]: Destroying... [id=eipalloc-0d66e7c17124d5409]
+module.vpc.aws_subnet.public[0]: Destroying... [id=subnet-02b8ec6b4d4aa0c69]
+module.vpc_endpoints.aws_vpc_endpoint.this["ecr_api"]: Still destroying... [id=vpce-0dce38fa1988b858a, 01m20s elapsed]
+module.vpc.aws_subnet.public[0]: Destruction complete after 0s
+module.vpc.aws_subnet.public[1]: Destroying... [id=subnet-0071919afe6ebce85]
+module.vpc.aws_eip.nat[0]: Destruction complete after 1s
+module.vpc.aws_internet_gateway.this[0]: Destroying... [id=igw-0dad1ea7bd38c8c28]
+module.vpc.aws_subnet.public[1]: Destruction complete after 1s
+module.vpc_endpoints.aws_vpc_endpoint.this["logs"]: Still destroying... [id=vpce-0898000b22171b1db, 01m20s elapsed]
+module.vpc.aws_internet_gateway.this[0]: Destruction complete after 1s
+module.vpc_endpoints.aws_vpc_endpoint.this["ecr_dkr"]: Still destroying... [id=vpce-0e8c8fc920e215e12, 01m20s elapsed]
+aws_db_instance.pg: Still destroying... [id=db-7TE3BA4ZMAZ6NATSBQ73WYQNY4, 01m20s elapsed]
+module.vpc_endpoints.aws_vpc_endpoint.this["ssm"]: Still destroying... [id=vpce-02faf878e320b3560, 01m30s elapsed]
+aws_ecs_service.commission: Still destroying... [id=arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-commission, 01m20s elapsed]
+aws_ecs_service.web: Still destroying... [id=arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-web, 01m20s elapsed]
+module.vpc_endpoints.aws_vpc_endpoint.this["secretsmanager"]: Still destroying... [id=vpce-0235d6cb813bd77f2, 01m30s elapsed]
+module.vpc_endpoints.aws_vpc_endpoint.this["ecr_api"]: Still destroying... [id=vpce-0dce38fa1988b858a, 01m30s elapsed]
+module.vpc_endpoints.aws_vpc_endpoint.this["logs"]: Still destroying... [id=vpce-0898000b22171b1db, 01m30s elapsed]
+module.vpc_endpoints.aws_vpc_endpoint.this["ecr_dkr"]: Still destroying... [id=vpce-0e8c8fc920e215e12, 01m30s elapsed]
+aws_db_instance.pg: Still destroying... [id=db-7TE3BA4ZMAZ6NATSBQ73WYQNY4, 01m30s elapsed]
+module.vpc_endpoints.aws_vpc_endpoint.this["ssm"]: Still destroying... [id=vpce-02faf878e320b3560, 01m40s elapsed]
+aws_ecs_service.commission: Still destroying... [id=arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-commission, 01m30s elapsed]
+aws_ecs_service.web: Still destroying... [id=arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-web, 01m30s elapsed]
+module.vpc_endpoints.aws_vpc_endpoint.this["secretsmanager"]: Still destroying... [id=vpce-0235d6cb813bd77f2, 01m40s elapsed]
+module.vpc_endpoints.aws_vpc_endpoint.this["ecr_api"]: Still destroying... [id=vpce-0dce38fa1988b858a, 01m40s elapsed]
+module.vpc_endpoints.aws_vpc_endpoint.this["logs"]: Still destroying... [id=vpce-0898000b22171b1db, 01m40s elapsed]
+module.vpc_endpoints.aws_vpc_endpoint.this["ecr_dkr"]: Still destroying... [id=vpce-0e8c8fc920e215e12, 01m40s elapsed]
+aws_db_instance.pg: Still destroying... [id=db-7TE3BA4ZMAZ6NATSBQ73WYQNY4, 01m40s elapsed]
+module.vpc_endpoints.aws_vpc_endpoint.this["ssm"]: Still destroying... [id=vpce-02faf878e320b3560, 01m50s elapsed]
+aws_ecs_service.commission: Still destroying... [id=arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-commission, 01m40s elapsed]
+aws_ecs_service.web: Still destroying... [id=arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-web, 01m40s elapsed]
+module.vpc_endpoints.aws_vpc_endpoint.this["secretsmanager"]: Still destroying... [id=vpce-0235d6cb813bd77f2, 01m50s elapsed]
+module.vpc_endpoints.aws_vpc_endpoint.this["ecr_api"]: Still destroying... [id=vpce-0dce38fa1988b858a, 01m50s elapsed]
+module.vpc_endpoints.aws_vpc_endpoint.this["logs"]: Still destroying... [id=vpce-0898000b22171b1db, 01m50s elapsed]
+module.vpc_endpoints.aws_vpc_endpoint.this["ecr_dkr"]: Still destroying... [id=vpce-0e8c8fc920e215e12, 01m50s elapsed]
+aws_db_instance.pg: Still destroying... [id=db-7TE3BA4ZMAZ6NATSBQ73WYQNY4, 01m50s elapsed]
+module.vpc_endpoints.aws_vpc_endpoint.this["ssm"]: Still destroying... [id=vpce-02faf878e320b3560, 02m00s elapsed]
+aws_ecs_service.commission: Still destroying... [id=arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-commission, 01m50s elapsed]
+aws_ecs_service.web: Still destroying... [id=arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-web, 01m50s elapsed]
+module.vpc_endpoints.aws_vpc_endpoint.this["secretsmanager"]: Still destroying... [id=vpce-0235d6cb813bd77f2, 02m00s elapsed]
+module.vpc_endpoints.aws_vpc_endpoint.this["ecr_api"]: Still destroying... [id=vpce-0dce38fa1988b858a, 02m00s elapsed]
+module.vpc_endpoints.aws_vpc_endpoint.this["logs"]: Still destroying... [id=vpce-0898000b22171b1db, 02m00s elapsed]
+module.vpc_endpoints.aws_vpc_endpoint.this["ecr_dkr"]: Still destroying... [id=vpce-0e8c8fc920e215e12, 02m00s elapsed]
+module.vpc_endpoints.aws_vpc_endpoint.this["logs"]: Destruction complete after 2m4s
+aws_db_instance.pg: Still destroying... [id=db-7TE3BA4ZMAZ6NATSBQ73WYQNY4, 02m00s elapsed]
+module.vpc_endpoints.aws_vpc_endpoint.this["ssm"]: Still destroying... [id=vpce-02faf878e320b3560, 02m10s elapsed]
+aws_ecs_service.commission: Still destroying... [id=arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-commission, 02m00s elapsed]
+aws_ecs_service.web: Still destroying... [id=arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-web, 02m00s elapsed]
+module.vpc_endpoints.aws_vpc_endpoint.this["secretsmanager"]: Still destroying... [id=vpce-0235d6cb813bd77f2, 02m10s elapsed]
+module.vpc_endpoints.aws_vpc_endpoint.this["ecr_dkr"]: Destruction complete after 2m6s
+module.vpc_endpoints.aws_vpc_endpoint.this["ssm"]: Destruction complete after 2m14s
+module.vpc_endpoints.aws_vpc_endpoint.this["ecr_api"]: Still destroying... [id=vpce-0dce38fa1988b858a, 02m10s elapsed]
+aws_db_instance.pg: Still destroying... [id=db-7TE3BA4ZMAZ6NATSBQ73WYQNY4, 02m10s elapsed]
+aws_ecs_service.commission: Still destroying... [id=arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-commission, 02m10s elapsed]
+aws_ecs_service.web: Still destroying... [id=arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-web, 02m10s elapsed]
+module.vpc_endpoints.aws_vpc_endpoint.this["secretsmanager"]: Still destroying... [id=vpce-0235d6cb813bd77f2, 02m20s elapsed]
+module.vpc_endpoints.aws_vpc_endpoint.this["ecr_api"]: Still destroying... [id=vpce-0dce38fa1988b858a, 02m20s elapsed]
+aws_db_instance.pg: Still destroying... [id=db-7TE3BA4ZMAZ6NATSBQ73WYQNY4, 02m20s elapsed]
+aws_ecs_service.commission: Still destroying... [id=arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-commission, 02m20s elapsed]
+aws_ecs_service.web: Still destroying... [id=arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-web, 02m20s elapsed]
+module.vpc_endpoints.aws_vpc_endpoint.this["secretsmanager"]: Still destroying... [id=vpce-0235d6cb813bd77f2, 02m30s elapsed]
+module.vpc_endpoints.aws_vpc_endpoint.this["ecr_api"]: Still destroying... [id=vpce-0dce38fa1988b858a, 02m30s elapsed]
+aws_ecs_service.commission: Destruction complete after 2m25s
+aws_sqs_queue_policy.commission_close: Destroying... [id=https://sqs.eu-central-1.amazonaws.com/240462142849/devops-g10-commission-close]
+aws_ecs_task_definition.commission: Destroying... [id=devops-g10-commission]
+aws_ecs_service.payments: Destroying... [id=arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-payments]
+aws_ecs_task_definition.commission: Destruction complete after 0s
+aws_cloudwatch_log_group.commission: Destroying... [id=/devops-g10/commission]
+aws_cloudwatch_log_group.adot_commission: Destroying... [id=/devops-g10/adot/commission]
+aws_cloudwatch_log_group.commission: Destruction complete after 1s
+aws_cloudwatch_log_group.adot_commission: Destruction complete after 1s
+module.vpc_endpoints.aws_vpc_endpoint.this["ecr_api"]: Destruction complete after 2m34s
+aws_db_instance.pg: Still destroying... [id=db-7TE3BA4ZMAZ6NATSBQ73WYQNY4, 02m30s elapsed]
+aws_ecs_service.web: Still destroying... [id=arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-web, 02m30s elapsed]
+module.vpc_endpoints.aws_vpc_endpoint.this["secretsmanager"]: Still destroying... [id=vpce-0235d6cb813bd77f2, 02m40s elapsed]
+module.vpc_endpoints.aws_vpc_endpoint.this["secretsmanager"]: Destruction complete after 2m44s
+module.vpc.aws_route_table.private[0]: Destroying... [id=rtb-020132f05decd0323]
+aws_security_group.vpc_endpoints: Destroying... [id=sg-0c0cc2e57426ea5c1]
+aws_sqs_queue_policy.commission_close: Still destroying... [id=https://sqs.eu-central-1.amazonaws.com/240462142849/devops-g10-commission-close, 00m10s elapsed]
+aws_ecs_service.payments: Still destroying... [id=arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-payments, 00m10s elapsed]
+aws_security_group.vpc_endpoints: Destruction complete after 1s
+module.vpc.aws_route_table.private[0]: Destruction complete after 2s
+aws_db_instance.pg: Still destroying... [id=db-7TE3BA4ZMAZ6NATSBQ73WYQNY4, 02m40s elapsed]
+aws_ecs_service.web: Still destroying... [id=arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-web, 02m40s elapsed]
+aws_ecs_service.payments: Still destroying... [id=arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-payments, 00m20s elapsed]
+aws_sqs_queue_policy.commission_close: Still destroying... [id=https://sqs.eu-central-1.amazonaws.com/240462142849/devops-g10-commission-close, 00m20s elapsed]
+aws_db_instance.pg: Still destroying... [id=db-7TE3BA4ZMAZ6NATSBQ73WYQNY4, 02m50s elapsed]
+aws_ecs_service.web: Still destroying... [id=arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-web, 02m50s elapsed]
+aws_sqs_queue_policy.commission_close: Destruction complete after 27s
+aws_cloudwatch_event_rule.commission_daily: Destroying... [id=devops-g10-commission-daily-close]
+aws_ecs_service.payments: Still destroying... [id=arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-payments, 00m30s elapsed]
+aws_cloudwatch_event_rule.commission_daily: Destruction complete after 1s
+aws_db_instance.pg: Still destroying... [id=db-7TE3BA4ZMAZ6NATSBQ73WYQNY4, 03m00s elapsed]
+aws_ecs_service.web: Still destroying... [id=arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-web, 03m00s elapsed]
+aws_ecs_service.payments: Still destroying... [id=arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-payments, 00m40s elapsed]
+aws_db_instance.pg: Still destroying... [id=db-7TE3BA4ZMAZ6NATSBQ73WYQNY4, 03m10s elapsed]
+aws_ecs_service.web: Still destroying... [id=arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-web, 03m10s elapsed]
+aws_ecs_service.payments: Still destroying... [id=arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-payments, 00m50s elapsed]
+aws_db_instance.pg: Still destroying... [id=db-7TE3BA4ZMAZ6NATSBQ73WYQNY4, 03m20s elapsed]
+aws_ecs_service.web: Still destroying... [id=arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-web, 03m20s elapsed]
+aws_ecs_service.payments: Still destroying... [id=arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-payments, 01m00s elapsed]
+aws_ecs_service.web: Destruction complete after 3m28s
+aws_db_instance.pg: Still destroying... [id=db-7TE3BA4ZMAZ6NATSBQ73WYQNY4, 03m30s elapsed]
+aws_ecs_task_definition.web: Destroying... [id=devops-g10-web]
+aws_lb_target_group.web: Destroying... [id=arn:aws:elasticloadbalancing:eu-central-1:240462142849:targetgroup/devops-g10-web-tg/b9fa0d6c6a7f47e0]
+aws_ecs_task_definition.web: Destruction complete after 0s
+aws_cloudwatch_log_group.web: Destroying... [id=/devops-g10/web]
+aws_cloudwatch_log_group.adot_web: Destroying... [id=/devops-g10/adot/web]
+aws_lb_target_group.web: Destruction complete after 1s
+aws_cloudwatch_log_group.adot_web: Destruction complete after 1s
+aws_cloudwatch_log_group.web: Destruction complete after 1s
+aws_ecs_service.payments: Still destroying... [id=arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-payments, 01m10s elapsed]
+aws_db_instance.pg: Still destroying... [id=db-7TE3BA4ZMAZ6NATSBQ73WYQNY4, 03m40s elapsed]
+aws_ecs_service.payments: Still destroying... [id=arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-payments, 01m20s elapsed]
+aws_db_instance.pg: Still destroying... [id=db-7TE3BA4ZMAZ6NATSBQ73WYQNY4, 03m50s elapsed]
+aws_ecs_service.payments: Still destroying... [id=arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-payments, 01m30s elapsed]
+aws_db_instance.pg: Still destroying... [id=db-7TE3BA4ZMAZ6NATSBQ73WYQNY4, 04m00s elapsed]
+aws_ecs_service.payments: Still destroying... [id=arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-payments, 01m40s elapsed]
+aws_db_instance.pg: Still destroying... [id=db-7TE3BA4ZMAZ6NATSBQ73WYQNY4, 04m10s elapsed]
+aws_ecs_service.payments: Still destroying... [id=arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-payments, 01m50s elapsed]
+aws_db_instance.pg: Still destroying... [id=db-7TE3BA4ZMAZ6NATSBQ73WYQNY4, 04m20s elapsed]
+aws_ecs_service.payments: Still destroying... [id=arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-payments, 02m00s elapsed]
+aws_db_instance.pg: Still destroying... [id=db-7TE3BA4ZMAZ6NATSBQ73WYQNY4, 04m30s elapsed]
+aws_ecs_service.payments: Still destroying... [id=arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-payments, 02m10s elapsed]
+aws_db_instance.pg: Still destroying... [id=db-7TE3BA4ZMAZ6NATSBQ73WYQNY4, 04m40s elapsed]
+aws_ecs_service.payments: Still destroying... [id=arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-payments, 02m20s elapsed]
+aws_db_instance.pg: Still destroying... [id=db-7TE3BA4ZMAZ6NATSBQ73WYQNY4, 04m50s elapsed]
+aws_ecs_service.payments: Still destroying... [id=arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-payments, 02m30s elapsed]
+aws_db_instance.pg: Still destroying... [id=db-7TE3BA4ZMAZ6NATSBQ73WYQNY4, 05m00s elapsed]
+aws_ecs_service.payments: Still destroying... [id=arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-payments, 02m40s elapsed]
+aws_db_instance.pg: Still destroying... [id=db-7TE3BA4ZMAZ6NATSBQ73WYQNY4, 05m10s elapsed]
+aws_ecs_service.payments: Still destroying... [id=arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-payments, 02m50s elapsed]
+aws_db_instance.pg: Still destroying... [id=db-7TE3BA4ZMAZ6NATSBQ73WYQNY4, 05m20s elapsed]
+aws_ecs_service.payments: Still destroying... [id=arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-payments, 03m00s elapsed]
+aws_db_instance.pg: Still destroying... [id=db-7TE3BA4ZMAZ6NATSBQ73WYQNY4, 05m30s elapsed]
+aws_ecs_service.payments: Still destroying... [id=arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-payments, 03m10s elapsed]
+aws_db_instance.pg: Still destroying... [id=db-7TE3BA4ZMAZ6NATSBQ73WYQNY4, 05m40s elapsed]
+aws_ecs_service.payments: Still destroying... [id=arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-payments, 03m20s elapsed]
+aws_db_instance.pg: Still destroying... [id=db-7TE3BA4ZMAZ6NATSBQ73WYQNY4, 05m50s elapsed]
+aws_ecs_service.payments: Still destroying... [id=arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-payments, 03m30s elapsed]
+aws_db_instance.pg: Still destroying... [id=db-7TE3BA4ZMAZ6NATSBQ73WYQNY4, 06m00s elapsed]
+aws_ecs_service.payments: Still destroying... [id=arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-payments, 03m40s elapsed]
+aws_db_instance.pg: Still destroying... [id=db-7TE3BA4ZMAZ6NATSBQ73WYQNY4, 06m10s elapsed]
+aws_ecs_service.payments: Still destroying... [id=arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-payments, 03m50s elapsed]
+aws_db_instance.pg: Still destroying... [id=db-7TE3BA4ZMAZ6NATSBQ73WYQNY4, 06m20s elapsed]
+aws_ecs_service.payments: Destruction complete after 3m57s
+aws_lb_listener_rule.payments_callback: Destroying... [id=arn:aws:elasticloadbalancing:eu-central-1:240462142849:listener-rule/app/devops-g10-alb/fbc75d83f8f153af/7f52ae32ff10aed2/fe89444a3a378eb9]
+aws_lb_listener_rule.payments_charges: Destroying... [id=arn:aws:elasticloadbalancing:eu-central-1:240462142849:listener-rule/app/devops-g10-alb/fbc75d83f8f153af/7f52ae32ff10aed2/2dde57ed24ba044c]
+aws_ecs_task_definition.payments: Destroying... [id=devops-g10-payments]
+aws_ecs_service.pos: Destroying... [id=arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-pos]
+aws_ecs_task_definition.payments: Destruction complete after 0s
+aws_cloudwatch_log_group.adot_payments: Destroying... [id=/devops-g10/adot/payments]
+aws_cloudwatch_log_group.payments: Destroying... [id=/devops-g10/payments]
+aws_lb_listener_rule.payments_charges: Destruction complete after 1s
+aws_cloudwatch_log_group.payments: Destruction complete after 1s
+aws_lb_listener_rule.payments_callback: Destruction complete after 1s
+aws_lb_target_group.payments: Destroying... [id=arn:aws:elasticloadbalancing:eu-central-1:240462142849:targetgroup/devops-g10-payments-tg/8a1d77ca29cd30f2]
+aws_cloudwatch_log_group.adot_payments: Destruction complete after 1s
+aws_lb_target_group.payments: Destruction complete after 0s
+aws_db_instance.pg: Still destroying... [id=db-7TE3BA4ZMAZ6NATSBQ73WYQNY4, 06m30s elapsed]
+aws_ecs_service.pos: Still destroying... [id=arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-pos, 00m10s elapsed]
+aws_db_instance.pg: Still destroying... [id=db-7TE3BA4ZMAZ6NATSBQ73WYQNY4, 06m40s elapsed]
+aws_ecs_service.pos: Still destroying... [id=arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-pos, 00m20s elapsed]
+aws_db_instance.pg: Still destroying... [id=db-7TE3BA4ZMAZ6NATSBQ73WYQNY4, 06m50s elapsed]
+aws_ecs_service.pos: Still destroying... [id=arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-pos, 00m30s elapsed]
+aws_db_instance.pg: Still destroying... [id=db-7TE3BA4ZMAZ6NATSBQ73WYQNY4, 07m00s elapsed]
+aws_ecs_service.pos: Still destroying... [id=arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-pos, 00m40s elapsed]
+aws_db_instance.pg: Still destroying... [id=db-7TE3BA4ZMAZ6NATSBQ73WYQNY4, 07m10s elapsed]
+aws_ecs_service.pos: Still destroying... [id=arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-pos, 00m50s elapsed]
+aws_db_instance.pg: Still destroying... [id=db-7TE3BA4ZMAZ6NATSBQ73WYQNY4, 07m20s elapsed]
+aws_ecs_service.pos: Still destroying... [id=arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-pos, 01m00s elapsed]
+aws_db_instance.pg: Still destroying... [id=db-7TE3BA4ZMAZ6NATSBQ73WYQNY4, 07m30s elapsed]
+aws_ecs_service.pos: Still destroying... [id=arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-pos, 01m10s elapsed]
+aws_db_instance.pg: Still destroying... [id=db-7TE3BA4ZMAZ6NATSBQ73WYQNY4, 07m40s elapsed]
+aws_ecs_service.pos: Still destroying... [id=arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-pos, 01m20s elapsed]
+aws_db_instance.pg: Still destroying... [id=db-7TE3BA4ZMAZ6NATSBQ73WYQNY4, 07m50s elapsed]
+aws_ecs_service.pos: Still destroying... [id=arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-pos, 01m30s elapsed]
+aws_db_instance.pg: Still destroying... [id=db-7TE3BA4ZMAZ6NATSBQ73WYQNY4, 08m00s elapsed]
+aws_ecs_service.pos: Still destroying... [id=arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-pos, 01m40s elapsed]
+aws_db_instance.pg: Still destroying... [id=db-7TE3BA4ZMAZ6NATSBQ73WYQNY4, 08m10s elapsed]
+aws_ecs_service.pos: Still destroying... [id=arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-pos, 01m50s elapsed]
+aws_db_instance.pg: Still destroying... [id=db-7TE3BA4ZMAZ6NATSBQ73WYQNY4, 08m20s elapsed]
+aws_ecs_service.pos: Still destroying... [id=arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-pos, 02m00s elapsed]
+aws_db_instance.pg: Still destroying... [id=db-7TE3BA4ZMAZ6NATSBQ73WYQNY4, 08m30s elapsed]
+aws_ecs_service.pos: Still destroying... [id=arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-pos, 02m10s elapsed]
+aws_db_instance.pg: Still destroying... [id=db-7TE3BA4ZMAZ6NATSBQ73WYQNY4, 08m40s elapsed]
+aws_ecs_service.pos: Still destroying... [id=arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-pos, 02m20s elapsed]
+aws_db_instance.pg: Still destroying... [id=db-7TE3BA4ZMAZ6NATSBQ73WYQNY4, 08m50s elapsed]
+aws_db_instance.pg: Destruction complete after 8m56s
+module.vpc.aws_db_subnet_group.database[0]: Destroying... [id=devops-g10-vpc]
+aws_security_group.rds: Destroying... [id=sg-0ece9add76cf20bba]
+aws_db_parameter_group.pg16: Destroying... [id=devops-g10-pg16]
+random_password.rds_master: Destroying... [id=none]
+random_password.rds_master: Destruction complete after 0s
+aws_ecs_service.pos: Still destroying... [id=arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-pos, 02m30s elapsed]
+aws_db_parameter_group.pg16: Destruction complete after 1s
+module.vpc.aws_db_subnet_group.database[0]: Destruction complete after 1s
+module.vpc.aws_subnet.database[0]: Destroying... [id=subnet-09e9a7061b4a519d7]
+module.vpc.aws_subnet.database[1]: Destroying... [id=subnet-08702886f08e85353]
+module.vpc.aws_subnet.database[1]: Destruction complete after 1s
+module.vpc.aws_subnet.database[0]: Destruction complete after 1s
+aws_security_group.rds: Destruction complete after 3s
+aws_ecs_service.pos: Still destroying... [id=arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-pos, 02m40s elapsed]
+aws_ecs_service.pos: Still destroying... [id=arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-pos, 02m50s elapsed]
+aws_ecs_service.pos: Still destroying... [id=arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-pos, 03m00s elapsed]
+aws_ecs_service.pos: Still destroying... [id=arn:aws:ecs:eu-central-1:240462142849:service/devops-g10/devops-g10-pos, 03m10s elapsed]
+aws_ecs_service.pos: Destruction complete after 3m15s
+aws_ecs_cluster.app: Destroying... [id=arn:aws:ecs:eu-central-1:240462142849:cluster/devops-g10]
+aws_security_group.ecs_tasks: Destroying... [id=sg-05cc34784cf1ed3e2]
+aws_lb_listener_rule.pos_sales: Destroying... [id=arn:aws:elasticloadbalancing:eu-central-1:240462142849:listener-rule/app/devops-g10-alb/fbc75d83f8f153af/7f52ae32ff10aed2/fd9c76481e00136c]
+aws_ecs_task_definition.pos: Destroying... [id=devops-g10-pos]
+aws_lb_listener_rule.pos_internal_sales: Destroying... [id=arn:aws:elasticloadbalancing:eu-central-1:240462142849:listener-rule/app/devops-g10-alb/fbc75d83f8f153af/7f52ae32ff10aed2/b4aac71effbcc449]
+aws_ecs_task_definition.pos: Destruction complete after 1s
+aws_cloudwatch_log_group.pos: Destroying... [id=/devops-g10/pos]
+aws_secretsmanager_secret.db_pos: Destroying... [id=arn:aws:secretsmanager:eu-central-1:240462142849:secret:devops-g10/db/pos-c5rCpu]
+aws_iam_role.task_exec["pos"]: Destroying... [id=devops-g10-pos-exec]
+aws_secretsmanager_secret.db_payments: Destroying... [id=arn:aws:secretsmanager:eu-central-1:240462142849:secret:devops-g10/db/payments-CZFAxr]
+aws_secretsmanager_secret.cache_auth: Destroying... [id=arn:aws:secretsmanager:eu-central-1:240462142849:secret:devops-g10/cache/auth-LOAkpy]
+aws_sqs_queue.commission_close: Destroying... [id=https://sqs.eu-central-1.amazonaws.com/240462142849/devops-g10-commission-close]
+aws_ecs_cluster.app: Destruction complete after 1s
+aws_iam_role.task["payments"]: Destroying... [id=devops-g10-payments-task]
+aws_lb_listener_rule.pos_internal_sales: Destruction complete after 1s
+aws_iam_role.task_exec["commission"]: Destroying... [id=devops-g10-commission-exec]
+aws_lb_listener_rule.pos_sales: Destruction complete after 1s
+aws_iam_role.task["commission"]: Destroying... [id=devops-g10-commission-task]
+aws_security_group.ecs_tasks: Destruction complete after 2s
+aws_iam_role.task["web"]: Destroying... [id=devops-g10-web-task]
+aws_secretsmanager_secret.db_payments: Destruction complete after 1s
+aws_apigatewayv2_api.app: Destroying... [id=f9nla14lfh]
+aws_secretsmanager_secret.cache_auth: Destruction complete after 1s
+aws_secretsmanager_secret.db_pos: Destruction complete after 1s
+aws_secretsmanager_secret.service_tokens: Destroying... [id=arn:aws:secretsmanager:eu-central-1:240462142849:secret:devops-g10/service-tokens-UMhS7k]
+aws_elasticache_replication_group.valkey: Destroying... [id=devops-g10-valkey]
+aws_cloudwatch_log_group.pos: Destruction complete after 1s
+aws_iam_role.task_exec["web"]: Destroying... [id=devops-g10-web-exec]
+aws_secretsmanager_secret.service_tokens: Destruction complete after 0s
+aws_iam_role.task["pos"]: Destroying... [id=devops-g10-pos-task]
+aws_iam_role.task_exec["pos"]: Destruction complete after 2s
+aws_iam_role.task_exec["payments"]: Destroying... [id=devops-g10-payments-exec]
+aws_iam_role.task["payments"]: Destruction complete after 2s
+aws_ssm_parameter.adot_config: Destroying... [id=/devops-g10/adot/config]
+aws_iam_role.task["web"]: Destruction complete after 1s
+aws_cloudwatch_log_group.adot_pos: Destroying... [id=/devops-g10/adot/pos]
+aws_iam_role.task_exec["commission"]: Destruction complete after 2s
+aws_lb_target_group.pos: Destroying... [id=arn:aws:elasticloadbalancing:eu-central-1:240462142849:targetgroup/devops-g10-pos-tg/65d6c970e3bd0f07]
+aws_iam_role.task["commission"]: Destruction complete after 2s
+aws_lb_listener.http: Destroying... [id=arn:aws:elasticloadbalancing:eu-central-1:240462142849:listener/app/devops-g10-alb/fbc75d83f8f153af/7f52ae32ff10aed2]
+aws_iam_role.task_exec["web"]: Destruction complete after 1s
+aws_cloudwatch_log_group.adot_pos: Destruction complete after 0s
+aws_lb_target_group.pos: Destruction complete after 0s
+aws_iam_role.task["pos"]: Destruction complete after 1s
+aws_lb_listener.http: Destruction complete after 0s
+aws_lb.app: Destroying... [id=arn:aws:elasticloadbalancing:eu-central-1:240462142849:loadbalancer/app/devops-g10-alb/fbc75d83f8f153af]
+aws_apigatewayv2_api.app: Destruction complete after 1s
+aws_iam_role.task_exec["payments"]: Destruction complete after 1s
+aws_ssm_parameter.adot_config: Destruction complete after 1s
+aws_sqs_queue.commission_close: Destruction complete after 5s
+aws_sqs_queue.commission_close_dlq: Destroying... [id=https://sqs.eu-central-1.amazonaws.com/240462142849/devops-g10-commission-close-dlq]
+aws_sqs_queue.commission_close_dlq: Destruction complete after 5s
+aws_elasticache_replication_group.valkey: Still destroying... [id=devops-g10-valkey, 00m10s elapsed]
+aws_lb.app: Still destroying... [id=arn:aws:elasticloadbalancing:eu-central...er/app/devops-g10-alb/fbc75d83f8f153af, 00m10s elapsed]
+aws_lb.app: Destruction complete after 18s
+aws_elasticache_replication_group.valkey: Still destroying... [id=devops-g10-valkey, 00m20s elapsed]
+aws_s3_bucket_policy.logs: Destroying... [id=devops-g10-logs-240462142849]
+aws_security_group.alb: Destroying... [id=sg-0635ff8540248d2c5]
+aws_security_group.alb: Destruction complete after 1s
+aws_s3_bucket_policy.logs: Destruction complete after 1s
+aws_s3_bucket.logs: Destroying... [id=devops-g10-logs-240462142849]
+aws_s3_bucket.logs: Destruction complete after 8s
+aws_elasticache_replication_group.valkey: Still destroying... [id=devops-g10-valkey, 00m30s elapsed]
+aws_elasticache_replication_group.valkey: Still destroying... [id=devops-g10-valkey, 00m40s elapsed]
+aws_elasticache_replication_group.valkey: Still destroying... [id=devops-g10-valkey, 00m50s elapsed]
+aws_elasticache_replication_group.valkey: Still destroying... [id=devops-g10-valkey, 01m00s elapsed]
+aws_elasticache_replication_group.valkey: Still destroying... [id=devops-g10-valkey, 01m10s elapsed]
+aws_elasticache_replication_group.valkey: Still destroying... [id=devops-g10-valkey, 01m20s elapsed]
+aws_elasticache_replication_group.valkey: Still destroying... [id=devops-g10-valkey, 01m30s elapsed]
+aws_elasticache_replication_group.valkey: Still destroying... [id=devops-g10-valkey, 01m40s elapsed]
+aws_elasticache_replication_group.valkey: Still destroying... [id=devops-g10-valkey, 01m50s elapsed]
+aws_elasticache_replication_group.valkey: Still destroying... [id=devops-g10-valkey, 02m00s elapsed]
+aws_elasticache_replication_group.valkey: Still destroying... [id=devops-g10-valkey, 02m10s elapsed]
+aws_elasticache_replication_group.valkey: Still destroying... [id=devops-g10-valkey, 02m20s elapsed]
+aws_elasticache_replication_group.valkey: Still destroying... [id=devops-g10-valkey, 02m30s elapsed]
+aws_elasticache_replication_group.valkey: Still destroying... [id=devops-g10-valkey, 02m40s elapsed]
+aws_elasticache_replication_group.valkey: Still destroying... [id=devops-g10-valkey, 02m50s elapsed]
+aws_elasticache_replication_group.valkey: Still destroying... [id=devops-g10-valkey, 03m00s elapsed]
+aws_elasticache_replication_group.valkey: Still destroying... [id=devops-g10-valkey, 03m10s elapsed]
+aws_elasticache_replication_group.valkey: Still destroying... [id=devops-g10-valkey, 03m20s elapsed]
+aws_elasticache_replication_group.valkey: Still destroying... [id=devops-g10-valkey, 03m30s elapsed]
+aws_elasticache_replication_group.valkey: Still destroying... [id=devops-g10-valkey, 03m40s elapsed]
+aws_elasticache_replication_group.valkey: Still destroying... [id=devops-g10-valkey, 03m50s elapsed]
+aws_elasticache_replication_group.valkey: Still destroying... [id=devops-g10-valkey, 04m00s elapsed]
+aws_elasticache_replication_group.valkey: Still destroying... [id=devops-g10-valkey, 04m10s elapsed]
+aws_elasticache_replication_group.valkey: Destruction complete after 4m19s
+aws_elasticache_subnet_group.cache: Destroying... [id=devops-g10-cache]
+random_password.cache_auth: Destroying... [id=none]
+aws_security_group.cache: Destroying... [id=sg-09f5f26c6b661d778]
+random_password.cache_auth: Destruction complete after 0s
+aws_elasticache_subnet_group.cache: Destruction complete after 0s
+module.vpc.aws_subnet.private[0]: Destroying... [id=subnet-034c31442d6c6c438]
+module.vpc.aws_subnet.private[1]: Destroying... [id=subnet-0dff0f1bc9e4c8ba1]
+module.vpc.aws_subnet.private[0]: Destruction complete after 2s
+module.vpc.aws_subnet.private[1]: Destruction complete after 2s
+aws_security_group.cache: Destruction complete after 2s
+module.vpc.aws_vpc.this[0]: Destroying... [id=vpc-0608a01d03195ac0d]
+module.vpc.aws_vpc.this[0]: Destruction complete after 1s
+╷
+│ Error: deleting Grafana Workspace (g-ede3f6a694): operation error grafana: DeleteWorkspace, https response error StatusCode: 403, RequestID: 0befa96e-1a05-406e-b77e-3581dc6095ec, AccessDeniedException: Customer does not have permissions to access SSO. Exception: User: arn:aws:sts::240462142849:assumed-role/AWSReservedSSO_DevOpsCohort-g10-eu-central-1_99cdba769bf0b318/yordanostesfayhagos@gmail.com is not authorized to perform: sso:DeleteManagedApplicationInstance with an explicit deny in an identity-based policy, User: arn:aws:sts::240462142849:assumed-role/AWSReservedSSO_DevOpsCohort-g10-eu-central-1_99cdba769bf0b318/yordanostesfayhagos@gmail.com is not authorized to perform: sso:DeleteApplication with an explicit deny in an identity-based policy (Service: AWSSingleSignOn; Status Code: 400; Error Code: AccessDeniedException; Request ID: 86a25735-1ac3-4582-bc3f-987d49b4064c; Proxy: null)
+│ 
+│ 
+╵
+destroy_ended=2026-09-22T22:02:52Z
+STARTED=2026-09-22T21:48:21Z ENDED=2026-09-22T22:02:52Z
