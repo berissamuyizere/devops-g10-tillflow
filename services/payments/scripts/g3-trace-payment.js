@@ -180,18 +180,28 @@ async function main() {
   check('sale is paid', finalSale.status, 'paid');
   check('paid_at set once', Boolean(finalSale.paid_at), true);
 
-  console.log(`7. waiting ${TRACE_WAIT_MS / 1000}s for X-Ray, then exporting`);
-  await new Promise((r) => setTimeout(r, TRACE_WAIT_MS));
-
+  const skipXray = process.env.SKIP_XRAY === '1';
   let trace = { found: false, segments: [] };
-  try {
-    trace = await fetchTrace(traceId);
-  } catch (err) {
-    console.log(`  could not read X-Ray: ${err.message}`);
+  let summary = { services: [], annotations: {} };
+
+  if (skipXray) {
+    console.log('7. SKIP_XRAY=1 — skipping X-Ray wait and export checks');
+  } else {
+    console.log(`7. waiting ${TRACE_WAIT_MS / 1000}s for X-Ray, then exporting`);
+    await new Promise((r) => setTimeout(r, TRACE_WAIT_MS));
+    try {
+      trace = await fetchTrace(traceId);
+    } catch (err) {
+      console.log(`  could not read X-Ray: ${err.message}`);
+    }
+    check('trace found in X-Ray', trace.found, true);
+    summary = summariseTrace(trace.segments);
+    check(
+      'trace covers pos and payments',
+      ['payments', 'pos'].every((s) => summary.services.includes(s)),
+      true
+    );
   }
-  check('trace found in X-Ray', trace.found, true);
-  const summary = summariseTrace(trace.segments);
-  check('trace covers pos and payments', ['payments', 'pos'].every((s) => summary.services.includes(s)), true);
 
   const evidence = {
     captured_at: new Date().toISOString(),
@@ -210,6 +220,7 @@ async function main() {
     trace_annotations: summary.annotations,
     trace_segment_count: trace.segments.length,
     checks: steps,
+    skip_xray: skipXray,
     passed: failures === 0,
   };
 

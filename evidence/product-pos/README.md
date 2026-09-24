@@ -12,6 +12,7 @@ Runtime proof for the POS sale path and commission eligibility.
 | `g3-commission-close-trace.json` | SQS-triggered close with `commission.daily_close` X-Ray trace (G3) |
 | `g4-cache-break.json` | G4 — revoke ECS→Valkey SG; fail-open 200s, `pos_cache_requests_total{result=error}` +8 (113s) |
 | `g4-dlq-recovery.json` | G4 — poison close → DLQ → `devops-g10-commission-dlq` ALARM + Slack → `start-message-move-task` → OK (241s) |
+| `g5-post-rebuild-e2e.json` | G5 — after rebuild: sale → pay (`254700000000`) → signed callback → `paid` on **mww3x8g0k2…** (public edge) |
 
 ## G5 post-rebuild seed
 
@@ -25,6 +26,24 @@ npm run g5:post-rebuild-seed
 ```
 
 Writes `g2-seed.json` (tenant **1111…** + attendant **2222…**). Optional paid sale: `RUN_CLOSE_SEED=1 npm run g5:post-rebuild-seed`.
+
+## G5 post-rebuild paid sale (PR to main)
+
+After seed + Arsema’s Daraja sandbox secret on the new stack:
+
+```bash
+aws sso login --profile g10
+export AWS_PROFILE=g10 AWS_REGION=eu-central-1
+export API_URL=https://mww3x8g0k2.execute-api.eu-central-1.amazonaws.com
+export TENANT_ID=11111111-1111-1111-1111-111111111111
+export ATTENDANT_ID=22222222-2222-2222-2222-222222222222
+TOKENS=$(aws secretsmanager get-secret-value --secret-id devops-g10/service-tokens \
+  --region eu-central-1 --query SecretString --output text)
+export DARAJA_CALLBACK_SECRET=$(echo "$TOKENS" | jq -r .daraja_callback_secret)
+cd services/pos && npm run g5:post-rebuild-e2e
+```
+
+Writes `g5-post-rebuild-e2e.json` (money path only; X-Ray skipped via `SKIP_XRAY=1`). Do not commit secrets.
 
 ## Reproduce close eligibility (G2)
 
