@@ -70,14 +70,20 @@
     "health_at": "2026-09-24T20:38:54Z",
     "version": "13.3.0-35221835068",
     "login_page": "https://grafana.com/auth/sign-in for punywaxwing1700",
-    "datasource_reconfirmed_live": false,
-    "why_not_reconfirmed": "GRAFANA_SA_TOKEN was unset and the browser stopped at Grafana.com sign-in, so this pass did not re-read the CloudWatch datasource JSON.",
+    "datasource_reconfirmed_live": true,
+    "read_at_eat": "2026-09-24 23:50 EAT",
+    "datasource_page": "https://punywaxwing1700.grafana.net/connections/datasources/edit/bfyueib39pipsc",
+    "type": "cloudwatch",
+    "default_region": "eu-central-1",
+    "default_region_note": "The field help text uses us-west-2 only as an example (US West Oregon). The selected value under Default Region is eu-central-1.",
+    "assume_role_arn": "arn:aws:iam::240462142849:role/devops-g10-grafana-cloud",
+    "custom_metrics_namespace": "TillFlow",
     "iam_role": {
       "arn": "arn:aws:iam::240462142849:role/devops-g10-grafana-cloud",
       "created": "2026-09-20T17:24:24+00:00",
       "description": "Grafana Cloud punywaxwing1700 Assume Role for CloudWatch Logs and X-Ray",
       "trust_principal": "arn:aws:iam::008923505280:root",
-      "note": "Role was not recreated by the 22 Sep rebuild. Last captured datasource (g3-grafana-cloud-datasources.json) is type cloudwatch, defaultRegion eu-central-1, authType grafana_assume_role, this role."
+      "note": "Role was not recreated by the 22 Sep rebuild."
     },
     "opened_amg": false
   }
