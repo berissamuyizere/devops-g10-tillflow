@@ -6,7 +6,7 @@
 // You can pass additional config via defineConfig({ vite: { ... }, etc... }) if needed.
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
-const LIVE_API = "https://f9nla14lfh.execute-api.eu-central-1.amazonaws.com";
+const LIVE_API = "https://mww3x8g0k2.execute-api.eu-central-1.amazonaws.com";
 
 export default defineConfig({
   // Skip Nitro so Vite emits dist/client (Vercel static). SPA still

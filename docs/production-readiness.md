@@ -28,7 +28,7 @@ Did **not** flip Daraja. Did **not** overwrite live RDS. Do **not**
 
 | Item | Value |
 |---|---|
-| Public edge | `https://f9nla14lfh.execute-api.eu-central-1.amazonaws.com` |
+| Public edge | `https://mww3x8g0k2.execute-api.eu-central-1.amazonaws.com` |
 | Probe | `devops-g10-probe` every minute on public `/health` and `/` |
 | Pay | `POST /sales/:id/pay` on the Gateway. Never `/internal/*`. |
 | Demo payer | `254700000000` (fake STK + signed callback → sale `paid`) |
